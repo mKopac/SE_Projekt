@@ -1,4 +1,4 @@
-# Internship management system - Sýstém evidencie praxe
+# Internship management system - Systém evidencie praxe
 
 ## Team members
 - Martin Kopáč (Team leader)

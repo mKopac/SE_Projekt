@@ -1,0 +1,4 @@
+Java: JDK 21 (LTS)
+Spring Boot: 3.5.x
+React: 19.x (aktuálne 19.2)
+Node.js (pre React build tooling): Node 22 LTS 

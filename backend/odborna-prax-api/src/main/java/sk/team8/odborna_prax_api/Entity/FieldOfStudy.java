@@ -1,0 +1,68 @@
+package sk.team8.odborna_prax_api.Entity;
+
+import jakarta.persistence.*;
+
+import java.util.List;
+
+@Entity
+@Table(name = "field_of_study")
+public class FieldOfStudy {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "field_of_study_id")
+    private int id;
+
+    @Column(name = "field_of_study_name", nullable = false, length = 45)
+    private String name;
+
+    // Relationships
+    @OneToMany(mappedBy = "fieldOfStudy")
+    private List<User> users;
+
+    // Constructors
+    public FieldOfStudy() {}
+
+    public FieldOfStudy(String name) {
+        this.name = name;
+    }
+
+    public FieldOfStudy(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    // Getters & Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
+    // toString
+    @Override
+    public String toString() {
+        return "FieldOfStudy{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
+}

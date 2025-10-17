@@ -48,6 +48,10 @@ public class User {
 
     // Relationships
     @ManyToOne
+    @JoinColumn(name = "address_id", nullable = false)
+    private Address address;
+
+    @ManyToOne
     @JoinColumn(name = "department_id")
     private Department department;
 
@@ -77,7 +81,7 @@ public class User {
     public User() {}
 
     // Student constructor
-    public User(int id, String firstName, String lastName, String email, String emailAlternate, String phoneNumber, String password, boolean active, Timestamp createdAt, Timestamp updatedAt, boolean passwordNeedsChange, FieldOfStudy fieldOfStudy, Role role, List<Internship> internships, List<InternshipStateChange> internshipStateChanges, List<TimestatementStateChange> timestatementStateChanges) {
+    public User(int id, String firstName, String lastName, String email, String emailAlternate, String phoneNumber, String password, Address address, boolean active, Timestamp createdAt, Timestamp updatedAt, boolean passwordNeedsChange, FieldOfStudy fieldOfStudy, Role role, List<Internship> internships, List<InternshipStateChange> internshipStateChanges, List<TimestatementStateChange> timestatementStateChanges) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -85,6 +89,7 @@ public class User {
         this.emailAlternate = emailAlternate;
         this.phoneNumber = phoneNumber;
         this.password = password;
+        this.address = address;
         this.active = active;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -229,6 +234,14 @@ public class User {
         this.passwordNeedsChange = passwordNeedsChange;
     }
 
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
     public Department getDepartment() {
         return department;
     }
@@ -300,6 +313,7 @@ public class User {
                 ", updatedAt=" + updatedAt +
                 ", adminReferal='" + adminReferal + '\'' +
                 ", passwordNeedsChange=" + passwordNeedsChange +
+                ", address=" + address +
                 ", department=" + department +
                 ", fieldOfStudy=" + fieldOfStudy +
                 ", company=" + company +

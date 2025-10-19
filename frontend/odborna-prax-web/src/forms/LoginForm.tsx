@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import './../css/LoginForm.css';
 
 type Props = {
@@ -83,7 +84,7 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
                 <div className="register-note">
                   Ešte nemáte účet?
                   <br />
-                 <a> Zaregistrujte sa. </a>
+                 <Link to="/register">Zaregistrujte sa.</Link>
                 </div>
                 <button type="submit" className="submit-btn">
                   Prihlásiť

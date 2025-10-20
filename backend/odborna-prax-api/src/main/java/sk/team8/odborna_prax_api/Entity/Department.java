@@ -10,7 +10,7 @@ public class Department {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "department_id") // DÔLEŽITÉ: PK v DB je department_id
+    @Column(name="department_id")
     private int id;
 
     @Column(name = "department_name", nullable = false, length = 45)

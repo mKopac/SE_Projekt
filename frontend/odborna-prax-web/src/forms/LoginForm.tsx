@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import './../css/LoginForm.css';
+import Header from "./Header";
+import Footer from "./Footer";
+import "./../css/LoginForm.css";
 
 type Props = {
   onSubmit?: (email: string, password: string) => void;
@@ -27,18 +29,7 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
 
   return (
     <div className="page-root">
-      <header className="topbar">
-        <div className="topbar-left">Logo</div>
-        <div className="topbar-center">Systém na evidenciu praxe</div>
-        <div className="topbar-right">
-          <a className="faq-link" href="#faq" onClick={(e) => e.preventDefault()}>
-            FAQ?
-          </a>
-          <button className="home-button" onClick={() => alert("Home clicked")}>
-            Home
-          </button>
-        </div>
-      </header>
+      <Header />
 
       <main className="main-content">
         <div className="login-box-outer">
@@ -84,7 +75,7 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
                 <div className="register-note">
                   Ešte nemáte účet?
                   <br />
-                 <Link to="/register">Zaregistrujte sa.</Link>
+                  <Link to="/register">Zaregistrujte sa.</Link>
                 </div>
                 <button type="submit" className="submit-btn">
                   Prihlásiť
@@ -95,7 +86,7 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
         </div>
       </main>
 
-      <footer className="footer">FOOTER</footer>
+      <Footer />
     </div>
   );
 };

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 import "./../css/RegisterForm.css";
 
 export type RegisterFormData = {
@@ -15,8 +17,6 @@ export type RegisterFormData = {
   zip: string;
   consent: boolean;
 };
-
-
 
 type Props = {
   onSubmit?: (formData: RegisterFormData) => void;
@@ -37,25 +37,22 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
     consent: false,
   });
 
-
-
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-) => {
-  const { name, type } = e.target;
-  const value =
-    type === "checkbox"
-      ? (e.target as HTMLInputElement).checked
-      : e.target.value;
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, type } = e.target;
+    const value =
+      type === "checkbox"
+        ? (e.target as HTMLInputElement).checked
+        : e.target.value;
 
-  setFormData((prev) => ({
-    ...prev,
-    [name]: value,
-  }));
-};
-
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,18 +76,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
 
   return (
     <div className="page-root">
-      <header className="topbar">
-        <div className="topbar-left">Logo</div>
-        <div className="topbar-center">Systém na evidenciu praxe</div>
-        <div className="topbar-right">
-          <a className="faq-link" href="#faq" onClick={(e) => e.preventDefault()}>
-            FAQ?
-          </a>
-          <button className="home-button" onClick={() => alert("Home clicked")}>
-            Home
-          </button>
-        </div>
-      </header>
+      <Header />
 
       <main className="main-content">
         <div className="login-box-outer register-outer">
@@ -255,36 +241,39 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                   />
                 </label>
               </div>
+
               {error && <div className="form-error">{error}</div>}
-              
-            <div className="actions-row consent-actions">
+
+              <div className="actions-row consent-actions">
                 <div className="consent-left">
-                    <input
+                  <input
                     type="checkbox"
                     name="consent"
                     checked={formData.consent}
                     onChange={handleChange}
                     id="consent"
-                    />
-                    <label htmlFor="consent">Súhlasím so spracovaním osobných údajov</label>
+                  />
+                  <label htmlFor="consent">
+                    Súhlasím so spracovaním osobných údajov
+                  </label>
                 </div>
 
                 <button type="submit" className="submit-btn">
-                    Odoslať
+                  Odoslať
                 </button>
-                </div>
+              </div>
 
-                <div className="back-link-row">
+              <div className="back-link-row">
                 <Link to="/" className="back-link">
-                    ← Späť na prihlásenie
+                  ← Späť na prihlásenie
                 </Link>
-            </div>
+              </div>
             </form>
           </div>
         </div>
       </main>
 
-      <footer className="footer">FOOTER – užitočné odkazy apod.</footer>
+      <Footer />
     </div>
   );
 };

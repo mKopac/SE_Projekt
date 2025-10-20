@@ -12,7 +12,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id") // DÔLEŽITÉ: PK v DB je user_id
+    @Column(name="user_id")
     private int id;
 
     @Column(name = "first_name", length = 50, nullable = false)

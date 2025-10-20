@@ -1,5 +1,6 @@
 package sk.team8.odborna_prax_api.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -16,6 +17,7 @@ public class Role {
     private String name;
 
     // Relationships
+    @JsonIgnore
     @OneToMany(mappedBy = "role")
     private List<User> users;
 
@@ -54,6 +56,15 @@ public class Role {
 
     public void setUsers(List<User> users) {
         this.users = users;
+    }
+
+
+    public String getRoleName() {
+        return this.name;
+    }
+
+    public void setRoleName(String roleName) {
+        this.name = roleName;
     }
 
     @Override

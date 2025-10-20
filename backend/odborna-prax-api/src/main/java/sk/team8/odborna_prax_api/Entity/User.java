@@ -1,5 +1,6 @@
 package sk.team8.odborna_prax_api.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
@@ -11,6 +12,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id") // DÔLEŽITÉ: PK v DB je user_id
     private int id;
 
     @Column(name = "first_name", length = 50, nullable = false)
@@ -46,37 +48,39 @@ public class User {
     @Column(name = "password_needs_change")
     private boolean passwordNeedsChange;
 
-    // Relationships
+    // ===== RELÁCIE (všetky nechávame NULLable, kým nemáš tabuľky) =====
+
     @ManyToOne
-    @JoinColumn(name = "address_id", nullable = false)
+    @JoinColumn(name = "address_id", nullable = true) // bolo false, nastavujeme na NULLable
     private Address address;
 
     @ManyToOne
-    @JoinColumn(name = "department_id")
+    @JoinColumn(name = "department_id", nullable = true) // NULLable
     private Department department;
 
     @ManyToOne
-    @JoinColumn(name = "field_of_study_id")
+    @JoinColumn(name = "field_of_study_id", nullable = true) // NULLable
     private FieldOfStudy fieldOfStudy;
 
     @ManyToOne
-    @JoinColumn(name = "company_id")
+    @JoinColumn(name = "company_id", nullable = true) // NULLable
     private Company company;
 
     @ManyToOne
-    @JoinColumn(name = "role_id", nullable = false)
+    @JoinColumn(name = "role_id", nullable = false) // rolu potrebujeme
     private Role role;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "student")
     private List<Internship> internships;
 
-
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<InternshipStateChange> internshipStateChanges;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "employee")
     private List<TimestatementStateChange> timestatementStateChanges;
-
 
     public User() {}
 
@@ -138,165 +142,85 @@ public class User {
         this.internshipStateChanges = internshipStateChanges;
     }
 
-    public int getId() {
-        return id;
+
+    @PrePersist
+    protected void onCreate() {
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        if (this.createdAt == null) {
+            this.createdAt = now;
+        }
+        if (this.updatedAt == null) {
+            this.updatedAt = now;
+        }
     }
 
-    public void setId(int id) {
-        this.id = id;
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+    // Gettery/Settery…
 
-    public String getLastName() {
-        return lastName;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getEmailAlternate() {
-        return emailAlternate;
-    }
+    public String getEmailAlternate() { return emailAlternate; }
+    public void setEmailAlternate(String emailAlternate) { this.emailAlternate = emailAlternate; }
 
-    public void setEmailAlternate(String emailAlternate) {
-        this.emailAlternate = emailAlternate;
-    }
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
 
-    public String getPassword() {
-        return password;
-    }
+    public Timestamp getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public Timestamp getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
 
-    public boolean isActive() {
-        return active;
-    }
+    public String getAdminReferal() { return adminReferal; }
+    public void setAdminReferal(String adminReferal) { this.adminReferal = adminReferal; }
 
-    public void setActive(boolean active) {
-        this.active = active;
-    }
+    public boolean isPasswordNeedsChange() { return passwordNeedsChange; }
+    public void setPasswordNeedsChange(boolean passwordNeedsChange) { this.passwordNeedsChange = passwordNeedsChange; }
 
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
+    public Address getAddress() { return address; }
+    public void setAddress(Address address) { this.address = address; }
 
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
+    public Department getDepartment() { return department; }
+    public void setDepartment(Department department) { this.department = department; }
 
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
-    }
+    public FieldOfStudy getFieldOfStudy() { return fieldOfStudy; }
+    public void setFieldOfStudy(FieldOfStudy fieldOfStudy) { this.fieldOfStudy = fieldOfStudy; }
 
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    public Company getCompany() { return company; }
+    public void setCompany(Company company) { this.company = company; }
 
-    public String getAdminReferal() {
-        return adminReferal;
-    }
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
 
-    public void setAdminReferal(String adminReferal) {
-        this.adminReferal = adminReferal;
-    }
+    public List<Internship> getInternships() { return internships; }
+    public void setInternships(List<Internship> internships) { this.internships = internships; }
 
-    public boolean isPasswordNeedsChange() {
-        return passwordNeedsChange;
-    }
+    public List<InternshipStateChange> getInternshipStateChanges() { return internshipStateChanges; }
+    public void setInternshipStateChanges(List<InternshipStateChange> internshipStateChanges) { this.internshipStateChanges = internshipStateChanges; }
 
-    public void setPasswordNeedsChange(boolean passwordNeedsChange) {
-        this.passwordNeedsChange = passwordNeedsChange;
-    }
-
-    public Address getAddress() {
-        return address;
-    }
-
-    public void setAddress(Address address) {
-        this.address = address;
-    }
-
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
-
-    public FieldOfStudy getFieldOfStudy() {
-        return fieldOfStudy;
-    }
-
-    public void setFieldOfStudy(FieldOfStudy fieldOfStudy) {
-        this.fieldOfStudy = fieldOfStudy;
-    }
-
-    public Company getCompany() {
-        return company;
-    }
-
-    public void setCompany(Company company) {
-        this.company = company;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public List<Internship> getInternships() {
-        return internships;
-    }
-
-    public void setInternships(List<Internship> internships) {
-        this.internships = internships;
-    }
-
-    public List<InternshipStateChange> getInternshipStateChanges() {
-        return internshipStateChanges;
-    }
-
-    public void setInternshipStateChanges(List<InternshipStateChange> internshipStateChanges) {
-        this.internshipStateChanges = internshipStateChanges;
-    }
-
-    public List<TimestatementStateChange> getTimestatementStateChanges() {
-        return timestatementStateChanges;
-    }
-
-    public void setTimestatementStateChanges(List<TimestatementStateChange> timestatementStateChanges) {
-        this.timestatementStateChanges = timestatementStateChanges;
-    }
+    public List<TimestatementStateChange> getTimestatementStateChanges() { return timestatementStateChanges; }
+    public void setTimestatementStateChanges(List<TimestatementStateChange> timestatementStateChanges) { this.timestatementStateChanges = timestatementStateChanges; }
 
     @Override
     public String toString() {
@@ -305,22 +229,9 @@ public class User {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
-                ", emailAlternate='" + emailAlternate + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", password='" + password + '\'' +
                 ", active=" + active +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
                 ", adminReferal='" + adminReferal + '\'' +
-                ", passwordNeedsChange=" + passwordNeedsChange +
-                ", address=" + address +
-                ", department=" + department +
-                ", fieldOfStudy=" + fieldOfStudy +
-                ", company=" + company +
-                ", role=" + role +
-                ", internships=" + internships +
-                ", internshipStateChanges=" + internshipStateChanges +
-                ", timestatementStateChanges=" + timestatementStateChanges +
+                ", role=" + (role != null ? role.getName() : null) +
                 '}';
     }
 }

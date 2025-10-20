@@ -10,6 +10,7 @@ public class Department {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="department_id")
     private int id;
 
     @Column(name = "department_name", nullable = false, length = 45)

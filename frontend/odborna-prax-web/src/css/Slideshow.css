@@ -1,0 +1,42 @@
+.slideshow {
+  text-align: center;
+  padding: 2rem;
+  background-color: #f5f5f5;
+}
+
+.slide-box {
+  background-color: #ddd;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.slide-buttons {
+  margin-top: 1rem;
+}
+
+.slide-btn {
+  margin: 0 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #0077cc;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.slide-nav {
+  margin-top: 1.5rem;
+}
+
+.slide-nav button {
+  margin: 0 0.5rem;
+  padding: 0.5rem 1rem;
+}
+
+.slide-info {
+  margin-top: 1rem;
+  font-weight: bold;
+  text-align: center;
+}
+

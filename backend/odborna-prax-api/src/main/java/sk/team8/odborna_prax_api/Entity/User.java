@@ -33,7 +33,7 @@ public class User {
     @Column(name = "password", length = 100, nullable = false)
     private String password;
 
-    @Column(name = "active")
+    @Column(name = "active", columnDefinition = "TINYINT(1)")
     private boolean active;
 
     @Column(name = "created_at", updatable = false)
@@ -45,7 +45,7 @@ public class User {
     @Column(name = "admin_referal", length = 6)
     private String adminReferal;
 
-    @Column(name = "password_needs_change")
+    @Column(name = "password_needs_change", columnDefinition = "TINYINT(1)")
     private boolean passwordNeedsChange;
 
     // ===== RELÁCIE (všetky nechávame NULLable, kým nemáš tabuľky) =====

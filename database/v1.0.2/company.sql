@@ -1,0 +1,1 @@
+ALTER TABLE `company` ADD `company_identification_number` VARCHAR(8) NOT NULL AFTER `company_name`;

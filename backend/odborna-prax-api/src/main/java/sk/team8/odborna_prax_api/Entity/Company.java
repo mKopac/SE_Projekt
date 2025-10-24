@@ -1,6 +1,7 @@
 package sk.team8.odborna_prax_api.Entity;
 
 import jakarta.persistence.*;
+
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -15,6 +16,9 @@ public class Company {
 
     @Column(name = "company_name", nullable = false, length = 45)
     private String name;
+
+    @Column(name = "company_identification_number")
+    private String company_identification_number;
 
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = false)
@@ -32,41 +36,79 @@ public class Company {
     @OneToMany(mappedBy = "company")
     private List<Internship> internships;
 
-    public Company() {}
+    public Company() {
+    }
 
-    public Company(String name, Address address) {
+    public Company(String name, String company_identification_number, Address address) {
         this.name = name;
+        this.company_identification_number = company_identification_number;
         this.address = address;
     }
 
     // Getters & Setters
-    public int getId() { return id; }
+    public int getId() {
+        return id;
+    }
 
-    public void setId(int id) { this.id = id; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
-    public void setName(String name) { this.name = name; }
+    public String getCompany_identification_number() {
+        return company_identification_number;
+    }
 
-    public Address getAddress() { return address; }
+    public void setCompany_identification_number(String company_identification_number) {
+        this.company_identification_number = company_identification_number;
+    }
 
-    public void setAddress(Address address) { this.address = address; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public Timestamp getCreatedAt() { return createdAt; }
+    public Address getAddress() {
+        return address;
+    }
 
-    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
+    public void setAddress(Address address) {
+        this.address = address;
+    }
 
-    public Timestamp getUpdatedAt() { return updatedAt; }
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
 
-    public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
 
-    public List<User> getUsers() { return users; }
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
 
-    public void setUsers(List<User> users) { this.users = users; }
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
-    public List<Internship> getInternships() { return internships; }
+    public List<User> getUsers() {
+        return users;
+    }
 
-    public void setInternships(List<Internship> internships) { this.internships = internships; }
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
+    public List<Internship> getInternships() {
+        return internships;
+    }
+
+    public void setInternships(List<Internship> internships) {
+        this.internships = internships;
+    }
 
     @Override
     public String toString() {

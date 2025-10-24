@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +25,8 @@ public class AuthService {
     }
 
     public String login(String email, String rawPassword) {
-        User user = userRepository.findByEmail(email)
+        String normalizedEmail = email == null ? null : email.trim();
+        User user = userRepository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Nesprávny email alebo heslo"));
 
         if (!user.isActive()) {

@@ -1,22 +1,26 @@
 package sk.team8.odborna_prax_api.controller;
-import sk.team8.odborna_prax_api.service.AuthService;
+
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sk.team8.odborna_prax_api.dto.AdminRegisterRequest;
+import sk.team8.odborna_prax_api.dto.LoginRequest;
 import sk.team8.odborna_prax_api.service.AdminRegistrationService;
+import sk.team8.odborna_prax_api.service.AuthService;
+
 import java.util.Map;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
     private final AdminRegistrationService adminRegistrationService;
+    private final AuthService authService;
 
-    public AuthController(AdminRegistrationService adminRegistrationService) {
+    public AuthController(AdminRegistrationService adminRegistrationService, AuthService authService) {
         this.adminRegistrationService = adminRegistrationService;
+        this.authService = authService;
     }
 
     @PostMapping("/register/admin")
@@ -29,31 +33,20 @@ public class AuthController {
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
         }
-
-
-
-@RestController
-@RequestMapping("/api/auth")
-public class AuthController {
-
-    private final AuthService authService;
-    public AuthController(AuthService authService) { this.authService = authService; }
+    }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest request) {
-        String token = authService.login(request.getEmail(), request.getPassword());
-        return ResponseEntity.ok(Map.of("access_token", token, "token_type", "Bearer"));
-    }
-
-    public static class LoginRequest {
-        private String email;
-        private String password;
-
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        try {
+            String token = authService.login(request.getEmail(), request.getPassword());
+            return ResponseEntity.ok(Map.of(
+                    "access_token", token,
+                    "token_type", "Bearer"
+            ));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Nastala chyba pri prihlasovaní"));
+        }
     }
 }
-    }}

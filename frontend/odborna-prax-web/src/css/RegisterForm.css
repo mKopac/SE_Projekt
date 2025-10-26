@@ -1,0 +1,136 @@
+.login-box-outer.register-outer {
+  box-sizing: border-box;
+  max-width: 650px;
+  width: 100%;
+  overflow: hidden;
+  background-color: #e5e5e5;
+  border: 1px solid #bcbcbc;
+  padding: 0;
+}
+
+.register-box {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 2rem 2rem;
+}
+
+.form-title {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.3rem;
+}
+
+.register-form {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.register-form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.register-form input,
+.register-form select {
+  width: 100%;
+  max-width: 100%;
+  padding: 0.45rem 0.5rem;
+  border: 1px solid #999;
+  border-radius: 4px;
+  margin-top: 0.3rem;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.form-row.two-cols {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-row.two-cols label {
+  margin-bottom: 0;
+}
+
+.register-form .form-error {
+  color: #b10000;
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 0.5rem 0;
+}
+
+/* Register form actions */
+.register-form .actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.register-form .submit-btn {
+  background: #0077cc;
+  color: white;
+  border: none;
+  padding: 0.55rem 1.4rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.register-form .submit-btn:hover {
+  background: #005fa3;
+}
+
+.back-link {
+  color: #0044cc;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.back-link-row {
+  text-align: left;
+  margin-top: 0.5rem;
+}
+
+/* Consent alignment */
+.consent-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.consent-left {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.consent-left input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #0077cc;
+  cursor: pointer;
+  margin: 0;
+}
+
+.consent-left label {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0;
+  font-size: 0.9rem;
+  color: #333;
+  line-height: 1.2;
+  cursor: pointer;
+}

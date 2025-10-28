@@ -14,10 +14,4 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     Optional<User> findByEmail(String email);
 
-    @Query("""
-        SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END
-        FROM User u
-        WHERE u.role.name = 'ADMIN' AND u.adminReferal = :code
-    """)
-    boolean existsAdminByReferral(String code);
 }

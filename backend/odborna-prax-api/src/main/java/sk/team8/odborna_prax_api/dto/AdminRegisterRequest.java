@@ -6,18 +6,16 @@ public class AdminRegisterRequest {
     private String lastName;
     private String email;
     private String password;
-    private String referralCode;
     private String phoneNumber;
 
     public AdminRegisterRequest() {
     }
 
-    public AdminRegisterRequest(String firstName, String lastName, String email, String password, String referralCode, String phoneNumber) {
+    public AdminRegisterRequest(String firstName, String lastName, String email, String password, String phoneNumber) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.referralCode = referralCode;
         this.phoneNumber = phoneNumber;
     }
 
@@ -49,12 +47,6 @@ public class AdminRegisterRequest {
         this.password = password;
     }
 
-    public String getReferralCode() {
-        return referralCode;
-    }
-    public void setReferralCode(String referralCode) {
-        this.referralCode = referralCode;
-    }
 
     public String getPhoneNumber() {
         return phoneNumber;
@@ -69,7 +61,6 @@ public class AdminRegisterRequest {
                 "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
-                ", referralCode='" + referralCode + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 '}';
     }

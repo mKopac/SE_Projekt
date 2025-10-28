@@ -42,9 +42,6 @@ public class User {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    @Column(name = "admin_referal", length = 6)
-    private String adminReferal;
-
     @Column(name = "password_needs_change", columnDefinition = "TINYINT(1)")
     private boolean passwordNeedsChange;
 
@@ -124,7 +121,7 @@ public class User {
     }
 
     // Admin Constructor
-    public User(int id, String firstName, String lastName, String email, String emailAlternate, String phoneNumber, String password, boolean active, Timestamp createdAt, Timestamp updatedAt, String adminReferal, boolean passwordNeedsChange, Department department, Role role, List<InternshipStateChange> internshipStateChanges) {
+    public User(int id, String firstName, String lastName, String email, String emailAlternate, String phoneNumber, String password, boolean active, Timestamp createdAt, Timestamp updatedAt, boolean passwordNeedsChange, Department department, Role role, List<InternshipStateChange> internshipStateChanges) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -135,7 +132,6 @@ public class User {
         this.active = active;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.adminReferal = adminReferal;
         this.passwordNeedsChange = passwordNeedsChange;
         this.department = department;
         this.role = role;
@@ -192,9 +188,6 @@ public class User {
     public Timestamp getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
 
-    public String getAdminReferal() { return adminReferal; }
-    public void setAdminReferal(String adminReferal) { this.adminReferal = adminReferal; }
-
     public boolean isPasswordNeedsChange() { return passwordNeedsChange; }
     public void setPasswordNeedsChange(boolean passwordNeedsChange) { this.passwordNeedsChange = passwordNeedsChange; }
 
@@ -230,7 +223,6 @@ public class User {
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", active=" + active +
-                ", adminReferal='" + adminReferal + '\'' +
                 ", role=" + (role != null ? role.getName() : null) +
                 '}';
     }

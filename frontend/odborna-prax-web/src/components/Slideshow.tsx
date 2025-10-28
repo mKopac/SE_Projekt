@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './../css/Slideshow.css';
+import { manualStrategy, autoStrategy } from './slideStrategies';
+import type { SlideStrategy } from './slideStrategies';
 
 type Slide = {
   title: string;
@@ -39,16 +41,26 @@ const slides: Slide[] = [
   },
 ];
 
+const AUTO_INTERVAL = 5000;
+
 const Slideshow: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const strategy: SlideStrategy = autoStrategy(AUTO_INTERVAL);
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
+    setCurrentSlide((prev) => strategy.next(prev, slides.length));
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    setCurrentSlide((prev) => strategy.prev(prev, slides.length));
   };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => strategy.next(prev, slides.length));
+    }, AUTO_INTERVAL);
+    return () => clearInterval(timer);
+  }, []);
 
   const slide = slides[currentSlide];
 

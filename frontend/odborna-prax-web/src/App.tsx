@@ -4,6 +4,7 @@ import LandingPage from "./pages/LandingPage";
 import LoginForm from "./forms/LoginForm";
 import RegisterForm from "./forms/RegisterForm";
 import DashboardPage from "./pages/DashboardPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 import type { RegisterFormData } from "./forms/RegisterForm";
 
 function App() {
@@ -21,7 +22,15 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginForm onSubmit={handleLogin} />} />
         <Route path="/register" element={<RegisterForm onSubmit={handleRegister} />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
+
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

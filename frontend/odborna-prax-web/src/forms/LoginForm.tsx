@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "./../css/LoginForm.css";
@@ -13,39 +13,43 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  const token = localStorage.getItem("token");
+  if (token) return <Navigate to="/dashboard" replace />;
+
+
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError(null);
+    e.preventDefault();
+    setError(null);
 
-  if (!email) {
-    setError("Zadajte email.");
-    return;
-  }
-  if (!password) {
-    setError("Zadajte heslo.");
-    return;
-  }
-
-  try {
-    const response = await fetch("http://localhost:8080/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      localStorage.setItem("token", data.access_token); // store JWT
-      window.location.href = "/dashboard"; // redirect to dashboard
-    } else {
-      const err = await response.json();
-      setError(err.error || "Prihlásenie zlyhalo.");
+    if (!email) {
+      setError("Zadajte email.");
+      return;
     }
-  } catch (error) {
-    console.error("Chyba pri prihlasovaní:", error);
-    setError("Server momentálne nie je dostupný.");
-  }
-};
+    if (!password) {
+      setError("Zadajte heslo.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:8080/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("token", data.access_token); // store JWT
+        window.location.href = "/dashboard"; // redirect to dashboard
+      } else {
+        const err = await response.json();
+        setError(err.error || "Prihlásenie zlyhalo.");
+      }
+    } catch (error) {
+      console.error("Chyba pri prihlasovaní:", error);
+      setError("Server momentálne nie je dostupný.");
+    }
+  };
 
 
   return (

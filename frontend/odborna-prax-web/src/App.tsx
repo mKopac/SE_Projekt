@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import LoginForm from "./forms/LoginForm";
 import RegisterForm from "./forms/RegisterForm";
-import DashboardPage from "./pages/Dashboardpage";
+import DashboardPage from "./pages/DashboardPage";
 import type { RegisterFormData } from "./forms/RegisterForm";
 
 function App() {

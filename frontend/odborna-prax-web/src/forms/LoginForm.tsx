@@ -13,19 +13,40 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    if (!email) {
-      setError("Zadajte email.");
-      return;
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
+
+  if (!email) {
+    setError("Zadajte email.");
+    return;
+  }
+  if (!password) {
+    setError("Zadajte heslo.");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:8080/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      localStorage.setItem("token", data.access_token); // store JWT
+      window.location.href = "/dashboard"; // redirect to dashboard
+    } else {
+      const err = await response.json();
+      setError(err.error || "Prihlásenie zlyhalo.");
     }
-    if (!password) {
-      setError("Zadajte heslo.");
-      return;
-    }
-    if (onSubmit) onSubmit(email, password);
-  };
+  } catch (error) {
+    console.error("Chyba pri prihlasovaní:", error);
+    setError("Server momentálne nie je dostupný.");
+  }
+};
+
 
   return (
     <div className="page-root">

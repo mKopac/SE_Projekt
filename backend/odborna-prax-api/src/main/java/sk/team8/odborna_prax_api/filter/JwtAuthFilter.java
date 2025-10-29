@@ -12,6 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import sk.team8.odborna_prax_api.Entity.User;
 import sk.team8.odborna_prax_api.dao.UserRepository;
 import sk.team8.odborna_prax_api.service.JwtService;
+import sk.team8.odborna_prax_api.service.AuthService;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -22,10 +23,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final AuthService authService;
 
-    public JwtAuthFilter(JwtService jwtService, UserRepository userRepository) {
+    public JwtAuthFilter(JwtService jwtService, UserRepository userRepository, AuthService authService) {
         this.jwtService = jwtService;
         this.userRepository = userRepository;
+        this.authService = authService;
     }
 
     @Override
@@ -39,7 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (auth != null && auth.startsWith("Bearer ")) {
             String token = auth.substring(7);
             try {
-                if (jwtService.isValid(token)) {
+                if (jwtService.isValid(token) && !authService.isBlacklisted(token)) {
                     String email = jwtService.extractSubject(token);
 
                     if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -61,14 +64,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     SecurityContextHolder.clearContext();
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
-                    response.getWriter().write("{\"error\": \"Invalid or expired token\"}");
+                    response.getWriter().write("{\"error\": \"Invalid, expired, or blacklisted token\"}");
                     return;
                 }
             } catch (Exception e) {
                 SecurityContextHolder.clearContext();
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
-                response.getWriter().write("{\"error\": \"Invalid or expired token\"}");
+                response.getWriter().write("{\"error\": \"Invalid, expired, or blacklisted token\"}");
                 return;
             }
         }

@@ -49,4 +49,16 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Nastala chyba pri prihlasovaní"));
         }
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Missing or invalid Authorization header"));
+        }
+
+        String token = authHeader.substring(7);
+        authService.logout(token);
+        return ResponseEntity.ok(Map.of("message", "Successfully logged out"));
+    }
 }

@@ -1,11 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Check if user is logged in (based on token)
+  useEffect(() => {
+    const token = localStorage.getItem('token'); // or sessionStorage
+    setIsLoggedIn(!!token);
+  }, []);
 
   const handleHomeClick = () => {
     navigate('/');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token'); // clear JWT
+    setIsLoggedIn(false);
+    navigate('/login');
   };
 
   return (
@@ -16,7 +29,17 @@ const Header: React.FC = () => {
         <a className="faq-link" href="#faq" onClick={(e) => e.preventDefault()}>
           FAQ?
         </a>
-        <Link to="/login" className="login-link">Login</Link>
+
+        {isLoggedIn ? (
+          <button className="logout-button" onClick={handleLogout}>
+            Logout
+          </button>
+        ) : (
+          <Link to="/login" className="login-link">
+            Login
+          </Link>
+        )}
+
         <button className="home-button" onClick={handleHomeClick}>
           Home
         </button>

@@ -51,7 +51,23 @@ public class AuthService {
         }
     }
 
+    public String extractEmailFromToken(String token) {
+        return jwtService.extractSubject(token);
+    }
+
+    public Optional<User> findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public boolean isTokenValid(String token) {
+        return jwtService.isValid(token) && !isBlacklisted(token);
+    }
+
+
     public boolean isBlacklisted(String token) {
         return blacklistedTokens.contains(token);
     }
 }
+
+
+

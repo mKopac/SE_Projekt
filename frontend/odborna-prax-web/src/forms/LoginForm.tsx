@@ -27,6 +27,40 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
     if (onSubmit) onSubmit(email, password);
   };
 
+  const handleForgotPassword = async (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (!email) {
+      alert("Najprv zadajte svoj e-mail.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Chcete odoslať odkaz na obnovenie hesla na e-mail: ${email}?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch("http://localhost:8080/auth/request-password-reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        alert("Odkaz na obnovenie hesla bol odoslaný na váš e-mail.");
+      } else {
+        const err = await response.json();
+        alert(err.error || "Nepodarilo sa odoslať odkaz.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Server momentálne nie je dostupný.");
+    }
+  };
+
+
   return (
     <div className="page-root">
       <Header />
@@ -64,7 +98,7 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
               </label>
 
               <div className="small-links">
-                <a href="#forgot" onClick={(e) => e.preventDefault()}>
+                <a href="#forgot" onClick={handleForgotPassword}>
                   Zabudnuté heslo? Zmeňte si ho tu.
                 </a>
               </div>

@@ -16,47 +16,6 @@ html, body {
   color: #333;
 }
 
-/* Topbar */
-.topbar {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #ffffff;
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  box-sizing: border-box;
-}
-
-.topbar-left,
-.topbar-center,
-.topbar-right {
-  display: flex;
-  align-items: center;
-}
-
-.topbar-center {
-  flex-grow: 1;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 1.2rem;
-}
-
-.faq-link {
-  margin-right: 1rem;
-  text-decoration: none;
-  color: #0077cc;
-}
-
-.home-button {
-  background-color: #0077cc;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
 /* Main content – vycentrovaný login box */
 .main-content {
   flex-grow: 1;

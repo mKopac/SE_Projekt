@@ -4,6 +4,7 @@ import LandingPage from "./pages/LandingPage";
 import LoginForm from "./forms/LoginForm";
 import RegisterForm from "./forms/RegisterForm";
 import DashboardPage from "./pages/DashboardPage";
+import ProfilePage from "./pages/ProfilePage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import type { RegisterFormData } from "./forms/RegisterForm";
 
@@ -31,6 +32,15 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+          ></Route>
       </Routes>
     </Router>
   );

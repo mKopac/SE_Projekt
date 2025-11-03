@@ -22,7 +22,6 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginForm onSubmit={handleLogin} />} />
         <Route path="/register" element={<RegisterForm onSubmit={handleRegister} />} />
-
         <Route
           path="/dashboard"
           element={

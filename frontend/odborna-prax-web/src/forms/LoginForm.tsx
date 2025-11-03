@@ -16,7 +16,6 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
   const token = localStorage.getItem("token");
   if (token) return <Navigate to="/dashboard" replace />;
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -39,8 +38,8 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem("token", data.access_token); // store JWT
-        window.location.href = "/dashboard"; // redirect to dashboard
+        localStorage.setItem("token", data.access_token); 
+        window.location.href = "/dashboard"; 
       } else {
         const err = await response.json();
         setError(err.error || "Prihlásenie zlyhalo.");
@@ -48,6 +47,38 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
     } catch (error) {
       console.error("Chyba pri prihlasovaní:", error);
       setError("Server momentálne nie je dostupný.");
+    }
+  };
+  const handleForgotPassword = async (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (!email) {
+      alert("Najprv zadajte svoj e-mail.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Chcete odoslať odkaz na obnovenie hesla na e-mail: ${email}?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch("http://localhost:8080/auth/request-password-reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        alert("Odkaz na obnovenie hesla bol odoslaný na váš e-mail.");
+      } else {
+        const err = await response.json();
+        alert(err.error || "Nepodarilo sa odoslať odkaz.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Server momentálne nie je dostupný.");
     }
   };
 
@@ -89,7 +120,7 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
               </label>
 
               <div className="small-links">
-                <a href="#forgot" onClick={(e) => e.preventDefault()}>
+                <a href="#forgot" onClick={handleForgotPassword}>
                   Zabudnuté heslo? Zmeňte si ho tu.
                 </a>
               </div>

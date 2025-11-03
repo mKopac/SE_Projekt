@@ -5,16 +5,12 @@ import Footer from "../components/Footer";
 import "./../css/RegisterForm.css";
 
 export type RegisterFormData = {
-  accountType: "Študent" | "Firma";
-  firmType: "" | "existujuca" | "nova";
-  firmName?: string;
-  ico?: string;
-  street?: string;
-  studyProgram?: string;
+  accountType: string;
+  studyProgram: string;
   firstName: string;
   lastName: string;
   studentEmail: string;
-  altEmail?: string;
+  altEmail: string;
   phone: string;
   address: string;
   city: string;
@@ -29,10 +25,6 @@ type Props = {
 export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
   const [formData, setFormData] = useState<RegisterFormData>({
     accountType: "Študent",
-    firmType: "existujuca",
-    firmName: "",
-    ico: "",
-    street: "",
     studyProgram: "AI22m",
     firstName: "",
     lastName: "",
@@ -50,13 +42,15 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, type, value } = e.target;
-    const newValue =
-      type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+    const { name, type } = e.target;
+    const value =
+      type === "checkbox"
+        ? (e.target as HTMLInputElement).checked
+        : e.target.value;
 
     setFormData((prev) => ({
       ...prev,
-      [name]: newValue,
+      [name]: value,
     }));
   };
 
@@ -90,37 +84,34 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
             <h2 className="form-title">Registrácia</h2>
 
             <form className="register-form" onSubmit={handleSubmit} noValidate>
-              <div className="form-row">
-                <label>Vyberte si typ účtu</label>
-                <div className="radio-group">
-                  {["Študent", "Firma"].map((type) => (
-                    <label key={type}>
-                      <input
-                        type="radio"
-                        name="accountType"
-                        value={type}
-                        checked={formData.accountType === type}
-                        onChange={handleChange}
-                      />
-                      {type}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {!isFirma && (
-                <div className="form-row">
-                  <label>Vyberte študijný odbor</label>
+              <div className="form-row two-cols">
+                <label>
+                  Vyberte si typ účtu
                   <select
-                    name="studyProgram"
-                    value={formData.studyProgram}
+                    name="accountType"
+                    value={formData.accountType}
                     onChange={handleChange}
                   >
-                    <option>AI22m</option>
-                    <option>AI22b</option>
+                    <option>Študent</option>
+                    <option>Garant</option>
+                    <option>Firma</option>
                   </select>
-                </div>
-              )}
+                </label>
+
+                {!isFirma && (
+                  <label>
+                    Vyberte študijný odbor
+                    <select
+                      name="studyProgram"
+                      value={formData.studyProgram}
+                      onChange={handleChange}
+                    >
+                      <option>AI22m</option>
+                      <option>AI22b</option>
+                    </select>
+                  </label>
+                )}
+              </div>
 
               <div className="form-row two-cols">
                 <label>
@@ -129,6 +120,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleChange}
+                    className="text-input"
                     type="text"
                   />
                 </label>
@@ -138,127 +130,94 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleChange}
+                    className="text-input"
                     type="text"
                   />
                 </label>
               </div>
 
-              {isFirma && (
-                <div className="form-row">
-                  <label>Typ firmy</label>
-                  <div className="radio-group">
-                    <label>
-                      <input
-                        type="radio"
-                        name="firmType"
-                        value="existujuca"
-                        checked={formData.firmType === "existujuca"}
-                        onChange={handleChange}
-                      />
-                      Existujúca firma
-                    </label>
-                    <label>
-                      <input
-                        type="radio"
-                        name="firmType"
-                        value="nova"
-                        checked={formData.firmType === "nova"}
-                        onChange={handleChange}
-                      />
-                      Nová firma
-                    </label>
-                  </div>
-                </div>
-              )}
-
-              {isFirma && formData.firmType === "existujuca" && (
-                <label>
-                  Vyberte firmu
-                  <select
-                    name="firmName"
-                    value={formData.firmName}
-                    onChange={handleChange}
-                  >
-                    <option value="">-- Vyberte --</option>
-                    <option value="Firma A">Firma A</option>
-                    <option value="Firma B">Firma B</option>
-                  </select>
-                </label>
-              )}
-
-              {isFirma && formData.firmType === "nova" && (
+              {isFirma ? (
                 <>
                   <label>
-                    Názov firmy
+                    Firemný email
                     <input
-                      name="firmName"
-                      value={formData.firmName || ""}
+                      name="studentEmail"
+                      value={formData.studentEmail}
                       onChange={handleChange}
+                      className="text-input"
+                      type="email"
+                    />
+                  </label>
+
+                  <label>
+                    Telefón
+                    <input
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="text-input"
+                      type="tel"
+                    />
+                  </label>
+
+                  <label>
+                    Adresa firmy
+                    <input
+                      name="address"
+                      value={formData.address}
+                      onChange={handleChange}
+                      className="text-input"
                       type="text"
                     />
                   </label>
+                </>
+              ) : (
+                <>
                   <label>
-                    IČO
+                    Študentský email
                     <input
-                      name="ico"
-                      value={formData.ico || ""}
+                      name="studentEmail"
+                      value={formData.studentEmail}
                       onChange={handleChange}
-                      type="text"
+                      className="text-input"
+                      type="email"
                     />
                   </label>
+
                   <label>
-                    Ulica
+                    Alternatívny email
                     <input
-                      name="street"
-                      value={formData.street || ""}
+                      name="altEmail"
+                      value={formData.altEmail}
                       onChange={handleChange}
+                      className="text-input"
+                      type="email"
+                    />
+                  </label>
+
+                  <label>
+                    Telefón
+                    <input
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="text-input"
+                      type="tel"
+                    />
+                  </label>
+
+                  <label>
+                    Adresa
+                    <input
+                      name="address"
+                      value={formData.address}
+                      onChange={handleChange}
+                      className="text-input"
                       type="text"
                     />
                   </label>
                 </>
               )}
-
-              <label>
-                Email
-                <input
-                  name="studentEmail"
-                  value={formData.studentEmail}
-                  onChange={handleChange}
-                  type="email"
-                />
-              </label>
-
-              {!isFirma && (
-                <label>
-                  Alternatívny email
-                  <input
-                    name="altEmail"
-                    value={formData.altEmail}
-                    onChange={handleChange}
-                    type="email"
-                  />
-                </label>
-              )}
-
-              <label>
-                Telefón
-                <input
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  type="tel"
-                />
-              </label>
-
-              <label>
-                Adresa
-                <input
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  type="text"
-                />
-              </label>
 
               <div className="form-row two-cols">
                 <label>
@@ -267,6 +226,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                     name="city"
                     value={formData.city}
                     onChange={handleChange}
+                    className="text-input"
                     type="text"
                   />
                 </label>
@@ -276,6 +236,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                     name="zip"
                     value={formData.zip}
                     onChange={handleChange}
+                    className="text-input"
                     type="text"
                   />
                 </label>

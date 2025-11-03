@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, Navigate, useSearchParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "./../css/LoginForm.css";
@@ -8,13 +8,32 @@ type Props = {
   onSubmit?: (email: string, password: string) => void;
 };
 
-export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
+export const LoginForm: React.FC<Props> = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-
+  const [searchParams] = useSearchParams();
+  const [infoMessage, setInfoMessage] = useState<string | null>(null); 
   const token = localStorage.getItem("token");
   if (token) return <Navigate to="/dashboard" replace />;
+  useEffect(() => {                                         
+    const registered = searchParams.get("registered");
+    const verification = searchParams.get("verification");
+
+    if (registered === "success") {
+      setInfoMessage(
+        "Registrácia prebehla úspešne. Potvrdzovací e-mail bol odoslaný."
+      );
+    }
+
+    if (verification === "success") {
+      setInfoMessage("Váš účet bol aktivovaný. Teraz sa môžete prihlásiť.");
+    }
+
+    if (verification === "error") {
+      setInfoMessage("Overovací odkaz je neplatný alebo expiroval.");
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +59,7 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
         const data = await response.json();
         localStorage.setItem("token", data.access_token); 
         window.location.href = "/dashboard"; 
+        
       } else {
         const err = await response.json();
         setError(err.error || "Prihlásenie zlyhalo.");
@@ -93,6 +113,19 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
             <button className="logo-btn" aria-label="Logo tlačidlo">
               Logo?
             </button>
+
+            {infoMessage && (            
+              <div className="form-info">
+                {infoMessage}
+                <button
+                  type="button"
+                  className="form-info-close"
+                  onClick={() => setInfoMessage(null)}
+                >
+                  X
+                </button>
+              </div>
+            )}
 
             <form className="login-form" onSubmit={handleSubmit} noValidate>
               <label className="input-label">

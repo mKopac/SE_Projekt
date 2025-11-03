@@ -3,6 +3,7 @@ package sk.team8.odborna_prax_api.Entity;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 @Entity
@@ -43,9 +44,19 @@ public class Company {
         this.name = name;
         this.company_identification_number = company_identification_number;
         this.address = address;
+
+    }
+    @PrePersist
+    protected void onCreate() {
+        Timestamp now = Timestamp.from(Instant.now());
+        this.createdAt = now;
+        this.updatedAt = now;
     }
 
-    // Getters & Setters
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = Timestamp.from(Instant.now());
+    }
     public int getId() {
         return id;
     }

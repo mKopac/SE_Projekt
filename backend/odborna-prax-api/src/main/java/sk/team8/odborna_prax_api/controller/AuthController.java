@@ -1,5 +1,6 @@
 package sk.team8.odborna_prax_api.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,14 +10,12 @@ import sk.team8.odborna_prax_api.Entity.AuthToken;
 import sk.team8.odborna_prax_api.Entity.TokenType;
 import sk.team8.odborna_prax_api.Entity.User;
 import sk.team8.odborna_prax_api.dao.UserRepository;
-import sk.team8.odborna_prax_api.dto.AdminRegisterRequest;
-import sk.team8.odborna_prax_api.dto.ChangePasswordRequest;
-import sk.team8.odborna_prax_api.dto.LoginRequest;
-import sk.team8.odborna_prax_api.service.AdminRegistrationService;
-import sk.team8.odborna_prax_api.service.AuthService;
-import sk.team8.odborna_prax_api.service.AuthTokenService;
-import sk.team8.odborna_prax_api.service.EmailService;
+import sk.team8.odborna_prax_api.dto.*;
+import sk.team8.odborna_prax_api.service.*;
+import sk.team8.odborna_prax_api.dto.CompanyRegisterRequest;
+import sk.team8.odborna_prax_api.service.CompanyRegistrationService;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -30,6 +29,10 @@ public class AuthController {
     private final EmailService emailService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final StudentRegistrationService studentRegistrationService;
+    private final CompanyRegistrationService companyRegistrationService;
+
+
 
     public AuthController(
             AdminRegistrationService adminRegistrationService,
@@ -37,7 +40,7 @@ public class AuthController {
             AuthTokenService authTokenService,
             EmailService emailService,
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder, StudentRegistrationService studentRegistrationService, CompanyRegistrationService companyRegistrationService
     ) {
         this.adminRegistrationService = adminRegistrationService;
         this.authService = authService;
@@ -45,6 +48,8 @@ public class AuthController {
         this.emailService = emailService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.studentRegistrationService = studentRegistrationService;
+        this.companyRegistrationService = companyRegistrationService;
     }
 
     @PostMapping("/register/admin")
@@ -58,6 +63,14 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
         }
     }
+    @PostMapping("/register/student")
+    public ResponseEntity<?> registerStudent(@RequestBody @Valid StudentRegisterRequest request) {
+        studentRegistrationService.registerStudent(request);
+        return ResponseEntity.ok(
+                Map.of("message", "Registrácia prebehla úspešne. Potvrdzovací e-mail bol odoslaný.")
+        );
+    }
+
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
@@ -86,13 +99,10 @@ public class AuthController {
 
         User user = userOpt.get();
 
-        // vytvor reset token
         AuthToken token = authTokenService.createToken(user, TokenType.PASSWORD_RESET, 1);
 
-        // link do e-mailu
         String link = "http://localhost:5173/reset-password?token=" + token.getToken();
 
-        // pošli e-mail
         emailService.sendEmail(
                 user.getEmail(),
                 "Obnovenie hesla – Odborná prax",
@@ -136,4 +146,36 @@ public class AuthController {
 
         return ResponseEntity.ok(Map.of("message", "Heslo bolo úspešne zmenené."));
     }
+
+    @GetMapping("/verify-email")
+    public void verifyEmail(@RequestParam("token") String token,
+                            HttpServletResponse response) throws IOException {
+
+        var tokenOpt = authTokenService.validateToken(token, TokenType.EMAIL_VERIFICATION);
+
+        if (tokenOpt.isEmpty()) {
+            response.sendRedirect("http://localhost:5173/login?verification=error");
+            return;
+        }
+
+        AuthToken authToken = tokenOpt.get();
+        User user = authToken.getUser();
+
+        user.setActive(true);
+        userRepository.save(user);
+        authTokenService.markTokenAsUsed(authToken);
+
+        response.sendRedirect("http://localhost:5173/login?verification=success");
+    }
+
+
+    @PostMapping("/register/company")
+    public ResponseEntity<?> registerCompany(@Valid @RequestBody CompanyRegisterRequest request) {
+        companyRegistrationService.registerCompany(request);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(Map.of("message", "Registrácia spoločnosti prebehla úspešne. Potvrdzovací e-mail bol odoslaný."));
+    }
+
 }

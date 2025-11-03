@@ -2,14 +2,18 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { http } from "../api/http";
+import { useNavigate } from "react-router-dom";
 import "./../css/RegisterForm.css";
 
 export type RegisterFormData = {
+
   accountType: "Študent" | "Firma";
   firmType: "" | "existujuca" | "nova";
-  firmName?: string;
-  ico?: string;
-  street?: string;
+  companyId?: string;   
+  firmName?: string;    
+  ico?: string;         
+  street?: string;     
   studyProgram?: string;
   firstName: string;
   lastName: string;
@@ -30,6 +34,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
   const [formData, setFormData] = useState<RegisterFormData>({
     accountType: "Študent",
     firmType: "existujuca",
+    companyId:"",
     firmName: "",
     ico: "",
     street: "",
@@ -44,9 +49,9 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
     zip: "",
     consent: false,
   });
-
+  const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
-
+  const [loading, setLoading] = useState(false);
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -60,22 +65,86 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
 
-    if (!formData.firstName || !formData.lastName) {
-      setError("Zadajte meno a priezvisko.");
-      return;
+  // 1) základná validácia
+  if (!formData.firstName || !formData.lastName) {
+    setError("Zadajte meno a priezvisko.");
+    return;
+  }
+
+  if (!formData.studentEmail) {
+    setError("Zadajte e-mail.");
+    return;
+  }
+
+  if (!formData.consent) {
+    setError("Musíte súhlasiť so spracovaním osobných údajov.");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    if (formData.accountType === "Študent") {
+      const payload = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        studentEmail: formData.studentEmail,
+        emailAlternate: formData.altEmail,
+        phoneNumber: formData.phone,
+        address: formData.address,
+        city: formData.city,
+        zip: formData.zip,
+        studyProgram: formData.studyProgram, 
+      };
+
+      await http.post("/auth/register/student", payload);
+
+      
+      navigate("/login?registered=success");
+    } else if (formData.accountType === "Firma") {
+        const payload = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          studentEmail: formData.studentEmail,          
+          emailAlternate: formData.altEmail,
+          phoneNumber: formData.phone,
+
+          firmType: formData.firmType,                
+          companyId:
+            formData.firmType === "existujuca" && formData.companyId
+              ? Number(formData.companyId)
+              : undefined,
+          companyName:
+            formData.firmType === "nova" ? formData.firmName : undefined,
+          companyIdentificationNumber:
+            formData.firmType === "nova" ? formData.ico : undefined,
+
+          // adresa kontaktnej osoby (user)
+          address: formData.address,
+          // adresa firmy – ulica zo sekcie "nová firma"
+          street: formData.street,
+          city: formData.city,
+          zip: formData.zip,
+        };
+
+        await http.post("/auth/register/company", payload);
+        navigate("/login?registered=success");
+      }
+
+    if (onSubmit) {
+      onSubmit(formData);
     }
 
-    if (!formData.consent) {
-      setError("Musíte súhlasiť so spracovaním osobných údajov.");
-      return;
-    }
-
-    if (onSubmit) onSubmit(formData);
-    else alert("Formulár odoslaný!");
+  } catch (err: any) {
+    console.error(err);
+    setError("Registrácia zlyhala. Skontrolujte údaje alebo skúste neskôr.");
+  } finally {
+    setLoading(false);
+  }
   };
 
   const isFirma = formData.accountType === "Firma";
@@ -170,18 +239,13 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                   </div>
                 </div>
               )}
-
               {isFirma && formData.firmType === "existujuca" && (
                 <label>
-                  Vyberte firmu
-                  <select
-                    name="firmName"
-                    value={formData.firmName}
-                    onChange={handleChange}
-                  >
+                Vyberte firmu
+                  <select name="companyId" value={formData.companyId} onChange={handleChange}>
                     <option value="">-- Vyberte --</option>
-                    <option value="Firma A">Firma A</option>
-                    <option value="Firma B">Firma B</option>
+                    <option value="1">Firma A</option>
+                    <option value="2">Firma B</option>
                   </select>
                 </label>
               )}
@@ -297,8 +361,8 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                   </label>
                 </div>
 
-                <button type="submit" className="submit-btn">
-                  Odoslať
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading ? "Odosielam..." : "Odoslať"}
                 </button>
               </div>
 

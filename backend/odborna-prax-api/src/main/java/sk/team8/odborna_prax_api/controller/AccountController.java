@@ -4,10 +4,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import sk.team8.odborna_prax_api.Entity.FieldOfStudy;
 import sk.team8.odborna_prax_api.Entity.User;
 import sk.team8.odborna_prax_api.service.UserService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static java.util.Map.entry;
@@ -64,4 +66,27 @@ public class AccountController {
                     .body(Map.of("error", "Chyba pri aktualizácii profilu"));
         }
     }
+
+    @GetMapping("/study-programs")
+    public ResponseEntity<?> getAllStudyPrograms() {
+        try {
+            List<FieldOfStudy> programs = userService.getAllStudyPrograms();
+
+            List<Map<String, Object>> response = programs.stream()
+                    .map(p -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("id", p.getId());
+                        map.put("name", p.getName());
+                        return map;
+                    })
+                    .toList();
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Chyba pri načítavaní študijných odborov"));
+        }
+    }
+
 }

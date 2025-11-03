@@ -14,20 +14,25 @@ interface UserProfile {
   studyProgram?: string;
 }
 
+interface StudyProgram {
+  id: number;
+  name: string;
+}
+
 const Profile: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [editingField, setEditingField] = useState<string | null>(null);
   const [fieldValue, setFieldValue] = useState<string>("");
   const [message, setMessage] = useState<string | null>(null);
+  const [studyPrograms, setStudyPrograms] = useState<StudyProgram[]>([]);
 
+  // 🔹 Načítanie profilu používateľa
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("token");
         const res = await fetch("http://localhost:8080/account/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Chyba pri načítavaní profilu");
         const data = await res.json();
@@ -39,14 +44,43 @@ const Profile: React.FC = () => {
     fetchProfile();
   }, []);
 
+  // 🔹 Načítanie zoznamu študijných odborov
+  useEffect(() => {
+    const fetchStudyPrograms = async () => {
+      try {
+        const token = localStorage.getItem("token"); // 👈 pridaj
+        const res = await fetch("http://localhost:8080/account/study-programs", {
+          headers: {
+            Authorization: `Bearer ${token}`, // 👈 pridaj
+          },
+        });
+
+        console.log("Response status:", res.status);
+        if (!res.ok) throw new Error("Chyba pri načítavaní študijných odborov");
+
+        const data = await res.json();
+        console.log("Fetched study programs:", data);
+        setStudyPrograms(data);
+      } catch (error) {
+        console.error("Fetch study programs failed:", error);
+      }
+    };
+    fetchStudyPrograms();
+  }, []);
+
+
+
+  // 🔹 Kliknutie na "Upraviť"
   const handleEditClick = (field: keyof UserProfile) => {
     if (!profile) return;
     setEditingField(field);
     setFieldValue(profile[field] || "");
   };
 
+  // 🔹 Uloženie zmeny
   const handleFieldSave = async () => {
     if (!profile || !editingField) return;
+
     const updated = { ...profile, [editingField]: fieldValue };
     setProfile(updated);
 
@@ -62,7 +96,6 @@ const Profile: React.FC = () => {
       });
 
       if (!res.ok) throw new Error("Chyba pri ukladaní zmien");
-
       setMessage("Údaje boli úspešne uložené.");
     } catch (error: any) {
       setMessage(error.message);
@@ -73,6 +106,7 @@ const Profile: React.FC = () => {
 
   if (!profile) return <p>Načítavam profil...</p>;
 
+  // 🔹 Popisky pre jednotlivé polia
   const labels: Record<keyof UserProfile, string> = {
     firstName: "Meno",
     lastName: "Priezvisko",
@@ -86,7 +120,8 @@ const Profile: React.FC = () => {
     studyProgram: "Študijný program",
   };
 
-  const readOnlyFields: (keyof UserProfile)[] = ["email", "role", "studyProgram"];
+  // 🔹 Polia, ktoré nie je možné editovať
+  const readOnlyFields: (keyof UserProfile)[] = ["email", "role"];
 
   return (
     <div className="profile-wrapper">
@@ -95,25 +130,40 @@ const Profile: React.FC = () => {
         {message && <div className="profile-message">{message}</div>}
 
         <div className="profile-grid">
-          {(Object.entries(profile) as [keyof UserProfile, string | undefined][]).map(
-            ([key, value]) => {
+          {(Object.entries(profile) as [keyof UserProfile, string | undefined][])
+            .map(([key, value]) => {
               const isReadOnly = readOnlyFields.includes(key);
 
               return (
                 <div
                   key={key}
-                  className={`profile-grid-item ${
-                    isReadOnly ? "readonly-field" : ""
-                  }`}
+                  className={`profile-grid-item ${isReadOnly ? "readonly-field" : ""
+                    }`}
                 >
                   <strong>{labels[key] || key}:</strong>
+
                   {editingField === key ? (
                     <span className="edit-field">
-                      <input
-                        value={fieldValue}
-                        onChange={(e) => setFieldValue(e.target.value)}
-                        autoFocus
-                      />
+                      {key === "studyProgram" ? (
+                        <select
+                          value={fieldValue || ""}
+                          onChange={(e) => setFieldValue(e.target.value)}
+                        >
+                          <option value="">-- Vyber odbor --</option>
+                          {studyPrograms.map((program) => (
+                            <option key={program.id} value={program.name}>
+                              {program.name}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          value={fieldValue}
+                          onChange={(e) => setFieldValue(e.target.value)}
+                          autoFocus
+                        />
+                      )}
+
                       <button className="save-btn" onClick={handleFieldSave}>
                         💾
                       </button>
@@ -140,8 +190,7 @@ const Profile: React.FC = () => {
                   )}
                 </div>
               );
-            }
-          )}
+            })}
         </div>
       </div>
     </div>

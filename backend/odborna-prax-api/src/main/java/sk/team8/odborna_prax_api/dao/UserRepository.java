@@ -1,6 +1,8 @@
 package sk.team8.odborna_prax_api.dao;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sk.team8.odborna_prax_api.Entity.User;
@@ -15,4 +17,14 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByEmail(String email);
 
     boolean existsByRoleId(int roleId);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+    DELETE FROM users
+    WHERE active = 0
+    AND created_at < NOW() - INTERVAL 1 DAY
+    """, nativeQuery = true)
+    int deleteInactiveOlderThan24h();
+
 }

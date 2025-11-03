@@ -15,5 +15,5 @@
 | Backend            | Spring Boot          |
 | DB                 | MySQL                |
 | Project Management | Jira                 |
-| Verison Management | GitHub               |
+| Version Management | GitHub               |
 | UML Diagrams       | Enterprise Architect |

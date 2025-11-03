@@ -12,6 +12,7 @@ interface UserProfile {
   zip?: string;
   role?: string;
   studyProgram?: string;
+  companyName?: string;
 }
 
 interface StudyProgram {
@@ -59,11 +60,8 @@ const Profile: React.FC = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        console.log("Response status:", res.status);
         if (!res.ok) throw new Error("Chyba pri načítavaní študijných odborov");
-
         const data = await res.json();
-        console.log("Fetched study programs:", data);
         setStudyPrograms(data);
       } catch (error) {
         console.error("Fetch study programs failed:", error);
@@ -153,10 +151,48 @@ const Profile: React.FC = () => {
     zip: "PSČ",
     role: "Typ účtu",
     studyProgram: "Študijný program",
+    companyName: "Názov firmy",
   };
 
   // Polia, ktoré nie je možné editovať
   const readOnlyFields: (keyof UserProfile)[] = ["email", "role"];
+
+  // Definovanie poradia polí pre každý typ účtu
+  const fieldOrderByRole: Record<string, (keyof UserProfile)[]> = {
+    STUDENT: [
+      "firstName",
+      "lastName",
+      "role",
+      "studyProgram",
+      "email",
+      "emailAlternate",
+      "phoneNumber",
+      "address",
+      "city",
+      "zip",
+    ],
+    COMPANY: [
+      "firstName",
+      "lastName",
+      "role",
+      "companyName",
+      "email",
+      "emailAlternate",
+      "phoneNumber",
+    ],
+    ADMIN: [
+      "firstName",
+      "lastName",
+      "role",
+      "email",
+      "emailAlternate",
+      "phoneNumber",
+    ],
+  };
+
+  // Zistenie rolového poradia (fallback na ADMIN)
+  const userRole = profile.role?.toUpperCase() || "ADMIN";
+  const fieldsToShow = fieldOrderByRole[userRole] || fieldOrderByRole["ADMIN"];
 
   return (
     <div className="profile-wrapper">
@@ -165,66 +201,66 @@ const Profile: React.FC = () => {
         {message && <div className="profile-message">{message}</div>}
 
         <div className="profile-grid">
-          {(Object.entries(profile) as [keyof UserProfile, string | undefined][])
-            .map(([key, value]) => {
-              const isReadOnly = readOnlyFields.includes(key);
+          {fieldsToShow.map((key) => {
+            const value = profile[key];
+            const isReadOnly = readOnlyFields.includes(key);
 
-              return (
-                <div
-                  key={key}
-                  className={`profile-grid-item ${isReadOnly ? "readonly-field" : ""}`}
-                >
-                  <strong>{labels[key] || key}:</strong>
+            return (
+              <div
+                key={key}
+                className={`profile-grid-item ${isReadOnly ? "readonly-field" : ""}`}
+              >
+                <strong>{labels[key] || key}:</strong>
 
-                  {editingField === key ? (
-                    <span className="edit-field">
-                      {key === "studyProgram" ? (
-                        <select
-                          value={fieldValue || ""}
-                          onChange={(e) => setFieldValue(e.target.value)}
-                        >
-                          <option value="">-- Vyber odbor --</option>
-                          {studyPrograms.map((program) => (
-                            <option key={program.id} value={program.name}>
-                              {program.name}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <input
-                          value={fieldValue}
-                          onChange={(e) => setFieldValue(e.target.value)}
-                          autoFocus
-                        />
-                      )}
-
-                      <button className="save-btn" onClick={handleFieldSave}>
-                        💾
-                      </button>
-                      <button
-                        className="cancel-btn"
-                        onClick={() => setEditingField(null)}
+                {editingField === key ? (
+                  <span className="edit-field">
+                    {key === "studyProgram" ? (
+                      <select
+                        value={fieldValue || ""}
+                        onChange={(e) => setFieldValue(e.target.value)}
                       >
-                        ✖
+                        <option value="">-- Vyber odbor --</option>
+                        {studyPrograms.map((program) => (
+                          <option key={program.id} value={program.name}>
+                            {program.name}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        value={fieldValue}
+                        onChange={(e) => setFieldValue(e.target.value)}
+                        autoFocus
+                      />
+                    )}
+
+                    <button className="save-btn" onClick={handleFieldSave}>
+                      💾
+                    </button>
+                    <button
+                      className="cancel-btn"
+                      onClick={() => setEditingField(null)}
+                    >
+                      ✖
+                    </button>
+                  </span>
+                ) : (
+                  <>
+                    <span>{value || "—"}</span>
+                    {!isReadOnly && (
+                      <button
+                        className="edit-btn"
+                        title="Upraviť"
+                        onClick={() => handleEditClick(key)}
+                      >
+                        ✏️
                       </button>
-                    </span>
-                  ) : (
-                    <>
-                      <span>{value || "—"}</span>
-                      {!isReadOnly && (
-                        <button
-                          className="edit-btn"
-                          title="Upraviť"
-                          onClick={() => handleEditClick(key)}
-                        >
-                          ✏️
-                        </button>
-                      )}
-                    </>
-                  )}
-                </div>
-              );
-            })}
+                    )}
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Sekcia pre zmenu hesla */}

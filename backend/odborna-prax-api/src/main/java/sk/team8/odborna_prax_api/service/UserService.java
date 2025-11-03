@@ -1,5 +1,6 @@
 package sk.team8.odborna_prax_api.service;
 
+import sk.team8.odborna_prax_api.Entity.Department;
 import sk.team8.odborna_prax_api.Entity.FieldOfStudy;
 import sk.team8.odborna_prax_api.Entity.User;
 
@@ -17,4 +18,6 @@ public interface UserService {
     Optional<User> findById(int id);
 
     List<FieldOfStudy> getAllStudyPrograms();
+
+    List<Department> getAllDepartments();
 }

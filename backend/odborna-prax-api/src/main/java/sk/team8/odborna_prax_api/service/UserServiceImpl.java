@@ -3,9 +3,11 @@ package sk.team8.odborna_prax_api.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sk.team8.odborna_prax_api.Entity.Address;
+import sk.team8.odborna_prax_api.Entity.Department;
 import sk.team8.odborna_prax_api.Entity.FieldOfStudy;
 import sk.team8.odborna_prax_api.Entity.User;
 import sk.team8.odborna_prax_api.dao.AddressRepository;
+import sk.team8.odborna_prax_api.dao.DepartmentRepository;
 import sk.team8.odborna_prax_api.dao.FieldOfStudyRepository;
 import sk.team8.odborna_prax_api.dao.UserRepository;
 
@@ -19,14 +21,18 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final FieldOfStudyRepository fieldOfStudyRepository;
+    private final DepartmentRepository departmentRepository;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, AddressRepository addressRepository,
-                           FieldOfStudyRepository fieldOfStudyRepository) {
+                           FieldOfStudyRepository fieldOfStudyRepository,
+                           DepartmentRepository departmentRepository) {
         this.userRepository = userRepository;
         this.addressRepository = addressRepository;
         this.fieldOfStudyRepository = fieldOfStudyRepository;
+        this.departmentRepository = departmentRepository;
     }
+
 
     @Override
     public User findByEmail(String email) {
@@ -96,6 +102,18 @@ public class UserServiceImpl implements UserService {
             }
         }
 
+        if (updates.containsKey("department")) {
+            String depName = (String) updates.get("department");
+            if (depName != null && !depName.isBlank()) {
+                Department dep = departmentRepository.findByName(depName)
+                        .orElseThrow(() -> new IllegalArgumentException("Neplatná katedra: " + depName));
+                user.setDepartment(dep);
+            } else {
+                user.setDepartment(null);
+            }
+        }
+
+
         userRepository.save(user);
     }
 
@@ -133,4 +151,10 @@ public class UserServiceImpl implements UserService {
     public List<FieldOfStudy> getAllStudyPrograms() {
         return fieldOfStudyRepository.findAll();
     }
+
+    @Override
+    public List<Department> getAllDepartments() {
+        return departmentRepository.findAll();
+    }
+
 }

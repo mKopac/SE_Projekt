@@ -12,10 +12,16 @@ interface UserProfile {
   zip?: string;
   role?: string;
   studyProgram?: string;
+  department?: string;
   companyName?: string;
 }
 
 interface StudyProgram {
+  id: number;
+  name: string;
+}
+
+interface Department {
   id: number;
   name: string;
 }
@@ -26,8 +32,8 @@ const Profile: React.FC = () => {
   const [fieldValue, setFieldValue] = useState<string>("");
   const [message, setMessage] = useState<string | null>(null);
   const [studyPrograms, setStudyPrograms] = useState<StudyProgram[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
 
-  // Stav pre zmenu hesla
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -51,7 +57,7 @@ const Profile: React.FC = () => {
     fetchProfile();
   }, []);
 
-  // Načítanie zoznamu študijných odborov
+  // Načítanie študijných programov
   useEffect(() => {
     const fetchStudyPrograms = async () => {
       try {
@@ -59,7 +65,6 @@ const Profile: React.FC = () => {
         const res = await fetch("http://localhost:8080/account/study-programs", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         if (!res.ok) throw new Error("Chyba pri načítavaní študijných odborov");
         const data = await res.json();
         setStudyPrograms(data);
@@ -70,14 +75,30 @@ const Profile: React.FC = () => {
     fetchStudyPrograms();
   }, []);
 
-  // Kliknutie na "Upraviť"
+  // Načítanie katedier
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:8080/account/departments", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("Chyba pri načítavaní katedier");
+        const data = await res.json();
+        setDepartments(data);
+      } catch (error) {
+        console.error("Fetch departments failed:", error);
+      }
+    };
+    fetchDepartments();
+  }, []);
+
   const handleEditClick = (field: keyof UserProfile) => {
     if (!profile) return;
     setEditingField(field);
     setFieldValue(profile[field] || "");
   };
 
-  // Uloženie zmeny
   const handleFieldSave = async () => {
     if (!profile || !editingField) return;
 
@@ -104,10 +125,8 @@ const Profile: React.FC = () => {
     setEditingField(null);
   };
 
-  // Odoslanie formulára pre zmenu hesla
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (newPassword !== confirmPassword) {
       setPasswordMessage("Nové heslá sa nezhodujú.");
       return;
@@ -121,10 +140,7 @@ const Profile: React.FC = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          oldPassword,
-          newPassword,
-        }),
+        body: JSON.stringify({ oldPassword, newPassword }),
       });
 
       if (!res.ok) throw new Error("Nepodarilo sa zmeniť heslo.");
@@ -139,7 +155,6 @@ const Profile: React.FC = () => {
 
   if (!profile) return <p>Načítavam profil...</p>;
 
-  // Popisky pre jednotlivé polia
   const labels: Record<keyof UserProfile, string> = {
     firstName: "Meno",
     lastName: "Priezvisko",
@@ -151,13 +166,12 @@ const Profile: React.FC = () => {
     zip: "PSČ",
     role: "Typ účtu",
     studyProgram: "Študijný program",
+    department: "Katedra",
     companyName: "Názov firmy",
   };
 
-  // Polia, ktoré nie je možné editovať
   const readOnlyFields: (keyof UserProfile)[] = ["email", "role"];
 
-  // Definovanie poradia polí pre každý typ účtu
   const fieldOrderByRole: Record<string, (keyof UserProfile)[]> = {
     STUDENT: [
       "firstName",
@@ -184,13 +198,13 @@ const Profile: React.FC = () => {
       "firstName",
       "lastName",
       "role",
+      "department",
       "email",
       "emailAlternate",
       "phoneNumber",
     ],
   };
 
-  // Zistenie rolového poradia (fallback na ADMIN)
   const userRole = profile.role?.toUpperCase() || "ADMIN";
   const fieldsToShow = fieldOrderByRole[userRole] || fieldOrderByRole["ADMIN"];
 
@@ -226,6 +240,18 @@ const Profile: React.FC = () => {
                           </option>
                         ))}
                       </select>
+                    ) : key === "department" ? (
+                      <select
+                        value={fieldValue || ""}
+                        onChange={(e) => setFieldValue(e.target.value)}
+                      >
+                        <option value="">-- Vyber katedru --</option>
+                        {departments.map((dep) => (
+                          <option key={dep.id} value={dep.name}>
+                            {dep.name}
+                          </option>
+                        ))}
+                      </select>
                     ) : (
                       <input
                         value={fieldValue}
@@ -234,15 +260,8 @@ const Profile: React.FC = () => {
                       />
                     )}
 
-                    <button className="save-btn" onClick={handleFieldSave}>
-                      💾
-                    </button>
-                    <button
-                      className="cancel-btn"
-                      onClick={() => setEditingField(null)}
-                    >
-                      ✖
-                    </button>
+                    <button className="save-btn" onClick={handleFieldSave}>💾</button>
+                    <button className="cancel-btn" onClick={() => setEditingField(null)}>✖</button>
                   </span>
                 ) : (
                   <>
@@ -263,41 +282,23 @@ const Profile: React.FC = () => {
           })}
         </div>
 
-        {/* Sekcia pre zmenu hesla */}
         <div className="password-section">
           <h3>Zmena hesla</h3>
           {passwordMessage && <div className="profile-message">{passwordMessage}</div>}
           <form onSubmit={handlePasswordChange} className="password-form">
             <div className="form-group">
               <label>Staré heslo:</label>
-              <input
-                type="password"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-                required
-              />
+              <input type="password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} required />
             </div>
             <div className="form-group">
               <label>Nové heslo:</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-              />
+              <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
             </div>
             <div className="form-group">
               <label>Potvrdenie hesla:</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
+              <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
             </div>
-            <button type="submit" className="password-save-btn">
-              Zmeniť heslo
-            </button>
+            <button type="submit" className="password-save-btn">Zmeniť heslo</button>
           </form>
         </div>
       </div>

@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import sk.team8.odborna_prax_api.Entity.Department;
 import sk.team8.odborna_prax_api.Entity.FieldOfStudy;
 import sk.team8.odborna_prax_api.Entity.User;
 import sk.team8.odborna_prax_api.service.UserService;
@@ -44,6 +45,7 @@ public class AccountController {
             response.put("zip", user.getAddress() != null ? user.getAddress().getZip() : null);
             response.put("role", user.getRole() != null ? user.getRole().getName() : null);
             response.put("studyProgram", user.getFieldOfStudy() != null ? user.getFieldOfStudy().getName() : null);
+            response.put("department", user.getDepartment() != null ? user.getDepartment().getName() : null);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -89,4 +91,25 @@ public class AccountController {
         }
     }
 
+    @GetMapping("/departments")
+    public ResponseEntity<?> getAllDepartments() {
+        try {
+            List<Department> departments = userService.getAllDepartments();
+
+            List<Map<String, Object>> response = departments.stream()
+                    .map(d -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("id", d.getId());
+                        map.put("name", d.getName());
+                        return map;
+                    })
+                    .toList();
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Chyba pri načítavaní katedier"));
+        }
+    }
 }

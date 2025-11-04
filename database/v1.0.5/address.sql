@@ -1,0 +1,1 @@
+ALTER TABLE `address` CHANGE `street` `street` VARCHAR(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL, CHANGE `city` `city` VARCHAR(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL, CHANGE `zip` `zip` VARCHAR(5) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL;

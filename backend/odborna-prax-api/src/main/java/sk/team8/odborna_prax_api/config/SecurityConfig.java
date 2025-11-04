@@ -34,13 +34,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/auth/register/admin", "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/auth/register/admin","/auth/register/company",
+                                "/auth/register/student",
+
+                                "/auth/login",
+                                "/auth/request-password-reset",
+                                "/auth/reset-password"
+                        ).permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/auth/verify-reset-token",
+                                "/auth/verify-email"
+                        ).permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                         .requestMatchers("/actuator/health", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated()

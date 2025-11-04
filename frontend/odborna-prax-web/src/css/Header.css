@@ -1,0 +1,134 @@
+/* General Topbar Layout */
+.topbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* Left side (logo or title) */
+.topbar-left {
+  font-weight: 600;
+  color: #004aad;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+/* Center title */
+.topbar-center {
+  flex-grow: 1;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: #222;
+}
+
+/* Right side buttons and links */
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* FAQ link styling */
+.faq-link {
+  text-decoration: none;
+  color: #0078d4;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+}
+
+.faq-link:hover {
+  color: #005fa3;
+  background-color: #f1f5ff;
+}
+
+/* General button styles */
+.topbar-right button {
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+/* Profile & Dashboard buttons */
+.profile-button,
+.dashboard-button {
+  background-color: #0078d4;
+  color: white;
+}
+
+.profile-button:hover,
+.dashboard-button:hover {
+  background-color: #005fa3;
+}
+
+/* Home button */
+.home-button {
+  background-color: #2e7d32; /* green tone */
+  color: white;
+}
+
+.home-button:hover {
+  background-color: #256628;
+}
+
+/* Logout button — red with black text */
+.logout-button {
+  background-color: #ff4d4f;
+  color: black;
+  font-weight: 600;
+}
+
+.logout-button:hover {
+  background-color: #d9363e;
+}
+
+/* Login link */
+.login-link {
+  text-decoration: none;
+  color: #fff;
+  background-color: #0078d4;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.login-link:hover {
+  background-color: #005fa3;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .topbar-center {
+    text-align: left;
+  }
+
+  .topbar-right {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .topbar-right button,
+  .login-link {
+    padding: 0.45rem 0.8rem;
+    font-size: 0.9rem;
+  }
+}

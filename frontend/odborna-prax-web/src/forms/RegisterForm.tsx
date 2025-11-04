@@ -2,15 +2,23 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { http } from "../api/http";
+import { useNavigate } from "react-router-dom";
 import "./../css/RegisterForm.css";
 
 export type RegisterFormData = {
-  accountType: string;
-  studyProgram: string;
+
+  accountType: "Študent" | "Firma";
+  firmType: "" | "existujuca" | "nova";
+  companyId?: string;   
+  firmName?: string;    
+  ico?: string;         
+  street?: string;     
+  studyProgram?: string;
   firstName: string;
   lastName: string;
   studentEmail: string;
-  altEmail: string;
+  altEmail?: string;
   phone: string;
   address: string;
   city: string;
@@ -25,6 +33,11 @@ type Props = {
 export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
   const [formData, setFormData] = useState<RegisterFormData>({
     accountType: "Študent",
+    firmType: "existujuca",
+    companyId:"",
+    firmName: "",
+    ico: "",
+    street: "",
     studyProgram: "AI22m",
     firstName: "",
     lastName: "",
@@ -36,40 +49,102 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
     zip: "",
     consent: false,
   });
-
+  const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
-
+  const [loading, setLoading] = useState(false);
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, type } = e.target;
-    const value =
-      type === "checkbox"
-        ? (e.target as HTMLInputElement).checked
-        : e.target.value;
+    const { name, type, value } = e.target;
+    const newValue =
+      type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
 
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: newValue,
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
 
-    if (!formData.firstName || !formData.lastName) {
-      setError("Zadajte meno a priezvisko.");
-      return;
+  // 1) základná validácia
+  if (!formData.firstName || !formData.lastName) {
+    setError("Zadajte meno a priezvisko.");
+    return;
+  }
+
+  if (!formData.studentEmail) {
+    setError("Zadajte e-mail.");
+    return;
+  }
+
+  if (!formData.consent) {
+    setError("Musíte súhlasiť so spracovaním osobných údajov.");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    if (formData.accountType === "Študent") {
+      const payload = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        studentEmail: formData.studentEmail,
+        emailAlternate: formData.altEmail,
+        phoneNumber: formData.phone,
+        address: formData.address,
+        city: formData.city,
+        zip: formData.zip,
+        studyProgram: formData.studyProgram, 
+      };
+
+      await http.post("/auth/register/student", payload);
+
+      
+      navigate("/login?registered=success");
+    } else if (formData.accountType === "Firma") {
+        const payload = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          studentEmail: formData.studentEmail,          
+          emailAlternate: formData.altEmail,
+          phoneNumber: formData.phone,
+
+          firmType: formData.firmType,                
+          companyId:
+            formData.firmType === "existujuca" && formData.companyId
+              ? Number(formData.companyId)
+              : undefined,
+          companyName:
+            formData.firmType === "nova" ? formData.firmName : undefined,
+          companyIdentificationNumber:
+            formData.firmType === "nova" ? formData.ico : undefined,
+
+          // adresa kontaktnej osoby (user)
+          address: formData.address,
+          // adresa firmy – ulica zo sekcie "nová firma"
+          street: formData.street,
+          city: formData.city,
+          zip: formData.zip,
+        };
+
+        await http.post("/auth/register/company", payload);
+        navigate("/login?registered=success");
+      }
+
+    if (onSubmit) {
+      onSubmit(formData);
     }
 
-    if (!formData.consent) {
-      setError("Musíte súhlasiť so spracovaním osobných údajov.");
-      return;
-    }
-
-    if (onSubmit) onSubmit(formData);
-    else alert("Formulár odoslaný!");
+  } catch (err: any) {
+    console.error(err);
+    setError("Registrácia zlyhala. Skontrolujte údaje alebo skúste neskôr.");
+  } finally {
+    setLoading(false);
+  }
   };
 
   const isFirma = formData.accountType === "Firma";
@@ -84,34 +159,37 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
             <h2 className="form-title">Registrácia</h2>
 
             <form className="register-form" onSubmit={handleSubmit} noValidate>
-              <div className="form-row two-cols">
-                <label>
-                  Vyberte si typ účtu
+              <div className="form-row">
+                <label>Vyberte si typ účtu</label>
+                <div className="radio-group">
+                  {["Študent", "Firma"].map((type) => (
+                    <label key={type}>
+                      <input
+                        type="radio"
+                        name="accountType"
+                        value={type}
+                        checked={formData.accountType === type}
+                        onChange={handleChange}
+                      />
+                      {type}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {!isFirma && (
+                <div className="form-row">
+                  <label>Vyberte študijný odbor</label>
                   <select
-                    name="accountType"
-                    value={formData.accountType}
+                    name="studyProgram"
+                    value={formData.studyProgram}
                     onChange={handleChange}
                   >
-                    <option>Študent</option>
-                    <option>Garant</option>
-                    <option>Firma</option>
+                    <option>AI22m</option>
+                    <option>AI22b</option>
                   </select>
-                </label>
-
-                {!isFirma && (
-                  <label>
-                    Vyberte študijný odbor
-                    <select
-                      name="studyProgram"
-                      value={formData.studyProgram}
-                      onChange={handleChange}
-                    >
-                      <option>AI22m</option>
-                      <option>AI22b</option>
-                    </select>
-                  </label>
-                )}
-              </div>
+                </div>
+              )}
 
               <div className="form-row two-cols">
                 <label>
@@ -120,7 +198,6 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleChange}
-                    className="text-input"
                     type="text"
                   />
                 </label>
@@ -130,94 +207,122 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleChange}
-                    className="text-input"
                     type="text"
                   />
                 </label>
               </div>
 
-              {isFirma ? (
+              {isFirma && (
+                <div className="form-row">
+                  <label>Typ firmy</label>
+                  <div className="radio-group">
+                    <label>
+                      <input
+                        type="radio"
+                        name="firmType"
+                        value="existujuca"
+                        checked={formData.firmType === "existujuca"}
+                        onChange={handleChange}
+                      />
+                      Existujúca firma
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="firmType"
+                        value="nova"
+                        checked={formData.firmType === "nova"}
+                        onChange={handleChange}
+                      />
+                      Nová firma
+                    </label>
+                  </div>
+                </div>
+              )}
+              {isFirma && formData.firmType === "existujuca" && (
+                <label>
+                Vyberte firmu
+                  <select name="companyId" value={formData.companyId} onChange={handleChange}>
+                    <option value="">-- Vyberte --</option>
+                    <option value="1">Firma A</option>
+                    <option value="2">Firma B</option>
+                  </select>
+                </label>
+              )}
+
+              {isFirma && formData.firmType === "nova" && (
                 <>
                   <label>
-                    Firemný email
+                    Názov firmy
                     <input
-                      name="studentEmail"
-                      value={formData.studentEmail}
+                      name="firmName"
+                      value={formData.firmName || ""}
                       onChange={handleChange}
-                      className="text-input"
-                      type="email"
-                    />
-                  </label>
-
-                  <label>
-                    Telefón
-                    <input
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="text-input"
-                      type="tel"
-                    />
-                  </label>
-
-                  <label>
-                    Adresa firmy
-                    <input
-                      name="address"
-                      value={formData.address}
-                      onChange={handleChange}
-                      className="text-input"
                       type="text"
                     />
                   </label>
-                </>
-              ) : (
-                <>
                   <label>
-                    Študentský email
+                    IČO
                     <input
-                      name="studentEmail"
-                      value={formData.studentEmail}
+                      name="ico"
+                      value={formData.ico || ""}
                       onChange={handleChange}
-                      className="text-input"
-                      type="email"
+                      type="text"
                     />
                   </label>
-
                   <label>
-                    Alternatívny email
+                    Ulica
                     <input
-                      name="altEmail"
-                      value={formData.altEmail}
+                      name="street"
+                      value={formData.street || ""}
                       onChange={handleChange}
-                      className="text-input"
-                      type="email"
-                    />
-                  </label>
-
-                  <label>
-                    Telefón
-                    <input
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="text-input"
-                      type="tel"
-                    />
-                  </label>
-
-                  <label>
-                    Adresa
-                    <input
-                      name="address"
-                      value={formData.address}
-                      onChange={handleChange}
-                      className="text-input"
                       type="text"
                     />
                   </label>
                 </>
               )}
+
+              <label>
+                Email
+                <input
+                  name="studentEmail"
+                  value={formData.studentEmail}
+                  onChange={handleChange}
+                  type="email"
+                />
+              </label>
+
+              {!isFirma && (
+                <label>
+                  Alternatívny email
+                  <input
+                    name="altEmail"
+                    value={formData.altEmail}
+                    onChange={handleChange}
+                    type="email"
+                  />
+                </label>
+              )}
+
+              <label>
+                Telefón
+                <input
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  type="tel"
+                />
+              </label>
+
+              <label>
+                Adresa
+                <input
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  type="text"
+                />
+              </label>
 
               <div className="form-row two-cols">
                 <label>
@@ -226,7 +331,6 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                     name="city"
                     value={formData.city}
                     onChange={handleChange}
-                    className="text-input"
                     type="text"
                   />
                 </label>
@@ -236,7 +340,6 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                     name="zip"
                     value={formData.zip}
                     onChange={handleChange}
-                    className="text-input"
                     type="text"
                   />
                 </label>
@@ -258,8 +361,8 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                   </label>
                 </div>
 
-                <button type="submit" className="submit-btn">
-                  Odoslať
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading ? "Odosielam..." : "Odoslať"}
                 </button>
               </div>
 

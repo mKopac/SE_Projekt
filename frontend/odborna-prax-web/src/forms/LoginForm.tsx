@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, Navigate, useSearchParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "./../css/LoginForm.css";
@@ -8,14 +8,32 @@ type Props = {
   onSubmit?: (email: string, password: string) => void;
 };
 
-export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
+export const LoginForm: React.FC<Props> = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-
+  const [searchParams] = useSearchParams();
+  const [infoMessage, setInfoMessage] = useState<string | null>(null); 
   const token = localStorage.getItem("token");
   if (token) return <Navigate to="/dashboard" replace />;
+  useEffect(() => {                                         
+    const registered = searchParams.get("registered");
+    const verification = searchParams.get("verification");
 
+    if (registered === "success") {
+      setInfoMessage(
+        "Registrácia prebehla úspešne. Potvrdzovací e-mail bol odoslaný."
+      );
+    }
+
+    if (verification === "success") {
+      setInfoMessage("Váš účet bol aktivovaný. Teraz sa môžete prihlásiť.");
+    }
+
+    if (verification === "error") {
+      setInfoMessage("Overovací odkaz je neplatný alebo expiroval.");
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,8 +57,9 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem("token", data.access_token); // store JWT
-        window.location.href = "/dashboard"; // redirect to dashboard
+        localStorage.setItem("token", data.access_token); 
+        window.location.href = "/dashboard"; 
+        
       } else {
         const err = await response.json();
         setError(err.error || "Prihlásenie zlyhalo.");
@@ -48,6 +67,38 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
     } catch (error) {
       console.error("Chyba pri prihlasovaní:", error);
       setError("Server momentálne nie je dostupný.");
+    }
+  };
+  const handleForgotPassword = async (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (!email) {
+      alert("Najprv zadajte svoj e-mail.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Chcete odoslať odkaz na obnovenie hesla na e-mail: ${email}?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch("http://localhost:8080/auth/request-password-reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        alert("Odkaz na obnovenie hesla bol odoslaný na váš e-mail.");
+      } else {
+        const err = await response.json();
+        alert(err.error || "Nepodarilo sa odoslať odkaz.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Server momentálne nie je dostupný.");
     }
   };
 
@@ -62,6 +113,19 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
             <button className="logo-btn" aria-label="Logo tlačidlo">
               Logo?
             </button>
+
+            {infoMessage && (            
+              <div className="form-info">
+                {infoMessage}
+                <button
+                  type="button"
+                  className="form-info-close"
+                  onClick={() => setInfoMessage(null)}
+                >
+                  X
+                </button>
+              </div>
+            )}
 
             <form className="login-form" onSubmit={handleSubmit} noValidate>
               <label className="input-label">
@@ -89,7 +153,7 @@ export const LoginForm: React.FC<Props> = ({ onSubmit }) => {
               </label>
 
               <div className="small-links">
-                <a href="#forgot" onClick={(e) => e.preventDefault()}>
+                <a href="#forgot" onClick={handleForgotPassword}>
                   Zabudnuté heslo? Zmeňte si ho tu.
                 </a>
               </div>

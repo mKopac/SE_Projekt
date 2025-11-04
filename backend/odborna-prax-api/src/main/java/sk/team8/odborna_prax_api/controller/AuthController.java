@@ -31,8 +31,7 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final StudentRegistrationService studentRegistrationService;
     private final CompanyRegistrationService companyRegistrationService;
-
-
+    private final PasswordChangeService passwordChangeService;
 
     public AuthController(
             AdminRegistrationService adminRegistrationService,
@@ -40,7 +39,7 @@ public class AuthController {
             AuthTokenService authTokenService,
             EmailService emailService,
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder, StudentRegistrationService studentRegistrationService, CompanyRegistrationService companyRegistrationService
+            PasswordEncoder passwordEncoder, StudentRegistrationService studentRegistrationService, CompanyRegistrationService companyRegistrationService, PasswordChangeService passwordChangeService
     ) {
         this.adminRegistrationService = adminRegistrationService;
         this.authService = authService;
@@ -50,6 +49,7 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
         this.studentRegistrationService = studentRegistrationService;
         this.companyRegistrationService = companyRegistrationService;
+        this.passwordChangeService = passwordChangeService;
     }
 
     @PostMapping("/register/admin")
@@ -176,6 +176,38 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(Map.of("message", "Registrácia spoločnosti prebehla úspešne. Potvrdzovací e-mail bol odoslaný."));
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody ChangePasswordRequest request) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "Missing or invalid Authorization header"));
+            }
+
+            String token = authHeader.substring(7);
+
+            if (!authService.isTokenValid(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Invalid or expired token"));
+            }
+
+            String userEmail = authService.extractEmailFromToken(token);
+            User user = authService.findUserByEmail(userEmail)
+                    .orElseThrow(() -> new IllegalArgumentException("Používateľ neexistuje."));
+
+            passwordChangeService.changePassword(user, request);
+            return ResponseEntity.ok(Map.of("message", "Heslo bolo úspešne zmenené."));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Nastala chyba pri zmene hesla."));
+        }
     }
 
 }

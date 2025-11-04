@@ -127,6 +127,7 @@ const Profile: React.FC = () => {
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (newPassword !== confirmPassword) {
       setPasswordMessage("Nové heslá sa nezhodujú.");
       return;
@@ -134,16 +135,24 @@ const Profile: React.FC = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8080/account/change-password", {
+      const res = await fetch("http://localhost:8080/auth/change-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ oldPassword, newPassword }),
+        body: JSON.stringify({
+          currentPassword: oldPassword,
+          newPassword: newPassword,
+          repeatNewPassword: confirmPassword,
+        }),
       });
 
-      if (!res.ok) throw new Error("Nepodarilo sa zmeniť heslo.");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Nepodarilo sa zmeniť heslo.");
+      }
+
       setPasswordMessage("Heslo bolo úspešne zmenené.");
       setOldPassword("");
       setNewPassword("");
@@ -152,6 +161,7 @@ const Profile: React.FC = () => {
       setPasswordMessage(error.message);
     }
   };
+
 
   if (!profile) return <p>Načítavam profil...</p>;
 

@@ -1,6 +1,7 @@
 package sk.team8.odborna_prax_api.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
@@ -49,18 +50,22 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = true) // bolo false, nastavujeme na NULLable
+    @JsonManagedReference("user-address")
     private Address address;
 
     @ManyToOne
     @JoinColumn(name = "department_id", nullable = true) // NULLable
+    @JsonManagedReference("department-user")
     private Department department;
 
     @ManyToOne
     @JoinColumn(name = "field_of_study_id", nullable = true) // NULLable
+    @JsonManagedReference("fieldofstudy-user")
     private FieldOfStudy fieldOfStudy;
 
     @ManyToOne
     @JoinColumn(name = "company_id", nullable = true) // NULLable
+    @JsonManagedReference("company-user")
     private Company company;
 
     @ManyToOne

@@ -1,5 +1,7 @@
 package sk.team8.odborna_prax_api.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
@@ -23,6 +25,7 @@ public class Company {
 
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = false)
+    @JsonManagedReference("company-address")
     private Address address;
 
     @Column(name = "created_at", updatable = false)
@@ -32,9 +35,11 @@ public class Company {
     private Timestamp updatedAt;
 
     @OneToMany(mappedBy = "company")
+    @JsonBackReference("company-user")
     private List<User> users;
 
     @OneToMany(mappedBy = "company")
+    @JsonBackReference("internship-company")
     private List<Internship> internships;
 
     public Company() {

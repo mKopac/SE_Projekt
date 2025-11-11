@@ -1,5 +1,7 @@
 package sk.team8.odborna_prax_api.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 
@@ -14,11 +16,14 @@ public class InternshipStateChange {
 
     @ManyToOne
     @JoinColumn(name = "internship_id", nullable = false)
+    @JsonBackReference("internship-internshipState")
     private Internship internship;
 
     @ManyToOne
     @JoinColumn(name = "internship_state_id", nullable = false)
+    @JsonIgnoreProperties("stateChanges") // zabráni cyklu
     private InternshipState internshipState;
+
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

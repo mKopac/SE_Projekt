@@ -1,5 +1,6 @@
 package sk.team8.odborna_prax_api.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class FieldOfStudy {
 
     // Relationships
     @OneToMany(mappedBy = "fieldOfStudy")
+    @JsonBackReference("fieldofstudy-user")
     private List<User> users;
 
     // Constructors

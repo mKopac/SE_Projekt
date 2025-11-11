@@ -1,5 +1,6 @@
 package sk.team8.odborna_prax_api.Entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -20,7 +21,13 @@ public class Internship {
 
     @ManyToOne
     @JoinColumn(name = "company_id", nullable = false)
+    @JsonManagedReference("internship-company")
     private Company company;
+
+    // 🔹 Nový stĺpec mentor - referencuje používateľa (User)
+    @ManyToOne
+    @JoinColumn(name = "mentor_id") // názov stĺpca v DB
+    private User mentor;
 
     @Column(name = "academic_year", nullable = false, length = 9)
     private String academicYear;
@@ -42,6 +49,7 @@ public class Internship {
 
     // Relationships
     @OneToMany(mappedBy = "internship")
+    @JsonManagedReference("internship-internshipState") // zachováva referenciu
     private List<InternshipStateChange> internshipStateChanges;
 
     @OneToMany(mappedBy = "internship")
@@ -82,6 +90,14 @@ public class Internship {
 
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+    public User getMentor() {
+        return mentor;
+    }
+
+    public void setMentor(User mentor) {
+        this.mentor = mentor;
     }
 
     public String getAcademicYear() {
@@ -154,6 +170,7 @@ public class Internship {
                 "id=" + id +
                 ", student=" + student +
                 ", company=" + company +
+                ", mentor=" + mentor +
                 ", academicYear='" + academicYear + '\'' +
                 ", semester=" + semester +
                 ", dateStart=" + dateStart +

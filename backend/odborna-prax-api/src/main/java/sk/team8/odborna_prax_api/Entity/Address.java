@@ -1,5 +1,6 @@
 package sk.team8.odborna_prax_api.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -23,9 +24,11 @@ public class Address {
 
     // Relationships
     @OneToMany(mappedBy = "address")
+    @JsonBackReference("user-address")
     private List<User> users;
 
     @OneToMany(mappedBy = "address")
+    @JsonBackReference("company-address")
     private List<Company> companies;
 
     public Address() {}

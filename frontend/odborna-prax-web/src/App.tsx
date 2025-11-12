@@ -8,6 +8,8 @@ import ProfilePage from "./pages/ProfilePage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ResetPasswordForm } from "./forms/ResetPasswordForm";
 import type { RegisterFormData } from "./forms/RegisterForm";
+import AdminUserManagement from "./pages/AdminUserManagement";
+import AdminRoute from "./components/AdminRoute";
 
 function App() {
   const handleLogin = (email: string, password: string) => {
@@ -23,8 +25,12 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginForm onSubmit={handleLogin} />} />
-        <Route path="/register" element={<RegisterForm onSubmit={handleRegister} />} />
+        <Route
+          path="/register"
+          element={<RegisterForm onSubmit={handleRegister} />}
+        />
         <Route path="/reset-password" element={<ResetPasswordForm />} />
+
         <Route
           path="/dashboard"
           element={
@@ -41,7 +47,9 @@ function App() {
               <ProfilePage />
             </ProtectedRoute>
           }
-          ></Route>
+        />
+
+        <Route path="/admin/users" element={<AdminUserManagement />} />
       </Routes>
     </Router>
   );

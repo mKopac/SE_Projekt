@@ -1,4 +1,4 @@
-export interface Practice {
+export interface Internship {
   id: number;
   studentId: number;
   companyId: number;

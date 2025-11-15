@@ -1,51 +1,98 @@
-import React, { useState, useEffect } from 'react';
-import PracticeForm from '../forms/PracticeForm';
-import PracticeTable from './PracticeTable';
-import type { Practice } from '../types/Practice';
-import './../css/Dashboard.css';
+import React, { useState, useEffect } from "react";
+import InternshipTable from "./InternshipTable";
+import InternshipForm from "../forms/InternshipForm";
+import "./../css/Dashboard.css";
+
+interface InternshipDTO {
+  id: number;
+  studentId: number;
+  companyId: number;
+  mentorId: number | null;
+  academicYear: string;
+  semester: number;
+  dateStart: string;
+  dateEnd: string;
+}
 
 const Dashboard: React.FC = () => {
-  const [practices, setPractices] = useState<Practice[]>([]);
-  const [showModal, setShowModal] = useState(false);
+  const [internships, setInternships] = useState<InternshipDTO[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // show/hide form
+  const [showForm, setShowForm] = useState(false);
+
+  // logged user role
+  const [role, setRole] = useState<string>("");
 
   useEffect(() => {
-    fetch('/api/practice')
-      .then(res => res.json())
-      .then(data => setPractices(data))
-      .catch(err => console.error('Chyba pri načítaní praxí:', err));
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Missing authentication token.");
+      setLoading(false);
+      return;
+    }
+
+    const headers = { Authorization: `Bearer ${token}` };
+
+    // Load user info
+    fetch("http://localhost:8080/auth/me", { headers })
+      .then(res => res.ok ? res.json() : null)
+      .then(user => {
+        if (user) setRole(user.role?.name || "");
+      });
+
+    // Load internships
+    fetch("http://localhost:8080/dashboard/internships", { headers })
+      .then(async res => {
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error("Backend error: " + text);
+        }
+        return res.json();
+      })
+      .then(data => {
+        const extracted = data.map((item: any) => item.internship);
+        setInternships(extracted);
+      })
+      .catch(err => {
+        console.error("Error loading internships:", err);
+        setError(err.message);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  const handleAddPractice = (newPractice: Practice) => {
-    fetch('/api/practice', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newPractice),
-    })
-      .then(res => res.json())
-      .then(saved => {
-        setPractices(prev => [...prev, saved]);
-        setShowModal(false);
-      })
-      .catch(err => console.error('Chyba pri ukladaní praxe:', err));
+  const handleAddInternship = (i: InternshipDTO) => {
+    setInternships(prev => [...prev, i]);
+    setShowForm(false);
   };
+
+  if (loading) return <p>Načítavam dáta...</p>;
+  if (error) return <p className="error-text">Chyba: {error}</p>;
 
   return (
     <div className="dashboard">
       <h2>Prehľad praxí</h2>
-      <button className="add-button" onClick={() => setShowModal(true)}>
-        Pridať prax
-      </button>
 
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <button className="close-button" onClick={() => setShowModal(false)}>×</button>
-            <PracticeForm onAdd={handleAddPractice} />
-          </div>
+      {/* BUTTON PRE ŠTUDENTA */}
+      {role === "STUDENT" && (
+        <button
+          className="dashboard-add-button"
+          onClick={() => setShowForm(prev => !prev)}
+        >
+          {showForm ? "Zavrieť formulár" : "Pridať prax"}
+        </button>
+      )}
+
+      {/* FORM */}
+      {showForm && role === "STUDENT" && (
+        <div className="dashboard-form-container">
+          <InternshipForm onAdd={handleAddInternship} />
         </div>
       )}
 
-      <PracticeTable practices={practices} />
+      {/* TABLE */}
+      <InternshipTable internships={internships} />
     </div>
   );
 };

@@ -38,6 +38,8 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+
+                        // ===== YOUR ORIGINAL PUBLIC ENDPOINTS =====
                         .requestMatchers(HttpMethod.POST,
                                 "/auth/register/admin","/auth/register/company",
                                 "/auth/register/student",
@@ -46,12 +48,21 @@ public class SecurityConfig {
                                 "/auth/request-password-reset",
                                 "/auth/reset-password"
                         ).permitAll()
+
                         .requestMatchers(HttpMethod.GET,
                                 "/auth/verify-reset-token",
                                 "/auth/verify-email"
                         ).permitAll()
+
+                        // ===== PROTECTED ENDPOINTS =====
+                        .requestMatchers("/auth/me").authenticated()
+
+                        .requestMatchers("/dashboard/**").authenticated()
+
                         .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                         .requestMatchers("/actuator/health", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+
+                        // EVERYTHING ELSE
                         .anyRequest().authenticated()
                 )
 
@@ -69,15 +80,28 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+
         configuration.setAllowedOrigins(List.of("http://localhost:5173")); // React frontend
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
+        configuration.setAllowedHeaders(List.of(
+                "Authorization",
+                "Content-Type",
+                "Accept",
+                "Origin",
+                "X-Requested-With"
+        ));
+
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
+
 
     @Bean
     public AuthenticationEntryPoint unauthorizedEntryPoint() {

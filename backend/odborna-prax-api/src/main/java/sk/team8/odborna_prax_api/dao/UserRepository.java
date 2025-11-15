@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sk.team8.odborna_prax_api.Entity.User;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -27,4 +28,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     """, nativeQuery = true)
     int deleteInactiveOlderThan24h();
 
+    // Needed for DashboardController
+    @Query("SELECT u FROM User u WHERE UPPER(u.role.name) = UPPER(:roleName)")
+    List<User> findByRoleName(String roleName);
+
+    // Optional strict version
+    @Query("SELECT u FROM User u WHERE u.role.name = :roleName")
+    List<User> findByRoleExact(String roleName);
 }

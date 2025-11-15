@@ -43,7 +43,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,
                                 "/auth/register/admin","/auth/register/company",
                                 "/auth/register/student",
-
                                 "/auth/login",
                                 "/auth/request-password-reset",
                                 "/auth/reset-password"
@@ -101,8 +100,6 @@ public class SecurityConfig {
 
         return source;
     }
-
-
     @Bean
     public AuthenticationEntryPoint unauthorizedEntryPoint() {
         return (request, response, authException) -> {

@@ -45,3 +45,13 @@
   font-size: 14px;
 }
 
+.filter-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.search-input {
+  padding: 6px;
+  width: 200px;
+}

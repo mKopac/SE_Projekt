@@ -19,10 +19,7 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // show/hide form
-  const [showForm, setShowForm] = useState(false);
-
-  // logged user role
+  const [showModal, setShowModal] = useState(false);
   const [role, setRole] = useState<string>("");
 
   useEffect(() => {
@@ -35,14 +32,12 @@ const Dashboard: React.FC = () => {
 
     const headers = { Authorization: `Bearer ${token}` };
 
-    // Load user info
     fetch("http://localhost:8080/auth/me", { headers })
       .then(res => res.ok ? res.json() : null)
       .then(user => {
         if (user) setRole(user.role?.name || "");
       });
 
-    // Load internships
     fetch("http://localhost:8080/dashboard/internships", { headers })
       .then(async res => {
         if (!res.ok) {
@@ -64,7 +59,7 @@ const Dashboard: React.FC = () => {
 
   const handleAddInternship = (i: InternshipDTO) => {
     setInternships(prev => [...prev, i]);
-    setShowForm(false);
+    setShowModal(false);
   };
 
   if (loading) return <p>Načítavam dáta...</p>;
@@ -74,24 +69,28 @@ const Dashboard: React.FC = () => {
     <div className="dashboard">
       <h2>Prehľad praxí</h2>
 
-      {/* BUTTON PRE ŠTUDENTA */}
       {role === "STUDENT" && (
-        <button
-          className="dashboard-add-button"
-          onClick={() => setShowForm(prev => !prev)}
-        >
-          {showForm ? "Zavrieť formulár" : "Pridať prax"}
+        <button className="add-button" onClick={() => setShowModal(true)}>
+          Pridať prax
         </button>
       )}
 
-      {/* FORM */}
-      {showForm && role === "STUDENT" && (
-        <div className="dashboard-form-container">
-          <InternshipForm onAdd={handleAddInternship} />
+      {/* === MODAL === */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <button
+              className="close-button"
+              onClick={() => setShowModal(false)}
+            >
+              ×
+            </button>
+
+            <InternshipForm onAdd={handleAddInternship} />
+          </div>
         </div>
       )}
 
-      {/* TABLE */}
       <InternshipTable internships={internships} />
     </div>
   );

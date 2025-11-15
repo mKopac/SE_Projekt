@@ -74,7 +74,12 @@ export const LoginForm: React.FC<Props> = () => {
         }
       } else {
         const err = await response.json();
-        setError(err.error || "Prihlásenie zlyhalo.");
+        setError(
+          err.error ||
+          err.message ||
+          err.detail ||
+          "Prihlásenie zlyhalo."
+        );
       }
     } catch (error) {
       console.error("Chyba pri prihlasovaní:", error);

@@ -76,9 +76,21 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
             String token = authService.login(request.getEmail(), request.getPassword());
+
+            User user = authService.findUserByEmail(request.getEmail())
+                    .orElseThrow(() -> new IllegalArgumentException("Používateľ neexistuje."));
+
             return ResponseEntity.ok(Map.of(
                     "access_token", token,
-                    "token_type", "Bearer"
+                    "token_type", "Bearer",
+                    "user", Map.of(
+                            "id", user.getId(),
+                            "email", user.getEmail(),
+                            "firstName", user.getFirstName(),
+                            "lastName", user.getLastName(),
+                            "role", user.getRole().getName(),
+                            "suspended", user.isSuspended()
+                    )
             ));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));

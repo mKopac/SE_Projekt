@@ -1,22 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "./../css/Header.css";
+import logo from "../assets/fpvai.png";
+
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user");
+
     setIsLoggedIn(!!token);
+
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        setIsAdmin(user.role === "ADMIN");
+      } catch {
+        setIsAdmin(false);
+      }
+    }
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setIsLoggedIn(false);
+    setIsAdmin(false);
     navigate("/login");
   };
 
@@ -27,7 +42,6 @@ const Header: React.FC = () => {
 
   const currentPath = location.pathname;
 
-  // Dynamic "Profile / Dashboard" button
   const renderNavButton = () => {
     if (!isLoggedIn) return null;
 
@@ -54,7 +68,6 @@ const Header: React.FC = () => {
     );
   };
 
-  // Dynamic "Home / Dashboard" button
   const renderHomeButton = () => {
     if (currentPath === "/") {
       return (
@@ -73,7 +86,12 @@ const Header: React.FC = () => {
   return (
     <header className="topbar">
       <div className="topbar-left" onClick={handleHomeClick}>
-        Logo
+        <img
+          src={logo}
+          alt="Logo"
+          style={{ height: "50px", objectFit: "contain" }}
+        />
+
       </div>
 
       <div className="topbar-center">Systém na evidenciu praxe</div>
@@ -85,11 +103,14 @@ const Header: React.FC = () => {
 
         {isLoggedIn ? (
           <>
-            <button className="admin-button" onClick={handleAdminClick}>
-              Správa používateľov
-            </button>
+            {isAdmin && (
+              <button className="admin-button" onClick={handleAdminClick}>
+                Správa používateľov
+              </button>
+            )}
 
             {renderNavButton()}
+
             <button className="logout-button" onClick={handleLogout}>
               Logout
             </button>

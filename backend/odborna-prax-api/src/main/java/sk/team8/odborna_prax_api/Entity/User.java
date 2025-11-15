@@ -36,6 +36,12 @@ public class User {
     @Column(name = "active", columnDefinition = "TINYINT(1)")
     private boolean active;
 
+    @Column(name = "suspended", columnDefinition = "TINYINT(1)")
+    private boolean suspended = false;
+
+    @Column(name = "suspended_at")
+    private Timestamp suspendedAt;
+
     @Column(name = "created_at", updatable = false)
     private Timestamp createdAt;
 
@@ -214,6 +220,12 @@ public class User {
 
     public List<TimestatementStateChange> getTimestatementStateChanges() { return timestatementStateChanges; }
     public void setTimestatementStateChanges(List<TimestatementStateChange> timestatementStateChanges) { this.timestatementStateChanges = timestatementStateChanges; }
+
+    public boolean isSuspended() { return suspended; }
+    public void setSuspended(boolean suspended) { this.suspended = suspended; }
+
+    public Timestamp getSuspendedAt() { return suspendedAt; }
+    public void setSuspendedAt(Timestamp suspendedAt) { this.suspendedAt = suspendedAt; }
 
     @Override
     public String toString() {

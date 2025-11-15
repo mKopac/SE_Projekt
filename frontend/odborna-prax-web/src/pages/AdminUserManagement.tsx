@@ -6,10 +6,12 @@ import Footer from "../components/Footer";
 
 interface User {
   id: number;
-  username: string;
+  firstName: string;
+  lastName: string;
   email: string;
   suspended: boolean;
 }
+
 
 export default function AdminUserManagement() {
   const [users, setUsers] = useState<User[]>([]);
@@ -71,7 +73,7 @@ export default function AdminUserManagement() {
                 {users.map((u) => (
                   <tr key={u.id}>
                     <td>{u.id}</td>
-                    <td>{u.username}</td>
+                    <td>{u.firstName} {u.lastName}</td>
                     <td>{u.email}</td>
                     <td>
                       {u.suspended ? (

@@ -233,6 +233,7 @@ public class AuthController {
         User user = userOpt.get();
 
         return ResponseEntity.ok(Map.of(
+                "id", user.getId(),
                 "email", user.getEmail(),
                 "firstName", user.getFirstName(),
                 "lastName", user.getLastName(),

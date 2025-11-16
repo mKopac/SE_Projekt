@@ -64,6 +64,19 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
       .then(res => res.ok ? res.json() : null)
       .then(user => setCurrentUserId(user?.id ?? null));
 
+    // Nastavenie defaultného akademického roku
+    const now = new Date();
+    let startYear: number;
+    let endYear: number;
+    if (now.getMonth() >= 8) { // September = 8 (0-indexované)
+      startYear = now.getFullYear();
+      endYear = startYear + 1;
+    } else {
+      endYear = now.getFullYear();
+      startYear = endYear - 1;
+    }
+    setForm(prev => ({ ...prev, academicYear: `${startYear}/${endYear}` }));
+
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -82,19 +95,46 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
       return;
     }
 
-    const newInternship: Internship = {
-      id: Date.now(),
-      studentId: currentUserId,
+    const payload = {
       companyId: form.companyId,
-      mentorId: form.mentorId,
+      mentorId: form.mentorId === 0 ? null : form.mentorId,
       academicYear: form.academicYear,
       semester: form.semester,
       dateStart: form.dateStart,
       dateEnd: form.dateEnd,
     };
 
-    onAdd(newInternship);
+    const res = await fetch(`${baseUrl}/dashboard/internship`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
 
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert("Chyba pri ukladaní praxe: " + (data.error ?? "Neznáma chyba"));
+      return;
+    }
+
+    alert("Prax bola úspešne vytvorená!");
+
+    // Zavoláme onAdd, ale použijeme ID z backendu
+    onAdd({
+      id: data.internshipId,
+      studentId: currentUserId,
+      companyId: form.companyId,
+      mentorId: form.mentorId ?? null,
+      academicYear: form.academicYear,
+      semester: form.semester,
+      dateStart: form.dateStart,
+      dateEnd: form.dateEnd,
+    });
+
+    // Reset formulára
     setForm({
       companyId: 0,
       mentorId: 0,
@@ -131,7 +171,7 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
 
       <div className="form-group">
         <label>Akademický rok:</label>
-        <input name="academicYear" value={form.academicYear} onChange={handleChange} required />
+        <input name="academicYear" value={form.academicYear} onChange={handleChange} required readOnly/>
       </div>
 
       <div className="form-group">
@@ -139,6 +179,14 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
         <select name="semester" value={form.semester} onChange={handleChange}>
           <option value={1}>1</option>
           <option value={2}>2</option>
+          <option value={3}>3</option>
+          <option value={4}>4</option>
+          <option value={5}>5</option>
+          <option value={6}>6</option>
+          <option value={7}>7</option>
+          <option value={8}>8</option>
+          <option value={9}>9</option>
+          <option value={10}>10</option>
         </select>
       </div>
 

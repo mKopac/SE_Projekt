@@ -1,18 +1,17 @@
 package sk.team8.odborna_prax_api.controller;
 
+import jakarta.transaction.Transactional;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sk.team8.odborna_prax_api.Entity.Company;
-import sk.team8.odborna_prax_api.Entity.Internship;
-import sk.team8.odborna_prax_api.Entity.InternshipStateChange;
-import sk.team8.odborna_prax_api.Entity.User;
-import sk.team8.odborna_prax_api.dao.CompanyRepository;
-import sk.team8.odborna_prax_api.dao.InternshipRepository;
-import sk.team8.odborna_prax_api.dao.InternshipStateChangeRepository;
-import sk.team8.odborna_prax_api.dao.UserRepository;
+import sk.team8.odborna_prax_api.Entity.*;
+import sk.team8.odborna_prax_api.dao.*;
+import sk.team8.odborna_prax_api.dto.CreateInternshipRequest;
 import sk.team8.odborna_prax_api.service.AuthService;
 
+
+import java.sql.Timestamp;
 import java.util.*;
 
 @RestController
@@ -24,18 +23,23 @@ public class DashboardController {
     private final InternshipStateChangeRepository stateChangeRepository;
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
+    private final InternshipStateRepository internshipStateRepository;
+    private final InternshipStateChangeRepository internshipStateChangeRepository;
+
 
     public DashboardController(AuthService authService,
                                InternshipRepository internshipRepository,
                                InternshipStateChangeRepository stateChangeRepository,
                                UserRepository userRepository,
-                               CompanyRepository companyRepository) {
+                               CompanyRepository companyRepository, InternshipStateRepository internshipStateRepository, InternshipStateChangeRepository internshipStateChangeRepository) {
 
         this.authService = authService;
         this.internshipRepository = internshipRepository;
         this.stateChangeRepository = stateChangeRepository;
         this.userRepository = userRepository;
         this.companyRepository = companyRepository;
+        this.internshipStateRepository = internshipStateRepository;
+        this.internshipStateChangeRepository = internshipStateChangeRepository;
     }
 
     // ============================================================
@@ -205,4 +209,73 @@ public class DashboardController {
 
         return ResponseEntity.ok(companies);
     }
+
+    @PostMapping("/internship")
+    @Transactional
+    public ResponseEntity<?> createInternship(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody CreateInternshipRequest request
+    ) {
+        try {
+            // 1️⃣ Overenie tokenu
+            if (!isValidToken(authHeader)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Invalid or expired token"));
+            }
+
+            String email = extractEmail(authHeader);
+            User student = authService.findUserByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
+
+            // 2️⃣ Načítame firmu
+            Company company = companyRepository.findById(request.companyId)
+                    .orElseThrow(() -> new RuntimeException("Company not found"));
+
+            // 3️⃣ Mentor (ak je)
+            User mentor = null;
+            if (request.mentorId != null) {
+                mentor = userRepository.findById(request.mentorId)
+                        .orElseThrow(() -> new RuntimeException("Mentor not found"));
+            }
+
+            // 4️⃣ Vytvorenie novej praxe
+            Internship internship = new Internship();
+            internship.setStudent(student);
+            internship.setCompany(company);
+            internship.setMentor(mentor);
+            internship.setAcademicYear(request.academicYear);
+            internship.setSemester(request.semester);
+            internship.setDateStart(request.dateStart);
+            internship.setDateEnd(request.dateEnd);
+            internship.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+            internship.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+
+            internshipRepository.save(internship);
+
+            // 5️⃣ Pridáme stav CREATED
+            InternshipState createdState = internshipStateRepository.findById(1)
+                    .orElseThrow(() -> new RuntimeException("State ID 1 (CREATED) not found"));
+
+            InternshipStateChange change = new InternshipStateChange(
+                    internship,
+                    createdState,
+                    student,
+                    new Timestamp(System.currentTimeMillis())
+            );
+
+            internshipStateChangeRepository.save(change);
+
+            // 6️⃣ Hotovo
+            return ResponseEntity.ok(Map.of(
+                    "message", "Internship created successfully",
+                    "internshipId", internship.getId()
+            ));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Server error", "details", e.getMessage()));
+        }
+    }
+
 }

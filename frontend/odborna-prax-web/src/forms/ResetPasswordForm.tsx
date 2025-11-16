@@ -17,7 +17,6 @@ const [error, setError] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
 
-  // ✅ Overenie tokenu pri načítaní
   useEffect(() => {
     if (!token) {
       setError("Odkaz na reset hesla je neplatný.");
@@ -58,9 +57,18 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     });
 
     if (response.ok) {
-      setMessage("Heslo bolo úspešne zmenené. Môžete sa prihlásiť.");
-      setValid(false); // po úspechu zneplatni formulár
-    } else {
+  const confirmed = window.confirm(
+    "Heslo bolo úspešne zmenené."
+  );
+
+  if (confirmed) {
+    window.location.href = "/login";
+  } else {
+    window.location.href = "/login";
+  }
+  return;
+}
+ else {
       const err = await response.json();
       setError(err.error || "Reset hesla zlyhal.");
     }
@@ -103,8 +111,6 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       </div>
     );
   }
-
-  // ✅ ak je token platný, zobraz formulár
   return (
     <div className="page-root">
       <Header />

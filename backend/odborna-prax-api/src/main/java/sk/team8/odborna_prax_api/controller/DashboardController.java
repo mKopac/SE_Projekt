@@ -2,7 +2,6 @@ package sk.team8.odborna_prax_api.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
-import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,80 +23,88 @@ public class DashboardController {
     private final AuthService authService;
     private final InternshipRepository internshipRepository;
     private final InternshipStateChangeRepository stateChangeRepository;
+    private final InternshipStateRepository stateRepository;
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
-    private final InternshipStateRepository internshipStateRepository;
-    private final InternshipStateChangeRepository internshipStateChangeRepository;
 
-
-    public DashboardController(AuthService authService,
-                               InternshipRepository internshipRepository,
-                               InternshipStateChangeRepository stateChangeRepository,
-                               UserRepository userRepository,
-                               CompanyRepository companyRepository, InternshipStateRepository internshipStateRepository, InternshipStateChangeRepository internshipStateChangeRepository) {
-
+    public DashboardController(
+            AuthService authService,
+            InternshipRepository internshipRepository,
+            InternshipStateChangeRepository stateChangeRepository,
+            InternshipStateRepository stateRepository,
+            UserRepository userRepository,
+            CompanyRepository companyRepository
+    ) {
         this.authService = authService;
         this.internshipRepository = internshipRepository;
         this.stateChangeRepository = stateChangeRepository;
+        this.stateRepository = stateRepository;
         this.userRepository = userRepository;
         this.companyRepository = companyRepository;
-        this.internshipStateRepository = internshipStateRepository;
-        this.internshipStateChangeRepository = internshipStateChangeRepository;
     }
 
     // ============================================================
-    // Token validation helper
+    // Helpers
     // ============================================================
+
     private boolean isValidToken(String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) return false;
-        return authService.isTokenValid(authHeader.substring(7));
+        return authHeader != null && authHeader.startsWith("Bearer ")
+                && authService.isTokenValid(authHeader.substring(7));
     }
 
     private String extractEmail(String authHeader) {
         return authService.extractEmailFromToken(authHeader.substring(7));
     }
 
-    // ============================================================
-    // INTERNSHIP DTO FOR FRONTEND
-    // ============================================================
-    public static class InternshipDTO {
+    private User getUser(String authHeader) {
+        String email = extractEmail(authHeader);
+        return authService.findUserByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
 
-        private int id;
-        private int studentId;
-        private int companyId;
-        private Integer mentorId;
-        private String academicYear;
-        private int semester;
-        private String dateStart;
-        private String dateEnd;
+    private ResponseEntity<?> unauthorized() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", "Invalid or expired token"));
+    }
 
-        public InternshipDTO(int id, int studentId, int companyId, Integer mentorId,
-                             String academicYear, int semester,
-                             String dateStart, String dateEnd) {
+    private ResponseEntity<?> forbidden(String msg) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", msg));
+    }
 
-            this.id = id;
-            this.studentId = studentId;
-            this.companyId = companyId;
-            this.mentorId = mentorId;
-            this.academicYear = academicYear;
-            this.semester = semester;
-            this.dateStart = dateStart;
-            this.dateEnd = dateEnd;
-        }
-
-        public int getId() { return id; }
-        public int getStudentId() { return studentId; }
-        public int getCompanyId() { return companyId; }
-        public Integer getMentorId() { return mentorId; }
-        public String getAcademicYear() { return academicYear; }
-        public int getSemester() { return semester; }
-        public String getDateStart() { return dateStart; }
-        public String getDateEnd() { return dateEnd; }
+    private ResponseEntity<?> badRequest(String msg) {
+        return ResponseEntity.badRequest().body(Map.of("error", msg));
     }
 
     // ============================================================
-    // GET INTERNSHIPS BASED ON LOGGED USER ROLE
+    // DTO pre FE
     // ============================================================
+
+    public static class InternshipDTO {
+        public int id;
+        public int studentId;
+        public int companyId;
+        public Integer mentorId;
+        public String academicYear;
+        public int semester;
+        public String dateStart;
+        public String dateEnd;
+
+        public InternshipDTO(Internship i) {
+            this.id = i.getId();
+            this.studentId = i.getStudent().getId();
+            this.companyId = i.getCompany().getId();
+            this.mentorId = i.getMentor() != null ? i.getMentor().getId() : null;
+            this.academicYear = i.getAcademicYear();
+            this.semester = i.getSemester();
+            this.dateStart = i.getDateStart() != null ? i.getDateStart().toString() : null;
+            this.dateEnd = i.getDateEnd() != null ? i.getDateEnd().toString() : null;
+        }
+    }
+
+    // ============================================================
+    // GET /dashboard/internships
+    // ============================================================
+
     @GetMapping("/internships")
     public ResponseEntity<?> getInternships(
             @RequestHeader("Authorization") String authHeader,
@@ -117,6 +124,7 @@ public class DashboardController {
         User user = authService.findUserByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Používateľ neexistuje."));
 
+        User user = getUser(authHeader);
         String role = user.getRole().getName().toUpperCase();
 
         Integer userStudentId = null;
@@ -149,78 +157,44 @@ public class DashboardController {
             Optional<InternshipStateChange> lastState =
                     stateChangeRepository.findTopByInternshipIdOrderByStateChangedAtDesc(i.getId());
 
-            InternshipDTO dto = new InternshipDTO(
-                    i.getId(),
-                    i.getStudent().getId(),
-                    i.getCompany().getId(),
-                    i.getMentor() != null ? i.getMentor().getId() : null,
-                    i.getAcademicYear(),
-                    i.getSemester(),
-                    i.getDateStart() != null ? i.getDateStart().toString() : null,
-                    i.getDateEnd() != null ? i.getDateEnd().toString() : null
-            );
-
-            return Map.of(
-                    "internship", dto,
-                    "last_state", lastState.orElse(null)
-            );
-
-        }).toList();
+            result.add(Map.of(
+                    "internship", new InternshipDTO(i),
+                    "last_state", last.orElse(null)
+            ));
+        }
 
         return ResponseEntity.ok(result);
     }
 
 
     // ============================================================
-    // GET STUDENTS
+    // POMOCNÉ ENDPOINTY PRE FRONTEND (študenti, mentori, firmy)
     // ============================================================
+
     @GetMapping("/students")
     public ResponseEntity<?> getStudents(@RequestHeader("Authorization") String authHeader) {
-
-        if (!isValidToken(authHeader)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Invalid token"));
-        }
-
-        List<User> students =
-                userRepository.findByRoleName("STUDENT");
-
+        if (!isValidToken(authHeader)) return unauthorized();
+        List<User> students = userRepository.findByRoleName("STUDENT");
         return ResponseEntity.ok(students);
     }
 
-    // ============================================================
-    // GET MENTORS (users with role COMPANY)
-    // ============================================================
     @GetMapping("/mentors")
     public ResponseEntity<?> getMentors(@RequestHeader("Authorization") String authHeader) {
-
-        if (!isValidToken(authHeader)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Invalid token"));
-        }
-
-        // Mentor = employee of a company (role COMPANY)
-        List<User> mentors =
-                userRepository.findByRoleName("COMPANY");
-
+        if (!isValidToken(authHeader)) return unauthorized();
+        List<User> mentors = userRepository.findByRoleName("COMPANY");
         return ResponseEntity.ok(mentors);
     }
 
-    // ============================================================
-    // GET COMPANIES
-    // ============================================================
     @GetMapping("/companies")
     public ResponseEntity<?> getCompanies(@RequestHeader("Authorization") String authHeader) {
-
-        if (!isValidToken(authHeader)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Invalid token"));
-        }
-
+        if (!isValidToken(authHeader)) return unauthorized();
         List<Company> companies = companyRepository.findAll();
-
         return ResponseEntity.ok(companies);
     }
+
+    // ============================================================
+    // CREATE INTERNSHIP + STATE CREATED
+    // ============================================================
 
     @PostMapping("/internship")
     @Transactional
@@ -234,9 +208,7 @@ public class DashboardController {
                         .body(Map.of("error", "Invalid or expired token"));
             }
 
-            String email = extractEmail(authHeader);
-            User student = authService.findUserByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
+        User student = getUser(authHeader);
 
             Company company = companyRepository.findById(request.companyId)
                     .orElseThrow(() -> new RuntimeException("Company not found"));
@@ -282,6 +254,37 @@ public class DashboardController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Server error", "details", e.getMessage()));
         }
+
+        Internship internship = new Internship();
+        internship.setStudent(student);
+        internship.setCompany(company);
+        internship.setMentor(mentor);
+        internship.setAcademicYear(request.academicYear);
+        internship.setSemester(request.semester);
+        internship.setDateStart(request.dateStart);
+        internship.setDateEnd(request.dateEnd);
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        internship.setCreatedAt(now);
+        internship.setUpdatedAt(now);
+
+        internshipRepository.save(internship);
+
+        InternshipState created = stateRepository.findByName("CREATED")
+                .orElseThrow(() -> new RuntimeException("State CREATED not found"));
+
+        InternshipStateChange change = new InternshipStateChange(
+                internship,
+                created,
+                student,
+                now
+        );
+
+        stateChangeRepository.save(change);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Internship created",
+                "internshipId", internship.getId()
+        ));
     }
 
     @GetMapping("/internships/export")
@@ -342,4 +345,131 @@ public class DashboardController {
     }
 
 
+    // ============================================================
+    // COMPANY DECISION (ACCEPT / REJECT)
+    // ============================================================
+
+    @PostMapping("/internship/{id}/company-decision")
+    @Transactional
+    public ResponseEntity<?> companyDecision(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable int id,
+            @RequestParam("decision") String decision
+    ) {
+
+        if (!isValidToken(authHeader)) return unauthorized();
+
+        User companyUser = getUser(authHeader);
+
+        if (!companyUser.getRole().getName().equals("COMPANY"))
+            return forbidden("Only company can perform this action");
+
+        Internship internship = internshipRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Internship not found"));
+
+        InternshipStateChange last =
+                stateChangeRepository.findTopByInternshipIdOrderByStateChangedAtDesc(id)
+                        .orElse(null);
+
+        if (last == null || !last.getInternshipState().getName().equals("CREATED"))
+            return badRequest("Company can change only CREATED internship");
+
+        String targetName = decision.equalsIgnoreCase("ACCEPT") ? "ACCEPTED" : "REJECTED";
+
+        InternshipState target = stateRepository.findByName(targetName)
+                .orElseThrow(() -> new RuntimeException("State not found"));
+
+        InternshipStateChange change = new InternshipStateChange(
+                internship,
+                target,
+                companyUser,
+                new Timestamp(System.currentTimeMillis())
+        );
+
+        stateChangeRepository.save(change);
+
+        return ResponseEntity.ok(Map.of("internshipId", id, "newState", targetName));
+    }
+
+    // ============================================================
+    // ADMIN – CHANGE STATE (možné opakovane po ACCEPTED, okrem REJECTED)
+    // ============================================================
+
+    @PostMapping("/internship/{id}/admin-state")
+    @Transactional
+    public ResponseEntity<?> adminChangeState(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable int id,
+            @RequestParam("state") String state   // APPROVED, DENIED, PASSED, FAILED
+    ) {
+        if (!isValidToken(authHeader)) return unauthorized();
+
+        User user = getUser(authHeader);
+
+        if (!"ADMIN".equalsIgnoreCase(user.getRole().getName())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Only admin can change internship state"));
+        }
+
+        Internship internship = internshipRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Internship not found"));
+
+        Optional<InternshipStateChange> lastOpt =
+                stateChangeRepository.findTopByInternshipIdOrderByStateChangedAtDesc(id);
+
+        if (lastOpt.isEmpty()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Internship has no state yet"));
+        }
+
+        String lastName = lastOpt.get().getInternshipState().getName().toUpperCase(Locale.ROOT);
+
+        // REJECTED sa nikdy meniť nesmie
+        if ("REJECTED".equals(lastName)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Rejected internship state cannot be changed"));
+        }
+
+        // admin môže meniť stav, ak je po potvrdení firmou:
+        // ACCEPTED alebo už niektorý z admin stavov (APPROVED, DENIED, PASSED, FAILED)
+        Set<String> allowedCurrent = Set.of("ACCEPTED", "APPROVED", "DENIED", "PASSED", "FAILED");
+        if (!allowedCurrent.contains(lastName)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Admin can change state only after company ACCEPTED"));
+        }
+
+        String targetName = state.toUpperCase(Locale.ROOT);
+        Set<String> allowedTarget = Set.of("APPROVED", "DENIED", "PASSED", "FAILED");
+        if (!allowedTarget.contains(targetName)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Unsupported state. Allowed: " + allowedTarget));
+        }
+
+        InternshipState targetState = stateRepository.findByName(targetName)
+                .orElseThrow(() -> new RuntimeException("State " + targetName + " not found"));
+
+        InternshipStateChange change = addStateChange(internship, targetState, user);
+
+        return ResponseEntity.ok(Map.of(
+                "internshipId", internship.getId(),
+                "newState", change.getInternshipState().getName()
+        ));
+    }
+
+    // ============================================================
+    // Helper na zápis zmeny stavu
+    // ============================================================
+
+    private InternshipStateChange addStateChange(
+            Internship internship,
+            InternshipState state,
+            User user
+    ) {
+        InternshipStateChange change = new InternshipStateChange();
+        change.setInternship(internship);
+        change.setInternshipState(state);
+        change.setUser(user);
+        change.setStateChangedAt(new Timestamp(System.currentTimeMillis()));
+        return stateChangeRepository.save(change);
+    }
 }

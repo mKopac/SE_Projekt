@@ -31,6 +31,9 @@ const InternshipTable: React.FC = () => {
   const [filterYear, setFilterYear] = useState<string | "ALL">("ALL");
   const [filterSemester, setFilterSemester] = useState<number | "ALL">("ALL");
 
+
+
+
   const token = localStorage.getItem("token") ?? "";
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -129,6 +132,45 @@ const InternshipTable: React.FC = () => {
             <option key={sem} value={sem}>{sem}</option>
           ))}
         </select>
+
+<button
+            className="export-btn"
+            onClick={async () => {
+              const params = new URLSearchParams();
+
+              if (search) params.append("search", search);
+              if (filterCompany !== "ALL") params.append("companyId", String(filterCompany));
+              if (filterMentor !== "ALL") params.append("mentorId", String(filterMentor));
+              if (filterYear !== "ALL") params.append("academicYear", filterYear);
+              if (filterSemester !== "ALL") params.append("semester", String(filterSemester));
+
+              const url = `${baseUrl}/dashboard/internships/export?${params.toString()}`;
+
+              const response = await fetch(url, {
+                headers: {
+                  Authorization: `Bearer ${token}`
+                }
+              });
+
+              if (!response.ok) {
+                alert("Export sa nepodaril – nemáš oprávnenie alebo token expiroval.");
+                return;
+              }
+
+              const blob = await response.blob();
+              const downloadUrl = window.URL.createObjectURL(blob);
+
+              const a = document.createElement("a");
+              a.href = downloadUrl;
+              a.download = "internships_export.csv";
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+  }}
+>
+  Export CSV
+</button>
+
       </div>
 
       {/* TABLE */}

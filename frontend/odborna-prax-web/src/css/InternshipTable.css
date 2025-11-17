@@ -55,3 +55,17 @@
   padding: 6px;
   width: 200px;
 }
+.export-btn {
+  padding: 8px 14px;
+  background: #1f6feb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.export-btn:hover {
+  background: #1557c0;
+}
+

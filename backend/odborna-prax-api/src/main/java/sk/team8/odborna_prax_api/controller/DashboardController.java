@@ -1,5 +1,6 @@
 package sk.team8.odborna_prax_api.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,8 @@ import sk.team8.odborna_prax_api.dto.CreateInternshipRequest;
 import sk.team8.odborna_prax_api.service.AuthService;
 
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -280,5 +283,63 @@ public class DashboardController {
                     .body(Map.of("error", "Server error", "details", e.getMessage()));
         }
     }
+
+    @GetMapping("/internships/export")
+    public void exportInternshipsCsv(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam(required = false) Integer companyId,
+            @RequestParam(required = false) Integer mentorId,
+            @RequestParam(required = false) String academicYear,
+            @RequestParam(required = false) Integer semester,
+            @RequestParam(required = false) String search,
+            HttpServletResponse response
+    ) throws IOException {
+
+        if (!isValidToken(authHeader)) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return;
+        }
+
+        String email = extractEmail(authHeader);
+        User user = authService.findUserByEmail(email)
+                .orElseThrow();
+
+        if (!user.getRole().getName().equalsIgnoreCase("ADMIN")) {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            return;
+        }
+
+        List<Internship> data = internshipRepository.filterInternships(
+                companyId, mentorId, academicYear, semester,
+                (search != null && !search.isBlank()) ? search : null
+        );
+
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=internships_export.csv");
+
+        PrintWriter writer = response.getWriter();
+        writer.println("Student,Firma,Mentor,Akademicky rok,Semester,Zaciatok praxe,Koniec praxe");
+
+        for (Internship i : data) {
+            String studentName = i.getStudent().getFirstName() + " " + i.getStudent().getLastName();
+            String mentorName = i.getMentor() != null
+                    ? i.getMentor().getFirstName() + " " + i.getMentor().getLastName()
+                    : "";
+            String companyName = i.getCompany().getName();
+
+            writer.printf("%s,%s,%s,%s,%d,%s,%s%n",
+                    studentName,
+                    companyName,
+                    mentorName,
+                    i.getAcademicYear(),
+                    i.getSemester(),
+                    i.getDateStart().toString(),
+                    i.getDateEnd().toString()
+            );
+        }
+
+        writer.flush();
+    }
+
 
 }

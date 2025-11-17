@@ -10,7 +10,6 @@ import sk.team8.odborna_prax_api.dao.*;
 import sk.team8.odborna_prax_api.dto.CreateInternshipRequest;
 import sk.team8.odborna_prax_api.service.AuthService;
 
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
@@ -88,8 +87,9 @@ public class DashboardController {
         public int semester;
         public String dateStart;
         public String dateEnd;
+        public String status;  // NOVÉ – pre FE
 
-        public InternshipDTO(Internship i) {
+        public InternshipDTO(Internship i, String status) {
             this.id = i.getId();
             this.studentId = i.getStudent().getId();
             this.companyId = i.getCompany().getId();
@@ -98,6 +98,7 @@ public class DashboardController {
             this.semester = i.getSemester();
             this.dateStart = i.getDateStart() != null ? i.getDateStart().toString() : null;
             this.dateEnd = i.getDateEnd() != null ? i.getDateEnd().toString() : null;
+            this.status = status;
         }
     }
 
@@ -116,16 +117,11 @@ public class DashboardController {
     ) {
 
         if (!isValidToken(authHeader)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Invalid or expired token"));
+            return unauthorized();
         }
 
-        String email = extractEmail(authHeader);
-        User user = authService.findUserByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("Používateľ neexistuje."));
-
         User user = getUser(authHeader);
-        String role = user.getRole().getName().toUpperCase();
+        String role = user.getRole().getName().toUpperCase(Locale.ROOT);
 
         Integer userStudentId = null;
         Integer userCompanyId = null;
@@ -134,16 +130,17 @@ public class DashboardController {
             case "STUDENT" -> userStudentId = user.getId();
             case "COMPANY" -> {
                 if (user.getCompany() == null)
-                    return ResponseEntity.badRequest().body(Map.of("error", "Firma nebola nájdená."));
+                    return badRequest("Firma nebola nájdená.");
                 userCompanyId = user.getCompany().getId();
             }
-            case "ADMIN" -> {}
+            case "ADMIN" -> {
+            }
             default -> {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(Map.of("error", "Neoprávnená rola"));
+                return forbidden("Neoprávnená rola");
             }
         }
 
+        // POZOR: userStudentId tu zatiaľ nepoužívam – závisí od signatúry filterInternships
         List<Internship> internships =
                 internshipRepository.filterInternships(
                         userCompanyId != null ? userCompanyId : companyId,
@@ -153,14 +150,21 @@ public class DashboardController {
                         (search != null && !search.isBlank()) ? search : null
                 );
 
-        List<Map<String, Object>> result = internships.stream().map(i -> {
-            Optional<InternshipStateChange> lastState =
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (Internship i : internships) {
+            Optional<InternshipStateChange> lastOpt =
                     stateChangeRepository.findTopByInternshipIdOrderByStateChangedAtDesc(i.getId());
 
-            result.add(Map.of(
-                    "internship", new InternshipDTO(i),
-                    "last_state", last.orElse(null)
-            ));
+            InternshipStateChange last = lastOpt.orElse(null);
+            String status = last != null
+                    ? last.getInternshipState().getName()
+                    : "UNKNOWN";
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("internship", new InternshipDTO(i, status));
+            map.put("last_state", last);
+            result.add(map);
         }
 
         return ResponseEntity.ok(result);
@@ -202,14 +206,13 @@ public class DashboardController {
             @RequestHeader("Authorization") String authHeader,
             @RequestBody CreateInternshipRequest request
     ) {
-        try {
-            if (!isValidToken(authHeader)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("error", "Invalid or expired token"));
-            }
+        if (!isValidToken(authHeader)) {
+            return unauthorized();
+        }
 
         User student = getUser(authHeader);
 
+        try {
             Company company = companyRepository.findById(request.companyId)
                     .orElseThrow(() -> new RuntimeException("Company not found"));
 
@@ -219,6 +222,8 @@ public class DashboardController {
                         .orElseThrow(() -> new RuntimeException("Mentor not found"));
             }
 
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+
             Internship internship = new Internship();
             internship.setStudent(student);
             internship.setCompany(company);
@@ -227,65 +232,38 @@ public class DashboardController {
             internship.setSemester(request.semester);
             internship.setDateStart(request.dateStart);
             internship.setDateEnd(request.dateEnd);
-            internship.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-            internship.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+            internship.setCreatedAt(now);
+            internship.setUpdatedAt(now);
 
             internshipRepository.save(internship);
 
-            InternshipState createdState = internshipStateRepository.findById(1)
-                    .orElseThrow(() -> new RuntimeException("State ID 1 (CREATED) not found"));
+            // inicialny stav CREATED
+            InternshipState created = stateRepository.findByName("CREATED")
+                    .orElseThrow(() -> new RuntimeException("State CREATED not found"));
 
             InternshipStateChange change = new InternshipStateChange(
                     internship,
-                    createdState,
+                    created,
                     student,
-                    new Timestamp(System.currentTimeMillis())
+                    now
             );
 
-            internshipStateChangeRepository.save(change);
+            stateChangeRepository.save(change);
 
             return ResponseEntity.ok(Map.of(
-                    "message", "Internship created successfully",
+                    "message", "Internship created",
                     "internshipId", internship.getId()
             ));
-
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Server error", "details", e.getMessage()));
         }
-
-        Internship internship = new Internship();
-        internship.setStudent(student);
-        internship.setCompany(company);
-        internship.setMentor(mentor);
-        internship.setAcademicYear(request.academicYear);
-        internship.setSemester(request.semester);
-        internship.setDateStart(request.dateStart);
-        internship.setDateEnd(request.dateEnd);
-        Timestamp now = new Timestamp(System.currentTimeMillis());
-        internship.setCreatedAt(now);
-        internship.setUpdatedAt(now);
-
-        internshipRepository.save(internship);
-
-        InternshipState created = stateRepository.findByName("CREATED")
-                .orElseThrow(() -> new RuntimeException("State CREATED not found"));
-
-        InternshipStateChange change = new InternshipStateChange(
-                internship,
-                created,
-                student,
-                now
-        );
-
-        stateChangeRepository.save(change);
-
-        return ResponseEntity.ok(Map.of(
-                "message", "Internship created",
-                "internshipId", internship.getId()
-        ));
     }
+
+    // ============================================================
+    // EXPORT CSV
+    // ============================================================
 
     @GetMapping("/internships/export")
     public void exportInternshipsCsv(
@@ -303,9 +281,7 @@ public class DashboardController {
             return;
         }
 
-        String email = extractEmail(authHeader);
-        User user = authService.findUserByEmail(email)
-                .orElseThrow();
+        User user = getUser(authHeader);
 
         if (!user.getRole().getName().equalsIgnoreCase("ADMIN")) {
             response.setStatus(HttpStatus.FORBIDDEN.value());
@@ -392,7 +368,7 @@ public class DashboardController {
     }
 
     // ============================================================
-    // ADMIN – CHANGE STATE (možné opakovane po ACCEPTED, okrem REJECTED)
+    // ADMIN – CHANGE STATE
     // ============================================================
 
     @PostMapping("/internship/{id}/admin-state")
@@ -407,8 +383,7 @@ public class DashboardController {
         User user = getUser(authHeader);
 
         if (!"ADMIN".equalsIgnoreCase(user.getRole().getName())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("error", "Only admin can change internship state"));
+            return forbidden("Only admin can change internship state");
         }
 
         Internship internship = internshipRepository.findById(id)
@@ -418,31 +393,26 @@ public class DashboardController {
                 stateChangeRepository.findTopByInternshipIdOrderByStateChangedAtDesc(id);
 
         if (lastOpt.isEmpty()) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Internship has no state yet"));
+            return badRequest("Internship has no state yet");
         }
 
         String lastName = lastOpt.get().getInternshipState().getName().toUpperCase(Locale.ROOT);
 
         // REJECTED sa nikdy meniť nesmie
         if ("REJECTED".equals(lastName)) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Rejected internship state cannot be changed"));
+            return badRequest("Rejected internship state cannot be changed");
         }
 
-        // admin môže meniť stav, ak je po potvrdení firmou:
-        // ACCEPTED alebo už niektorý z admin stavov (APPROVED, DENIED, PASSED, FAILED)
+        // admin môže meniť stav po potvrdení firmou
         Set<String> allowedCurrent = Set.of("ACCEPTED", "APPROVED", "DENIED", "PASSED", "FAILED");
         if (!allowedCurrent.contains(lastName)) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Admin can change state only after company ACCEPTED"));
+            return badRequest("Admin can change state only after company ACCEPTED");
         }
 
         String targetName = state.toUpperCase(Locale.ROOT);
         Set<String> allowedTarget = Set.of("APPROVED", "DENIED", "PASSED", "FAILED");
         if (!allowedTarget.contains(targetName)) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Unsupported state. Allowed: " + allowedTarget));
+            return badRequest("Unsupported state. Allowed: " + allowedTarget);
         }
 
         InternshipState targetState = stateRepository.findByName(targetName)

@@ -96,7 +96,14 @@ public class DashboardController {
     // GET INTERNSHIPS BASED ON LOGGED USER ROLE
     // ============================================================
     @GetMapping("/internships")
-    public ResponseEntity<?> getInternships(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<?> getInternships(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam(required = false) Integer companyId,
+            @RequestParam(required = false) Integer mentorId,
+            @RequestParam(required = false) String academicYear,
+            @RequestParam(required = false) Integer semester,
+            @RequestParam(required = false) String search
+    ) {
 
         if (!isValidToken(authHeader)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -104,37 +111,38 @@ public class DashboardController {
         }
 
         String email = extractEmail(authHeader);
-
         User user = authService.findUserByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Používateľ neexistuje."));
 
         String role = user.getRole().getName().toUpperCase();
-        List<Internship> internships;
+
+        Integer userStudentId = null;
+        Integer userCompanyId = null;
 
         switch (role) {
-
-            case "STUDENT" -> internships =
-                    internshipRepository.findByStudentId(user.getId());
-
+            case "STUDENT" -> userStudentId = user.getId();
             case "COMPANY" -> {
-                if (user.getCompany() == null) {
-                    return ResponseEntity.badRequest()
-                            .body(Map.of("error", "Firma nebola nájdená."));
-                }
-                internships =
-                        internshipRepository.findByCompanyId(user.getCompany().getId());
+                if (user.getCompany() == null)
+                    return ResponseEntity.badRequest().body(Map.of("error", "Firma nebola nájdená."));
+                userCompanyId = user.getCompany().getId();
             }
-
-            case "ADMIN" -> internships = internshipRepository.findAll();
-
+            case "ADMIN" -> {}
             default -> {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(Map.of("error", "Unauthorized role"));
+                        .body(Map.of("error", "Neoprávnená rola"));
             }
         }
 
-        List<Map<String, Object>> result = internships.stream().map(i -> {
+        List<Internship> internships =
+                internshipRepository.filterInternships(
+                        userCompanyId != null ? userCompanyId : companyId,
+                        mentorId,
+                        academicYear,
+                        semester,
+                        (search != null && !search.isBlank()) ? search : null
+                );
 
+        List<Map<String, Object>> result = internships.stream().map(i -> {
             Optional<InternshipStateChange> lastState =
                     stateChangeRepository.findTopByInternshipIdOrderByStateChangedAtDesc(i.getId());
 
@@ -158,6 +166,7 @@ public class DashboardController {
 
         return ResponseEntity.ok(result);
     }
+
 
     // ============================================================
     // GET STUDENTS
@@ -217,7 +226,6 @@ public class DashboardController {
             @RequestBody CreateInternshipRequest request
     ) {
         try {
-            // 1️⃣ Overenie tokenu
             if (!isValidToken(authHeader)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("error", "Invalid or expired token"));
@@ -227,18 +235,15 @@ public class DashboardController {
             User student = authService.findUserByEmail(email)
                     .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
 
-            // 2️⃣ Načítame firmu
             Company company = companyRepository.findById(request.companyId)
                     .orElseThrow(() -> new RuntimeException("Company not found"));
 
-            // 3️⃣ Mentor (ak je)
             User mentor = null;
             if (request.mentorId != null) {
                 mentor = userRepository.findById(request.mentorId)
                         .orElseThrow(() -> new RuntimeException("Mentor not found"));
             }
 
-            // 4️⃣ Vytvorenie novej praxe
             Internship internship = new Internship();
             internship.setStudent(student);
             internship.setCompany(company);
@@ -252,7 +257,6 @@ public class DashboardController {
 
             internshipRepository.save(internship);
 
-            // 5️⃣ Pridáme stav CREATED
             InternshipState createdState = internshipStateRepository.findById(1)
                     .orElseThrow(() -> new RuntimeException("State ID 1 (CREATED) not found"));
 
@@ -265,7 +269,6 @@ public class DashboardController {
 
             internshipStateChangeRepository.save(change);
 
-            // 6️⃣ Hotovo
             return ResponseEntity.ok(Map.of(
                     "message", "Internship created successfully",
                     "internshipId", internship.getId()

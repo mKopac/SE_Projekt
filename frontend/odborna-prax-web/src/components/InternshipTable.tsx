@@ -16,19 +16,15 @@ interface Internship {
   dateEnd: string;
 }
 
-interface Props {
-  internships?: Internship[];
-}
-
 const baseUrl = "http://localhost:8080";
 
-const InternshipTable: React.FC<Props> = ({ internships = [] }) => {
+const InternshipTable: React.FC = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
+  const [internships, setInternships] = useState<Internship[]>([]);
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
-  // SEARCH + FILTERS
   const [search, setSearch] = useState("");
   const [filterCompany, setFilterCompany] = useState<number | "ALL">("ALL");
   const [filterMentor, setFilterMentor] = useState<number | "ALL">("ALL");
@@ -40,20 +36,39 @@ const InternshipTable: React.FC<Props> = ({ internships = [] }) => {
 
   useEffect(() => {
     fetch(`${baseUrl}/dashboard/companies`, { headers })
-      .then(res => res.ok ? res.json() : [])
-      .then(data => setCompanies(Array.isArray(data) ? data : []))
+      .then(res => res.json())
+      .then(setCompanies)
       .catch(() => setCompanies([]));
 
     fetch(`${baseUrl}/dashboard/mentors`, { headers })
-      .then(res => res.ok ? res.json() : [])
-      .then(data => setMentors(Array.isArray(data) ? data : []))
+      .then(res => res.json())
+      .then(setMentors)
       .catch(() => setMentors([]));
 
     fetch(`${baseUrl}/dashboard/students`, { headers })
-      .then(res => res.ok ? res.json() : [])
-      .then(data => setStudents(Array.isArray(data) ? data : []))
+      .then(res => res.json())
+      .then(setStudents)
       .catch(() => setStudents([]));
   }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (search) params.append("search", search);
+    if (filterCompany !== "ALL") params.append("companyId", String(filterCompany));
+    if (filterMentor !== "ALL") params.append("mentorId", String(filterMentor));
+    if (filterYear !== "ALL") params.append("academicYear", filterYear);
+    if (filterSemester !== "ALL") params.append("semester", String(filterSemester));
+
+    fetch(`${baseUrl}/dashboard/internships?${params.toString()}`, { headers })
+      .then(res => res.json())
+      .then(data => {
+        const mapped = data.map((d: any) => d.internship);
+        setInternships(mapped);
+      })
+      .catch(() => setInternships([]));
+
+  }, [search, filterCompany, filterMentor, filterYear, filterSemester]);
 
   const getCompanyName = (id: number) =>
     companies.find(c => c.id === id)?.name || "—";
@@ -71,31 +86,6 @@ const InternshipTable: React.FC<Props> = ({ internships = [] }) => {
 
   const toggleExpand = (id: number) =>
     setExpandedId(prev => (prev === id ? null : id));
-
-  // 🔍 FILTERING + SEARCH LOGIC
-  const filteredData = useMemo(() => {
-    return internships.filter(i => {
-      const student = getStudentName(i.studentId).toLowerCase();
-      const company = getCompanyName(i.companyId).toLowerCase();
-      const mentor = getMentorName(i.mentorId).toLowerCase();
-
-      const searchMatch =
-        student.includes(search.toLowerCase()) ||
-        company.includes(search.toLowerCase()) ||
-        mentor.includes(search.toLowerCase()) ||
-        i.academicYear.toLowerCase().includes(search.toLowerCase()) ||
-        i.semester.toString().includes(search) ||
-        i.dateStart.includes(search) ||
-        i.dateEnd.includes(search);
-
-      const companyMatch = filterCompany === "ALL" || i.companyId === filterCompany;
-      const mentorMatch = filterMentor === "ALL" || i.mentorId === filterMentor;
-      const yearMatch = filterYear === "ALL" || i.academicYear === filterYear;
-      const semesterMatch = filterSemester === "ALL" || i.semester === filterSemester;
-
-      return searchMatch && companyMatch && mentorMatch && yearMatch && semesterMatch;
-    });
-  }, [internships, search, filterCompany, filterMentor, filterYear, filterSemester]);
 
   return (
     <>
@@ -130,9 +120,10 @@ const InternshipTable: React.FC<Props> = ({ internships = [] }) => {
           ))}
         </select>
 
-        <select 
-          value={filterSemester} 
-          onChange={e => setFilterSemester(e.target.value === "ALL" ? "ALL" : Number(e.target.value))}>
+        <select
+          value={filterSemester}
+          onChange={e => setFilterSemester(e.target.value === "ALL" ? "ALL" : Number(e.target.value))}
+        >
           <option value="ALL">Všetky semestre</option>
           {Array.from(new Set(internships.map(i => i.semester))).map(sem => (
             <option key={sem} value={sem}>{sem}</option>
@@ -140,9 +131,7 @@ const InternshipTable: React.FC<Props> = ({ internships = [] }) => {
         </select>
       </div>
 
-
-
-      {/* 📄 TABLE */}
+      {/* TABLE */}
       <table className="practice-table">
         <thead>
           <tr>
@@ -157,41 +146,39 @@ const InternshipTable: React.FC<Props> = ({ internships = [] }) => {
         </thead>
 
         <tbody>
-          {filteredData.length === 0 ? (
-            <tr>
-              <td colSpan={7} style={{ textAlign: "center" }}>
-                Žiadne výsledky.
-              </td>
-            </tr>
-          ) : (
-            filteredData.map(p => (
-              <React.Fragment key={p.id}>
-                <tr className="clickable-row" onClick={() => toggleExpand(p.id)}>
-                  <td>{getStudentName(p.studentId)}</td>
-                  <td>{getCompanyName(p.companyId)}</td>
-                  <td>{getMentorName(p.mentorId)}</td>
-                  <td>{new Date(p.dateStart).toLocaleDateString("sk-SK")}</td>
-                  <td>{new Date(p.dateEnd).toLocaleDateString("sk-SK")}</td>
-                  <td>{p.academicYear}</td>
-                  <td>{p.semester}</td>
-                </tr>
+        {internships.length === 0 ? (
+          <tr>
+            <td colSpan={7} style={{ textAlign: "center" }}>Žiadne výsledky.</td>
+          </tr>
+        ) : (
+          internships.map(p => (
+            <React.Fragment key={p.id}>
+              <tr className="clickable-row" onClick={() => toggleExpand(p.id)}>
+                <td>{getStudentName(p.studentId)}</td>
+                <td>{getCompanyName(p.companyId)}</td>
+                <td>{getMentorName(p.mentorId)}</td>
+                <td>{new Date(p.dateStart).toLocaleDateString("sk-SK")}</td>
+                <td>{new Date(p.dateEnd).toLocaleDateString("sk-SK")}</td>
+                <td>{p.academicYear}</td>
+                <td>{p.semester}</td>
+              </tr>
 
-                {expandedId === p.id && (
-                  <tr className="expanded-row">
-                    <td colSpan={7}>
-                      <div className="expanded-content">
-                        <p><strong>Mentor:</strong> {getMentorName(p.mentorId)}</p>
-                        <p><strong>Akademický rok:</strong> {p.academicYear}</p>
-                        <p><strong>Semester:</strong> {p.semester}</p>
-                        <p><strong>Začiatok:</strong> {p.dateStart}</p>
-                        <p><strong>Koniec:</strong> {p.dateEnd}</p>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </React.Fragment>
-            ))
-          )}
+              {expandedId === p.id && (
+                <tr className="expanded-row">
+                  <td colSpan={7}>
+                    <div className="expanded-content">
+                      <p><strong>Mentor:</strong> {getMentorName(p.mentorId)}</p>
+                      <p><strong>Akademický rok:</strong> {p.academicYear}</p>
+                      <p><strong>Semester:</strong> {p.semester}</p>
+                      <p><strong>Začiatok:</strong> {p.dateStart}</p>
+                      <p><strong>Koniec:</strong> {p.dateEnd}</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </React.Fragment>
+          ))
+        )}
         </tbody>
       </table>
     </>

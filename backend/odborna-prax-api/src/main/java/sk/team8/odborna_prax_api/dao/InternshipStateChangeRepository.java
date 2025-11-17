@@ -5,5 +5,6 @@ import sk.team8.odborna_prax_api.Entity.InternshipStateChange;
 import java.util.Optional;
 
 public interface InternshipStateChangeRepository extends JpaRepository<InternshipStateChange, Integer> {
-    Optional<InternshipStateChange> findTopByInternshipIdOrderByStateChangedAtDesc(int internshipId);
+    Optional<InternshipStateChange> findTopByInternshipIdOrderByStateChangedAtDesc(Integer internshipId);
+
 }

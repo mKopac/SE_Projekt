@@ -12,7 +12,10 @@ interface InternshipDTO {
   semester: number;
   dateStart: string;
   dateEnd: string;
+  status: string; // 🔥 pridane
 }
+
+type NewInternship = Omit<InternshipDTO, "status">; // 🔥 FE formulár nepozná status
 
 const Dashboard: React.FC = () => {
   const [internships, setInternships] = useState<InternshipDTO[]>([]);
@@ -32,12 +35,14 @@ const Dashboard: React.FC = () => {
 
     const headers = { Authorization: `Bearer ${token}` };
 
+    // === Load role ===
     fetch("http://localhost:8080/auth/me", { headers })
-      .then(res => res.ok ? res.json() : null)
+      .then(res => (res.ok ? res.json() : null))
       .then(user => {
         if (user) setRole(user.role?.name || "");
       });
 
+    // === Load internships + state ===
     fetch("http://localhost:8080/dashboard/internships", { headers })
       .then(async res => {
         if (!res.ok) {
@@ -47,8 +52,18 @@ const Dashboard: React.FC = () => {
         return res.json();
       })
       .then(data => {
-        const extracted = data.map((item: any) => item.internship);
-        setInternships(extracted);
+        const mapped: InternshipDTO[] = data.map((item: any) => {
+          const i = item.internship;
+          const last = item.last_state;
+          const status = last?.internshipState?.name || "CREATED";
+
+          return {
+            ...i,
+            status
+          };
+        });
+
+        setInternships(mapped);
       })
       .catch(err => {
         console.error("Error loading internships:", err);
@@ -57,8 +72,14 @@ const Dashboard: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleAddInternship = (i: InternshipDTO) => {
-    setInternships(prev => [...prev, i]);
+  // === Add new internship ===
+  const handleAddInternship = (i: NewInternship) => {
+    const newEntry: InternshipDTO = {
+      ...i,
+      status: "CREATED" // 🔥 FE default
+    };
+
+    setInternships(prev => [...prev, newEntry]);
     setShowModal(false);
   };
 
@@ -91,7 +112,8 @@ const Dashboard: React.FC = () => {
         </div>
       )}
 
-      <InternshipTable internships={internships} />
+      {/* 🔥 Passing role + statuses into table */}
+      <InternshipTable internships={internships} role={role} />
     </div>
   );
 };

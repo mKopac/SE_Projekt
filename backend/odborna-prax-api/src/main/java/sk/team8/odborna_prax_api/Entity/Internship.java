@@ -2,6 +2,7 @@ package sk.team8.odborna_prax_api.Entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
@@ -24,9 +25,8 @@ public class Internship {
     @JsonManagedReference("internship-company")
     private Company company;
 
-    // 🔹 Nový stĺpec mentor - referencuje používateľa (User)
     @ManyToOne
-    @JoinColumn(name = "mentor_id") // názov stĺpca v DB
+    @JoinColumn(name = "mentor_id")
     private User mentor;
 
     @Column(name = "academic_year", nullable = false, length = 9)
@@ -40,6 +40,9 @@ public class Internship {
 
     @Column(name = "date_end", nullable = false)
     private Date dateEnd;
+
+    @Column(name = "description")
+    private String description;
 
     @Column(name = "created_at", updatable = false)
     private Timestamp createdAt;
@@ -56,15 +59,17 @@ public class Internship {
     private List<Documents> documents;
 
     // Constructors
-    public Internship() {}
+    public Internship() {
+    }
 
-    public Internship(User student, Company company, String academicYear, int semester, Date dateStart, Date dateEnd) {
+    public Internship(User student, Company company, String academicYear, int semester, Date dateStart, Date dateEnd, String description) {
         this.student = student;
         this.company = company;
         this.academicYear = academicYear;
         this.semester = semester;
         this.dateStart = dateStart;
         this.dateEnd = dateEnd;
+        this.description = description;
     }
 
     // Getters & Setters
@@ -130,6 +135,14 @@ public class Internship {
 
     public void setDateEnd(Date dateEnd) {
         this.dateEnd = dateEnd;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Timestamp getCreatedAt() {

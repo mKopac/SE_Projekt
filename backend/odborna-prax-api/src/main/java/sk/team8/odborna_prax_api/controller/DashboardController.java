@@ -87,7 +87,8 @@ public class DashboardController {
         public int semester;
         public String dateStart;
         public String dateEnd;
-        public String status;  // NOVÉ – pre FE
+        public String status;
+        public String description;   // ← pridáme
 
         public InternshipDTO(Internship i, String status) {
             this.id = i.getId();
@@ -99,6 +100,7 @@ public class DashboardController {
             this.dateStart = i.getDateStart() != null ? i.getDateStart().toString() : null;
             this.dateEnd = i.getDateEnd() != null ? i.getDateEnd().toString() : null;
             this.status = status;
+            this.description = i.getDescription(); // ← pridáme
         }
     }
 
@@ -232,6 +234,7 @@ public class DashboardController {
             internship.setSemester(request.semester);
             internship.setDateStart(request.dateStart);
             internship.setDateEnd(request.dateEnd);
+            internship.setDescription(request.description);
             internship.setCreatedAt(now);
             internship.setUpdatedAt(now);
 
@@ -297,7 +300,7 @@ public class DashboardController {
         response.setHeader("Content-Disposition", "attachment; filename=internships_export.csv");
 
         PrintWriter writer = response.getWriter();
-        writer.println("Student,Firma,Mentor,Akademicky rok,Semester,Zaciatok praxe,Koniec praxe");
+        writer.println("Student,Firma,Mentor,Akademicky rok,Semester,Zaciatok praxe,Koniec praxe,Popis");
 
         for (Internship i : data) {
             String studentName = i.getStudent().getFirstName() + " " + i.getStudent().getLastName();
@@ -313,7 +316,8 @@ public class DashboardController {
                     i.getAcademicYear(),
                     i.getSemester(),
                     i.getDateStart().toString(),
-                    i.getDateEnd().toString()
+                    i.getDateEnd().toString(),
+                    i.getDescription() != null ? i.getDescription() : ""
             );
         }
 

@@ -9,4 +9,5 @@ public class CreateInternshipRequest {
     public int semester;
     public Date dateStart;
     public Date dateEnd;
+    public String description;
 }

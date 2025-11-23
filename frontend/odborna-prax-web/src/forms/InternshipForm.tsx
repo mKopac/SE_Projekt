@@ -14,6 +14,7 @@ interface Internship {
   semester: number;
   dateStart: string;
   dateEnd: string;
+  description?: string; // ← PRIDANÉ
 }
 
 interface Props {
@@ -37,6 +38,7 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
     semester: number;
     dateStart: string;
     dateEnd: string;
+    description: string;
   };
 
   const [form, setForm] = useState<InternshipFormData>({
@@ -46,29 +48,26 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
     semester: 1,
     dateStart: "",
     dateEnd: "",
+    description: "",
   });
 
   useEffect(() => {
-    // LOAD COMPANIES
     fetch(`${baseUrl}/dashboard/companies`, { headers })
       .then(res => res.ok ? res.json() : [])
       .then(data => setCompanies(Array.isArray(data) ? data : []));
 
-    // LOAD MENTORS
     fetch(`${baseUrl}/dashboard/mentors`, { headers })
       .then(res => res.ok ? res.json() : [])
       .then(data => setMentors(Array.isArray(data) ? data : []));
 
-    // LOAD CURRENT USER
     fetch(`${baseUrl}/auth/me`, { headers })
       .then(res => res.ok ? res.json() : null)
       .then(user => setCurrentUserId(user?.id ?? null));
 
-    // Nastavenie defaultného akademického roku
     const now = new Date();
     let startYear: number;
     let endYear: number;
-    if (now.getMonth() >= 8) { // September = 8 (0-indexované)
+    if (now.getMonth() >= 8) {
       startYear = now.getFullYear();
       endYear = startYear + 1;
     } else {
@@ -79,7 +78,9 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
 
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement> // ← PRIDANÉ
+  ) => {
     const { name, value } = e.target;
     setForm(prev => ({
       ...prev,
@@ -102,6 +103,7 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
       semester: form.semester,
       dateStart: form.dateStart,
       dateEnd: form.dateEnd,
+      description: form.description,
     };
 
     const res = await fetch(`${baseUrl}/dashboard/internship`, {
@@ -122,7 +124,6 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
 
     alert("Prax bola úspešne vytvorená!");
 
-    // Zavoláme onAdd, ale použijeme ID z backendu
     onAdd({
       id: data.internshipId,
       studentId: currentUserId,
@@ -132,9 +133,9 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
       semester: form.semester,
       dateStart: form.dateStart,
       dateEnd: form.dateEnd,
+      description: form.description,
     });
 
-    // Reset formulára
     setForm({
       companyId: 0,
       mentorId: 0,
@@ -142,6 +143,7 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
       semester: 1,
       dateStart: "",
       dateEnd: "",
+      description: "",
     });
   };
 
@@ -200,6 +202,16 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
           <label>Koniec:</label>
           <input type="date" name="dateEnd" value={form.dateEnd} onChange={handleChange} required />
         </div>
+      </div>
+
+      <div className="form-group">
+        <label>Popis:</label>
+        <textarea
+          name="description"
+          value={form.description}
+          onChange={handleChange}
+          rows={3}
+        ></textarea>
       </div>
 
       <button type="submit" className="btn-save">Uložiť prax</button>

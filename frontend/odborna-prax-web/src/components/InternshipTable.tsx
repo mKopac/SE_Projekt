@@ -15,6 +15,9 @@ interface Internship {
   dateStart: string;
   dateEnd: string;
   status: string;
+
+  /** ➕ PRIDANÉ PRE POPIS */
+  description: string;
 }
 
 interface Props {
@@ -82,7 +85,7 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
       .catch(() => setInternships([]));
     setLocalData(internships);
 
-  }, [search, filterCompany, filterMentor, filterYear, filterSemester,internships]);
+  }, [search, filterCompany, filterMentor, filterYear, filterSemester, internships]);
 
   const getCompanyName = (id: number) =>
     companies.find(c => c.id === id)?.name || "—";
@@ -236,43 +239,43 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
           ))}
         </select>
 
-<button
-            className="export-btn"
-            onClick={async () => {
-              const params = new URLSearchParams();
+        <button
+          className="export-btn"
+          onClick={async () => {
+            const params = new URLSearchParams();
 
-              if (search) params.append("search", search);
-              if (filterCompany !== "ALL") params.append("companyId", String(filterCompany));
-              if (filterMentor !== "ALL") params.append("mentorId", String(filterMentor));
-              if (filterYear !== "ALL") params.append("academicYear", filterYear);
-              if (filterSemester !== "ALL") params.append("semester", String(filterSemester));
+            if (search) params.append("search", search);
+            if (filterCompany !== "ALL") params.append("companyId", String(filterCompany));
+            if (filterMentor !== "ALL") params.append("mentorId", String(filterMentor));
+            if (filterYear !== "ALL") params.append("academicYear", filterYear);
+            if (filterSemester !== "ALL") params.append("semester", String(filterSemester));
 
-              const url = `${baseUrl}/dashboard/internships/export?${params.toString()}`;
+            const url = `${baseUrl}/dashboard/internships/export?${params.toString()}`;
 
-              const response = await fetch(url, {
-                headers: {
-                  Authorization: `Bearer ${token}`
-                }
-              });
-
-              if (!response.ok) {
-                alert("Export sa nepodaril – nemáš oprávnenie alebo token expiroval.");
-                return;
+            const response = await fetch(url, {
+              headers: {
+                Authorization: `Bearer ${token}`
               }
+            });
 
-              const blob = await response.blob();
-              const downloadUrl = window.URL.createObjectURL(blob);
+            if (!response.ok) {
+              alert("Export sa nepodaril – nemáš oprávnenie alebo token expiroval.");
+              return;
+            }
 
-              const a = document.createElement("a");
-              a.href = downloadUrl;
-              a.download = "internships_export.csv";
-              document.body.appendChild(a);
-              a.click();
-              a.remove();
-  }}
->
-  Export CSV
-</button>
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = downloadUrl;
+            a.download = "internships_export.csv";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        }}
+        >
+          Export CSV
+        </button>
 
       </div>
 
@@ -323,6 +326,10 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
                         <p><strong>Semester:</strong> {p.semester}</p>
                         <p><strong>Dátum začiatku:</strong> {p.dateStart}</p>
                         <p><strong>Dátum konca:</strong> {p.dateEnd}</p>
+
+                        {/* ➕ PRIDANÉ – POPIS PRAXE */}
+                        <p><strong>Popis praxe:</strong> {p.description || "—"}</p>
+
                         <p><strong>Stav praxe:</strong> {p.status}</p>
 
                         {role === "COMPANY" && p.status === "CREATED" && (

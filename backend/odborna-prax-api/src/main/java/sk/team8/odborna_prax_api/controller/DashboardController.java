@@ -309,7 +309,7 @@ public class DashboardController {
                     : "";
             String companyName = i.getCompany().getName();
 
-            writer.printf("%s,%s,%s,%s,%d,%s,%s%n",
+            writer.printf("%s,%s,%s,%s,%d,%s,%s,%s%n",
                     studentName,
                     companyName,
                     mentorName,

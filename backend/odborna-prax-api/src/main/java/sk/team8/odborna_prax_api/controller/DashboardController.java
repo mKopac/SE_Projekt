@@ -135,14 +135,12 @@ public class DashboardController {
                     return badRequest("Firma nebola nájdená.");
                 userCompanyId = user.getCompany().getId();
             }
-            case "ADMIN" -> {
-            }
+            case "ADMIN" -> {}
             default -> {
                 return forbidden("Neoprávnená rola");
             }
         }
 
-        // POZOR: userStudentId tu zatiaľ nepoužívam – závisí od signatúry filterInternships
         List<Internship> internships =
                 internshipRepository.filterInternships(
                         userCompanyId != null ? userCompanyId : companyId,
@@ -151,6 +149,12 @@ public class DashboardController {
                         semester,
                         (search != null && !search.isBlank()) ? search : null
                 );
+
+        if (userStudentId != null) {
+            final Integer finalUserStudentId = userStudentId;
+            internships.removeIf(i -> i.getStudent().getId() != finalUserStudentId);
+        }
+
 
         List<Map<String, Object>> result = new ArrayList<>();
 
@@ -171,7 +175,6 @@ public class DashboardController {
 
         return ResponseEntity.ok(result);
     }
-
 
     // ============================================================
     // POMOCNÉ ENDPOINTY PRE FRONTEND (študenti, mentori, firmy)

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -7,14 +7,13 @@ import { useNavigate } from "react-router-dom";
 import "./../css/RegisterForm.css";
 
 export type RegisterFormData = {
-
   accountType: "Študent" | "Firma";
   firmType: "" | "existujuca" | "nova";
-  companyId?: string;   
+  companyId?: number;   
   firmName?: string;    
   ico?: string;         
   street?: string;     
-  studyProgram?: string;
+  studyProgramId?: number;  
   firstName: string;
   lastName: string;
   studentEmail: string;
@@ -30,15 +29,25 @@ type Props = {
   onSubmit?: (formData: RegisterFormData) => void;
 };
 
+interface StudyProgram {
+  id: number;
+  name: string;
+}
+
+interface Company {
+  id: number;
+  name: string;
+}
+
 export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
   const [formData, setFormData] = useState<RegisterFormData>({
     accountType: "Študent",
     firmType: "existujuca",
-    companyId:"",
+    companyId: undefined,
     firmName: "",
     ico: "",
     street: "",
-    studyProgram: "AI22m",
+    studyProgramId: undefined,
     firstName: "",
     lastName: "",
     studentEmail: "",
@@ -49,9 +58,13 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
     zip: "",
     consent: false,
   });
+
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [studyPrograms, setStudyPrograms] = useState<StudyProgram[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -61,71 +74,91 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
 
     setFormData((prev) => ({
       ...prev,
-      [name]: newValue,
+      [name]: type === "select-one" && (name === "studyProgramId" || name === "companyId")
+        ? Number(value) || undefined
+        : newValue,
     }));
   };
 
+  // Načítanie študijných programov
+  useEffect(() => {
+    const fetchStudyPrograms = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/auth/study-programs");
+        if (!res.ok) throw new Error("Chyba pri načítavaní študijných odborov");
+        const data = await res.json();
+        setStudyPrograms(data);
+      } catch (error) {
+        console.error("Fetch study programs failed:", error);
+      }
+    };
+    fetchStudyPrograms();
+  }, []);
+
+  // Načítanie existujúcich firiem
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/auth/companies"); // endpoint pre všetky firmy
+        if (!res.ok) throw new Error("Chyba pri načítavaní firiem");
+        const data = await res.json();
+        setCompanies(data);
+      } catch (error) {
+        console.error("Fetch companies failed:", error);
+      }
+    };
+    fetchCompanies();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError(null);
+    e.preventDefault();
+    setError(null);
 
-  // 1) základná validácia
-  if (!formData.firstName || !formData.lastName) {
-    setError("Zadajte meno a priezvisko.");
-    return;
-  }
+    if (!formData.firstName || !formData.lastName) {
+      setError("Zadajte meno a priezvisko.");
+      return;
+    }
 
-  if (!formData.studentEmail) {
-    setError("Zadajte e-mail.");
-    return;
-  }
+    if (!formData.studentEmail) {
+      setError("Zadajte e-mail.");
+      return;
+    }
 
-  if (!formData.consent) {
-    setError("Musíte súhlasiť so spracovaním osobných údajov.");
-    return;
-  }
+    if (!formData.consent) {
+      setError("Musíte súhlasiť so spracovaním osobných údajov.");
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    if (formData.accountType === "Študent") {
-      const payload = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        studentEmail: formData.studentEmail,
-        emailAlternate: formData.altEmail,
-        phoneNumber: formData.phone,
-        address: formData.address,
-        city: formData.city,
-        zip: formData.zip,
-        studyProgram: formData.studyProgram, 
-      };
-
-      await http.post("/auth/register/student", payload);
-
-      
-      navigate("/login?registered=success");
-    } else if (formData.accountType === "Firma") {
+    try {
+      if (formData.accountType === "Študent") {
         const payload = {
           firstName: formData.firstName,
           lastName: formData.lastName,
-          studentEmail: formData.studentEmail,          
+          studentEmail: formData.studentEmail,
           emailAlternate: formData.altEmail,
           phoneNumber: formData.phone,
-
-          firmType: formData.firmType,                
-          companyId:
-            formData.firmType === "existujuca" && formData.companyId
-              ? Number(formData.companyId)
-              : undefined,
-          companyName:
-            formData.firmType === "nova" ? formData.firmName : undefined,
-          companyIdentificationNumber:
-            formData.firmType === "nova" ? formData.ico : undefined,
-
-          // adresa kontaktnej osoby (user)
           address: formData.address,
-          // adresa firmy – ulica zo sekcie "nová firma"
+          city: formData.city,
+          zip: formData.zip,
+          fieldOfStudyId: formData.studyProgramId,
+        };
+
+        await http.post("/auth/register/student", payload);
+        navigate("/login?registered=success");
+      } else if (formData.accountType === "Firma") {
+        const payload = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          studentEmail: formData.studentEmail,
+          emailAlternate: formData.altEmail,
+          phoneNumber: formData.phone,
+          firmType: formData.firmType,
+          companyId: formData.firmType === "existujuca" ? formData.companyId : undefined,
+          companyName: formData.firmType === "nova" ? formData.firmName : undefined,
+          companyIdentificationNumber: formData.firmType === "nova" ? formData.ico : undefined,
+          address: formData.address,
           street: formData.street,
           city: formData.city,
           zip: formData.zip,
@@ -135,16 +168,15 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
         navigate("/login?registered=success");
       }
 
-    if (onSubmit) {
-      onSubmit(formData);
+      if (onSubmit) {
+        onSubmit(formData);
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError("Registrácia zlyhala. Skontrolujte údaje alebo skúste neskôr.");
+    } finally {
+      setLoading(false);
     }
-
-  } catch (err: any) {
-    console.error(err);
-    setError("Registrácia zlyhala. Skontrolujte údaje alebo skúste neskôr.");
-  } finally {
-    setLoading(false);
-  }
   };
 
   const isFirma = formData.accountType === "Firma";
@@ -181,12 +213,16 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                 <div className="form-row">
                   <label>Vyberte študijný odbor</label>
                   <select
-                    name="studyProgram"
-                    value={formData.studyProgram}
+                    name="studyProgramId"
+                    value={formData.studyProgramId || ""}
                     onChange={handleChange}
                   >
-                    <option>AI22m</option>
-                    <option>AI22b</option>
+                    <option value="">-- Vyber odbor --</option>
+                    {studyPrograms.map((program) => (
+                      <option key={program.id} value={program.id}>
+                        {program.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
               )}
@@ -239,15 +275,23 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                   </div>
                 </div>
               )}
+
               {isFirma && formData.firmType === "existujuca" && (
-                <label>
-                Vyberte firmu
-                  <select name="companyId" value={formData.companyId} onChange={handleChange}>
-                    <option value="">-- Vyberte --</option>
-                    <option value="1">Firma A</option>
-                    <option value="2">Firma B</option>
+                <div className="form-row">
+                  <label>Vyberte firmu</label>
+                  <select
+                    name="companyId"
+                    value={formData.companyId || ""}
+                    onChange={handleChange}
+                  >
+                    <option value="">-- Vyber firmu --</option>
+                    {companies.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
                   </select>
-                </label>
+                </div>
               )}
 
               {isFirma && formData.firmType === "nova" && (

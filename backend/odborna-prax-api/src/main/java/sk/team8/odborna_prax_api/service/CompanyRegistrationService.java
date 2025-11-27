@@ -17,6 +17,8 @@ import sk.team8.odborna_prax_api.dao.RoleRepository;
 import sk.team8.odborna_prax_api.dao.UserRepository;
 import sk.team8.odborna_prax_api.dto.CompanyRegisterRequest;
 
+import java.util.List;
+
 @Service
 public class CompanyRegistrationService {
 
@@ -47,6 +49,13 @@ public class CompanyRegistrationService {
         this.authTokenService = authTokenService;
         this.emailService = emailService;
         this.passwordGeneratorService = passwordGeneratorService;
+    }
+
+    /**
+     * ➕ NOVÉ — použije sa v /auth/companies endpoint-e
+     */
+    public List<Company> getAllCompanies() {
+        return companyRepository.findAll();
     }
 
     @Transactional
@@ -99,7 +108,6 @@ public class CompanyRegistrationService {
 
         } else if ("nova".equals(firmType)) {
 
-
             Address companyAddress = new Address();
             companyAddress.setStreet(req.getStreet());
             companyAddress.setCity(req.getCity());
@@ -133,14 +141,15 @@ public class CompanyRegistrationService {
         u.setActive(false);
         u.setPasswordNeedsChange(true);
 
-
         String rawPassword = passwordGeneratorService.generatePassword(10);
         u.setPassword(passwordEncoder.encode(rawPassword));
 
         userRepository.save(u);
 
-
-        AuthToken token = authTokenService.createToken(u, TokenType.EMAIL_VERIFICATION, 24
+        AuthToken token = authTokenService.createToken(
+                u,
+                TokenType.EMAIL_VERIFICATION,
+                24
         );
 
         String verificationLink =
@@ -153,7 +162,7 @@ public class CompanyRegistrationService {
                 verificationLink + "\n\n" +
                 "Vaše dočasné heslo pre prihlásenie je:\n" +
                 rawPassword + "\n\n" +
-                "Link pre aktiváciu účtu je platný24 hodín.";
+                "Link pre aktiváciu účtu je platný 24 hodín.";
 
         emailService.sendEmail(u.getEmail(), subject, body);
     }

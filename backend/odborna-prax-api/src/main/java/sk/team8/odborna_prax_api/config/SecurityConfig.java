@@ -48,7 +48,9 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/auth/verify-reset-token",
-                                "/auth/verify-email"
+                                "/auth/verify-email",
+                                "/auth/study-programs",
+                                "/auth/companies"
                         ).permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                         .requestMatchers("/actuator/health", "/v3/api-docs/**", "/swagger-ui/**").permitAll()

@@ -6,9 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import sk.team8.odborna_prax_api.Entity.AuthToken;
-import sk.team8.odborna_prax_api.Entity.TokenType;
-import sk.team8.odborna_prax_api.Entity.User;
+import sk.team8.odborna_prax_api.Entity.*;
 import sk.team8.odborna_prax_api.dao.UserRepository;
 import sk.team8.odborna_prax_api.dto.*;
 import sk.team8.odborna_prax_api.service.*;
@@ -16,6 +14,8 @@ import sk.team8.odborna_prax_api.dto.CompanyRegisterRequest;
 import sk.team8.odborna_prax_api.service.CompanyRegistrationService;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -32,6 +32,7 @@ public class AuthController {
     private final StudentRegistrationService studentRegistrationService;
     private final CompanyRegistrationService companyRegistrationService;
     private final PasswordChangeService passwordChangeService;
+    private final UserService userService;
 
     public AuthController(
             AdminRegistrationService adminRegistrationService,
@@ -39,7 +40,7 @@ public class AuthController {
             AuthTokenService authTokenService,
             EmailService emailService,
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder, StudentRegistrationService studentRegistrationService, CompanyRegistrationService companyRegistrationService, PasswordChangeService passwordChangeService
+            PasswordEncoder passwordEncoder, StudentRegistrationService studentRegistrationService, CompanyRegistrationService companyRegistrationService, PasswordChangeService passwordChangeService, UserService userService
     ) {
         this.adminRegistrationService = adminRegistrationService;
         this.authService = authService;
@@ -50,6 +51,7 @@ public class AuthController {
         this.studentRegistrationService = studentRegistrationService;
         this.companyRegistrationService = companyRegistrationService;
         this.passwordChangeService = passwordChangeService;
+        this.userService = userService;
     }
 
     @PostMapping("/register/admin")
@@ -207,6 +209,50 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Nastala chyba pri zmene hesla."));
+        }
+    }
+
+    @GetMapping("/study-programs")
+    public ResponseEntity<?> getAllStudyPrograms() {
+        try {
+            List<FieldOfStudy> programs = userService.getAllStudyPrograms();
+
+            List<Map<String, Object>> response = programs.stream()
+                    .map(p -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("id", p.getId());
+                        map.put("name", p.getName());
+                        return map;
+                    })
+                    .toList();
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Chyba pri načítavaní študijných odborov"));
+        }
+    }
+
+    @GetMapping("/companies")
+    public ResponseEntity<?> getAllCompanies() {
+        try {
+            List<Company> companies = companyRegistrationService.getAllCompanies();
+
+            List<Map<String, Object>> response = companies.stream()
+                    .map(c -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("id", c.getId());
+                        map.put("name", c.getName());
+                        return map;
+                    })
+                    .toList();
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Chyba pri načítavaní firiem"));
         }
     }
 

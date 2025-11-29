@@ -12,10 +12,15 @@ interface User {
   suspended: boolean;
 }
 
-
 export default function AdminUserManagement() {
   const [users, setUsers] = useState<User[]>([]);
   const token = localStorage.getItem("token");
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -51,12 +56,21 @@ export default function AdminUserManagement() {
   }, []);
 
   return (
-    <div >
+    <div>
       <Header />
 
       <main className="main-content">
         <div className="dashboard-container">
           <h2 className="page-title">Správa používateľov</h2>
+
+          <div className="actions-top">
+            <button
+              className="btn create-admin"
+              onClick={() => setShowCreateForm(true)}
+            >
+              + Vytvoriť admina
+            </button>
+          </div>
 
           <div className="table-wrapper">
             <table className="styled-table">
@@ -73,7 +87,9 @@ export default function AdminUserManagement() {
                 {users.map((u) => (
                   <tr key={u.id}>
                     <td>{u.id}</td>
-                    <td>{u.firstName} {u.lastName}</td>
+                    <td>
+                      {u.firstName} {u.lastName}
+                    </td>
                     <td>{u.email}</td>
                     <td>
                       {u.suspended ? (
@@ -103,15 +119,102 @@ export default function AdminUserManagement() {
                 ))}
               </tbody>
             </table>
-
-{/*
-           {users.length === 0 && (
-               
-               <p className="no-data">Žiadny používatelia na zobrazenie.</p>
-            )}
-      */  } 
           </div>
         </div>
+
+        {showCreateForm && (
+          <div className="create-admin-container">
+            <h3>Vytvoriť admin účet</h3>
+
+            <form
+              className="create-admin-form"
+              onSubmit={async (e) => {
+                e.preventDefault();
+
+                const res = await fetch(
+                  "http://localhost:8080/auth/register/admin",
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                      firstName,
+                      lastName,
+                      email,
+                      phoneNumber,
+                    }),
+                  }
+                );
+
+                if (res.ok) {
+                  alert("Admin účet bol vytvorený. Overovací email bol odoslaný.");
+                  setShowCreateForm(false);
+                  fetchUsers();
+                } else {
+                  let errorMessage = "Chyba pri vytváraní admina.";
+
+                  try {
+                    const err = await res.json();
+                    errorMessage = err.message || err.error || errorMessage;
+                  } catch (_) {}
+
+                  alert(errorMessage);
+                }
+              }}
+            >
+              <label>
+                Meno
+                <input
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </label>
+
+              <label>
+                Priezvisko
+                <input
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
+              </label>
+
+              <label>
+                Email
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </label>
+
+              <label>
+                Telefónne číslo
+                <input
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                />
+              </label>
+
+              <div className="form-buttons">
+                <button type="submit" className="btn create">
+                  Vytvoriť
+                </button>
+                <button
+                  type="button"
+                  className="btn cancel"
+                  onClick={() => setShowCreateForm(false)}
+                >
+                  Zrušiť
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
       </main>
 
       <Footer />

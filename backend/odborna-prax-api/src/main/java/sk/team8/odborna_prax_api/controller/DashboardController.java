@@ -188,11 +188,21 @@ public class DashboardController {
     }
 
     @GetMapping("/mentors")
-    public ResponseEntity<?> getMentors(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<?> getMentors(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam(required = false) Integer companyId
+    ) {
         if (!isValidToken(authHeader)) return unauthorized();
+
+        if (companyId != null) {
+            List<User> mentors = userRepository.findByCompanyId(companyId);
+            return ResponseEntity.ok(mentors);
+        }
+
         List<User> mentors = userRepository.findByRoleName("COMPANY");
         return ResponseEntity.ok(mentors);
     }
+
 
     @GetMapping("/companies")
     public ResponseEntity<?> getCompanies(@RequestHeader("Authorization") String authHeader) {

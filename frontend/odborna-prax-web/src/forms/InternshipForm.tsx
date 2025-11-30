@@ -14,7 +14,7 @@ interface Internship {
   semester: number;
   dateStart: string;
   dateEnd: string;
-  description?: string; // ← PRIDANÉ
+  description?: string;
 }
 
 interface Props {
@@ -25,7 +25,12 @@ const baseUrl = "http://localhost:8080";
 
 const InternshipForm: React.FC<Props> = ({ onAdd }) => {
   const [companies, setCompanies] = useState<Company[]>([]);
+  const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
+  const [companyInput, setCompanyInput] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+
   const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [filteredMentors, setFilteredMentors] = useState<Mentor[]>([]);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
   const token = localStorage.getItem("token");
@@ -54,7 +59,10 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
   useEffect(() => {
     fetch(`${baseUrl}/dashboard/companies`, { headers })
       .then(res => res.ok ? res.json() : [])
-      .then(data => setCompanies(Array.isArray(data) ? data : []));
+      .then(data => {
+        setCompanies(Array.isArray(data) ? data : []);
+        setFilteredCompanies(Array.isArray(data) ? data : []);
+      });
 
     fetch(`${baseUrl}/dashboard/mentors`, { headers })
       .then(res => res.ok ? res.json() : [])
@@ -78,8 +86,33 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
 
   }, []);
 
+  // FULLTEXT FILTER
+  const handleCompanySearch = (text: string) => {
+    setCompanyInput(text);
+    setShowDropdown(true);
+
+    const filtered = companies.filter(c =>
+      c.name.toLowerCase().includes(text.toLowerCase())
+    );
+    setFilteredCompanies(filtered);
+  };
+
+  const selectCompany = (company: Company) => {
+    setCompanyInput(company.name);
+    setForm(prev => ({ ...prev, companyId: company.id }));
+    setShowDropdown(false);
+
+    fetch(`${baseUrl}/dashboard/mentors?companyId=${company.id}`, { headers })
+      .then(res => res.ok ? res.json() : [])
+      .then(data => {
+        setMentors(data);
+        setFilteredMentors(data);
+      });
+  };
+
+
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement> // ← PRIDANÉ
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setForm(prev => ({
@@ -93,6 +126,11 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
 
     if (!currentUserId) {
       alert("Nepodarilo sa načítať používateľa.");
+      return;
+    }
+
+    if (form.companyId === 0) {
+      alert("Musíš vybrať firmu zo zoznamu!");
       return;
     }
 
@@ -145,50 +183,66 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
       dateEnd: "",
       description: "",
     });
+
+    setCompanyInput("");
   };
 
   return (
     <form className="practice-form" onSubmit={handleSubmit}>
       <h3>Nová prax</h3>
 
-      <div className="form-group">
+      <div className="form-group" style={{ position: "relative" }}>
         <label>Firma:</label>
-        <select name="companyId" value={form.companyId} onChange={handleChange} required>
-          <option value="">-- Vyber firmu --</option>
-          {companies.map(c => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
+        <input
+          type="text"
+          placeholder="Začni písať…"
+          value={companyInput}
+          onChange={(e) => handleCompanySearch(e.target.value)}
+          onFocus={() => setShowDropdown(true)}
+          required
+        />
+
+        {showDropdown && filteredCompanies.length > 0 && (
+          <ul className="autocomplete-list">
+            {filteredCompanies.map((c) => (
+              <li
+                key={c.id}
+                onClick={() => selectCompany(c)}
+                className="autocomplete-item"
+              >
+                {c.name}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <div className="form-group">
         <label>Mentor:</label>
-        <select name="mentorId" value={form.mentorId} onChange={handleChange} required>
-          <option value="">-- Vyber mentora --</option>
+        <select
+          name="mentorId"
+          value={form.mentorId}
+          onChange={handleChange}
+          required
+          disabled={form.companyId === 0}
+        >
+          <option value="">-- Najprv vyber firmu --</option>
           {mentors.map(m => (
             <option key={m.id} value={m.id}>{m.firstName} {m.lastName}</option>
           ))}
         </select>
+
       </div>
 
       <div className="form-group">
         <label>Akademický rok:</label>
-        <input name="academicYear" value={form.academicYear} onChange={handleChange} required readOnly/>
+        <input name="academicYear" value={form.academicYear} readOnly />
       </div>
 
       <div className="form-group">
         <label>Semester:</label>
         <select name="semester" value={form.semester} onChange={handleChange}>
-          <option value={1}>1</option>
-          <option value={2}>2</option>
-          <option value={3}>3</option>
-          <option value={4}>4</option>
-          <option value={5}>5</option>
-          <option value={6}>6</option>
-          <option value={7}>7</option>
-          <option value={8}>8</option>
-          <option value={9}>9</option>
-          <option value={10}>10</option>
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <option key={n} value={n}>{n}</option>)}
         </select>
       </div>
 

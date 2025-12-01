@@ -13,10 +13,12 @@ export const LoginForm: React.FC<Props> = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
-  const [infoMessage, setInfoMessage] = useState<string | null>(null); 
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
+
   const token = localStorage.getItem("token");
   if (token) return <Navigate to="/dashboard" replace />;
-  useEffect(() => {                                         
+
+  useEffect(() => {
     const registered = searchParams.get("registered");
     const verification = searchParams.get("verification");
 
@@ -57,18 +59,34 @@ export const LoginForm: React.FC<Props> = () => {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem("token", data.access_token); 
-        window.location.href = "/dashboard"; 
-        
+
+        // 🔐 uloží token aj používateľa
+        localStorage.setItem("token", data.access_token);
+        if (data.user) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+        }
+
+        // 🔀 presmerovanie podľa roly
+        if (data.user?.role === "ADMIN") {
+          window.location.href = "/admin/users";
+        } else {
+          window.location.href = "/dashboard";
+        }
       } else {
         const err = await response.json();
-        setError(err.error || "Prihlásenie zlyhalo.");
+        setError(
+          err.error ||
+          err.message ||
+          err.detail ||
+          "Prihlásenie zlyhalo."
+        );
       }
     } catch (error) {
       console.error("Chyba pri prihlasovaní:", error);
       setError("Server momentálne nie je dostupný.");
     }
   };
+
   const handleForgotPassword = async (e: React.MouseEvent) => {
     e.preventDefault();
 
@@ -84,11 +102,14 @@ export const LoginForm: React.FC<Props> = () => {
     if (!confirmed) return;
 
     try {
-      const response = await fetch("http://localhost:8080/auth/request-password-reset", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      const response = await fetch(
+        "http://localhost:8080/auth/request-password-reset",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        }
+      );
 
       if (response.ok) {
         alert("Odkaz na obnovenie hesla bol odoslaný na váš e-mail.");
@@ -102,7 +123,6 @@ export const LoginForm: React.FC<Props> = () => {
     }
   };
 
-
   return (
     <div className="page-root">
       <Header />
@@ -114,7 +134,7 @@ export const LoginForm: React.FC<Props> = () => {
               Logo?
             </button>
 
-            {infoMessage && (            
+            {infoMessage && (
               <div className="form-info">
                 {infoMessage}
                 <button

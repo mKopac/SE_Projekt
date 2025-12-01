@@ -34,6 +34,10 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Účet nie je aktívny");
         }
 
+        if (user.isSuspended()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Váš účet je pozastavený. Kontaktujte administrátora.");
+        }
+
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Nesprávny email alebo heslo");
         }

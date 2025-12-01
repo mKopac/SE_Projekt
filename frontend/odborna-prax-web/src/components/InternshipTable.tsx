@@ -37,6 +37,9 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [localData, setLocalData] = useState<Internship[]>(initialInternships);
 
+const [documents, setDocuments] = useState<Record<number, any[]>>({});
+
+
   // filtre
   const [search, setSearch] = useState("");
   const [filterCompany, setFilterCompany] = useState<number | "ALL">("ALL");
@@ -101,8 +104,20 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
     return s ? `${s.firstName} ${s.lastName}` : "—";
   };
 
-  const toggleExpand = (id: number) =>
-    setExpandedId(prev => (prev === id ? null : id));
+const toggleExpand = (id: number) => {
+  setExpandedId(prev => {
+    const newValue = prev === id ? null : id;
+
+    // ak rozklikávame (otvárame), načítaj dokumenty
+    if (newValue !== null) {
+      loadDocuments(newValue);
+    }
+
+    return newValue;
+  });
+};
+
+
 
   const handleCompanyDecision = async (id: number, decision: "ACCEPT" | "REJECT") => {
     try {
@@ -180,6 +195,93 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
       return searchMatch && companyMatch && mentorMatch && yearMatch && semesterMatch;
     });
   }, [localData, search, filterCompany, filterMentor, filterYear, filterSemester]);
+
+const loadDocuments = async (internshipId: number) => {
+  try {
+    const res = await fetch(`${baseUrl}/dashboard/internships/${internshipId}/documents`, { headers });
+    if (res.ok) {
+      const data = await res.json();
+      setDocuments(prev => ({ ...prev, [internshipId]: data }));
+    } else {
+      setDocuments(prev => ({ ...prev, [internshipId]: [] }));
+    }
+  } catch {
+    setDocuments(prev => ({ ...prev, [internshipId]: [] }));
+  }
+};
+
+
+
+const handleUpload = async (internshipId: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const form = new FormData();
+  form.append("file", file);
+
+  const res = await fetch(
+    `${baseUrl}/documents/upload/timestatement?internshipId=${internshipId}`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: form
+    }
+  );
+
+  if (res.ok) {
+    alert("Výkaz bol nahraný.");
+    loadDocuments(internshipId);
+  } else {
+    alert("Chyba pri nahrávaní.");
+  }
+};
+
+const renderDocuments = (internshipId: number) => {
+  const docs = documents[internshipId] || [];
+
+  if (docs.length === 0) {
+    return (
+      <>
+        <strong>Nahrať výkaz o činnosti:</strong><br/>
+        <input
+          type="file"
+          accept="application/pdf"
+          onChange={(e) => handleUpload(internshipId, e)}
+        />
+      </>
+    );
+  }
+
+  const doc = docs[0];
+
+  return (
+    <>
+      <strong>Nahraný výkaz o činnosti:</strong>
+      <div className="document-item" style={{ marginTop: 8 }}>
+        <a
+          href={`${baseUrl}/documents/${doc.documentId}/download`}
+          target="_blank"
+          rel="noreferrer"
+          className="doc-link"
+        >
+          {doc.fileName}
+        </a>
+
+        <span className={`state-badge ${doc.currentState.toLowerCase()}`}>
+          {doc.currentState === "APPROVED" && "✔️ Potvrdené"}
+          {doc.currentState === "DENIED" && "❌ Zamietnuté"}
+          {doc.currentState === "PENDING" && "⏳ Čaká na schválenie"}
+          {["UNKNOWN", null].includes(doc.currentState) && "🟦 Bez stavu"}
+        </span>
+      </div>
+    </>
+  );
+};
+
+
+
+
+
 
   return (
     <>
@@ -331,6 +433,53 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
                         <p><strong>Popis praxe:</strong> {p.description || "—"}</p>
 
                         <p><strong>Stav praxe:</strong> {p.status}</p>
+                        {role === "STUDENT" && (
+  <div style={{ marginTop: 20 }}>
+    {(() => {
+      const docs = documents[p.id] || [];
+
+      if (docs.length === 0) {
+        return (
+          <>
+            <strong>Nahrať výkaz o činnosti:</strong>
+            <br />
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={(e) => handleUpload(p.id, e)}
+            />
+          </>
+        );
+      }
+
+      const doc = docs[0];
+      return (
+        <>
+          <strong>Nahraný výkaz o činnosti:</strong>
+          <div className="document-item" style={{ marginTop: 8 }}>
+            <a
+              href={`${baseUrl}/documents/${doc.documentId}/download`}
+              target="_blank"
+              rel="noreferrer"
+              className="doc-link"
+            >
+              {doc.fileName}
+            </a>
+
+            <span className={`state-badge ${doc.currentState.toLowerCase()}`}>
+              {doc.currentState === "APPROVED" && " Potvrdené"}
+              {doc.currentState === "DENIED" && " Zamietnuté"}
+              {doc.currentState === "UPLOADED" && "Čaká na schválenie"}
+              {["UNKNOWN", null].includes(doc.currentState) && "🟦 Bez stavu"}
+            </span>
+          </div>
+        </>
+      );
+    })()}
+  </div>
+)}
+
+
 
                         {role === "COMPANY" && p.status === "CREATED" && (
                           <div style={{ marginTop: 15 }}>

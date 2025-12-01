@@ -25,6 +25,10 @@ public class DashboardController {
     private final InternshipStateRepository stateRepository;
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
+    private final DocumentsRepository documentsRepository;
+    private final TimestatementStateChangeRepository timestatementStateChangeRepository;
+    private final TimestatementStateRepository timestatementStateRepository;
+
 
     public DashboardController(
             AuthService authService,
@@ -32,7 +36,10 @@ public class DashboardController {
             InternshipStateChangeRepository stateChangeRepository,
             InternshipStateRepository stateRepository,
             UserRepository userRepository,
-            CompanyRepository companyRepository
+            CompanyRepository companyRepository,
+            DocumentsRepository documentsRepository,
+            TimestatementStateChangeRepository timestatementStateChangeRepository,
+            TimestatementStateRepository timestatementStateRepository
     ) {
         this.authService = authService;
         this.internshipRepository = internshipRepository;
@@ -40,6 +47,9 @@ public class DashboardController {
         this.stateRepository = stateRepository;
         this.userRepository = userRepository;
         this.companyRepository = companyRepository;
+        this.documentsRepository = documentsRepository;
+        this.timestatementStateChangeRepository = timestatementStateChangeRepository;
+        this.timestatementStateRepository = timestatementStateRepository;
     }
 
     // ============================================================
@@ -459,4 +469,40 @@ public class DashboardController {
         change.setStateChangedAt(new Timestamp(System.currentTimeMillis()));
         return stateChangeRepository.save(change);
     }
+
+
+    @GetMapping("/internships/{id}/documents")
+    public ResponseEntity<?> getDocumentsForInternship(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable int id
+    ) {
+        if (!authService.isTokenValid(authHeader.substring(7))) {
+            return ResponseEntity.status(401).body("Invalid token");
+        }
+
+        List<Documents> docs = documentsRepository.findByInternshipId(id);
+
+        List<Map<String, Object>> response = new ArrayList<>();
+
+        for (Documents d : docs) {
+            TimestatementStateChange lastState =
+                    timestatementStateChangeRepository
+                            .findTopByDocumentIdOrderByStateChangedAtDesc(d.getId())
+                            .orElse(null);
+
+            String stateName = lastState != null
+                    ? lastState.getTimestatementState().getName()
+                    : "UNKNOWN";
+
+            response.add(Map.of(
+                    "documentId", d.getId(),
+                    "fileName", d.getDocumentName(),
+                    "currentState", stateName
+            ));
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+
 }

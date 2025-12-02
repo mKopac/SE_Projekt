@@ -34,12 +34,15 @@ public class DocumentController {
     @GetMapping("/contracts/template")
     public ResponseEntity<Resource> downloadContractTemplate() {
         try {
-            Resource resource = new ClassPathResource("contracts/contract_template.docx");
+
+            Resource resource = new ClassPathResource("documents/Ziadost_o_prax.docx");
 
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(
                             "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"Zmluva_prax_template.docx\"")
+
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"Ziadost_o_prax.docx\"")
                     .body(resource);
 
         } catch (Exception e) {

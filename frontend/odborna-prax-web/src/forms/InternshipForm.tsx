@@ -163,7 +163,37 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
     }
 
     alert("Prax bola úspešne vytvorená!");
+   if (form.internshipType === "new") {
+  try {
+    const token = localStorage.getItem("token");
 
+    const resTemplate = await fetch(
+      `${baseUrl}/documents/contracts/template`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    if (!resTemplate.ok) {
+      console.error("Zlyhalo sťahovanie šablóny zmluvy");
+    } else {
+      const blob = await resTemplate.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Ziadost_o_prax.docx"; // názov súboru pre usera
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    }
+  } catch (e) {
+    console.error("Chyba pri sťahovaní šablóny:", e);
+  }
+}
     onAdd({
       id: data.internshipId,
       studentId: currentUserId,

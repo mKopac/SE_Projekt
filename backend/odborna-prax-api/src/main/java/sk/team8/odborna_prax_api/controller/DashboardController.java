@@ -264,7 +264,6 @@ public class DashboardController {
 
             internshipRepository.save(internship);
 
-            // inicialny stav CREATED
             InternshipState created = stateRepository.findByName("CREATED")
                     .orElseThrow(() -> new RuntimeException("State CREATED not found"));
 
@@ -276,34 +275,6 @@ public class DashboardController {
             );
 
             stateChangeRepository.save(change);
-
-
-            if ("new".equalsIgnoreCase(request.internshipType)) {
-
-                Files.createDirectories(Paths.get("documents"));
-
-                String fileName = "Zmluva_prax_" + internship.getId() + ".docx";
-                Path filePath = Paths.get("documents").resolve(fileName);
-
-                Resource resource = new ClassPathResource("contracts/contract_template.docx");
-
-                Files.copy(resource.getInputStream(), filePath);
-
-                DocumentType contractType = new DocumentType();
-                contractType.setId(1); // CONTRACT
-
-                Documents document = new Documents(
-                        contractType,
-                        internship,
-                        fileName,
-                        new Timestamp(System.currentTimeMillis())
-                );
-
-                documentsRepository.save(document);
-
-            } else if ("existing".equalsIgnoreCase(request.internshipType)) {
-            }
-
             return ResponseEntity.ok(Map.of(
                     "message", "Internship created",
                     "internshipId", internship.getId()

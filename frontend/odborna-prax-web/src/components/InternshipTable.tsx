@@ -494,45 +494,81 @@ const renderDocuments = (internshipId: number) => {
                         <p><strong>Popis praxe:</strong> {p.description || "—"}</p>
 
                         <p><strong>Stav praxe:</strong> {p.status}</p>
-                        {role === "STUDENT" && (
+{role === "STUDENT" && (
   <div style={{ marginTop: 20 }}>
     {(() => {
       const docs = documents[p.id] || [];
+      const contract = docs.find((d) => d.documentType === "CONTRACT");
+      const timestatement = docs.find((d) => d.documentType === "TIMESTATEMENT");
 
-      if (docs.length === 0) {
-        return (
-          <>
-            <strong>Nahrať výkaz o činnosti:</strong>
-            <br />
-            <input
-              type="file"
-              accept="application/pdf"
-              onChange={(e) => handleUpload(p.id, e)}
-            />
-          </>
-        );
-      }
-
-      const doc = docs[0];
       return (
         <>
-          <strong>Nahraný výkaz o činnosti:</strong>
-          <div className="document-item" style={{ marginTop: 8 }}>
-            <a
-              href={`${baseUrl}/documents/${doc.documentId}/download`}
-              target="_blank"
-              rel="noreferrer"
-              className="doc-link"
-            >
-              {doc.fileName}
-            </a>
+          {/* ====== CONTRACT – Zmluva o praxi ====== */}
+          <div style={{ marginBottom: 16 }}>
+            <strong>Zmluva o praxi:</strong>
+            <br />
+            {contract ? (
+              <div className="document-item" style={{ marginTop: 8 }}>
+                <a
+                  href={`${baseUrl}/documents/${contract.documentId}/download`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="doc-link"
+                >
+                  {contract.fileName}
+                </a>
+              </div>
+            ) : (
+              <>
+                <span style={{ color: "#666" }}>
+                  Zmluva zatiaľ nebola nahraná.
+                </span>
+                <br />
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => handleUploadContract(p.id, e)}
+                  style={{ marginTop: 6 }}
+                />
+              </>
+            )}
+          </div>
 
-            <span className={`state-badge ${doc.currentState.toLowerCase()}`}>
-              {doc.currentState === "APPROVED" && " Potvrdené"}
-              {doc.currentState === "DENIED" && " Zamietnuté"}
-              {doc.currentState === "UPLOADED" && "Čaká na schválenie"}
-              {["UNKNOWN", null].includes(doc.currentState) && "🟦 Bez stavu"}
-            </span>
+          {/* ====== TIMESTATEMENT – Výkaz o činnosti ====== */}
+          <div>
+            <strong>Výkaz o činnosti:</strong>
+            <br />
+            {timestatement ? (
+              <div className="document-item" style={{ marginTop: 8 }}>
+                <a
+                  href={`${baseUrl}/documents/${timestatement.documentId}/download`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="doc-link"
+                >
+                  {timestatement.fileName}
+                </a>
+
+                <span
+                  className={`state-badge ${timestatement.currentState?.toLowerCase()}`}
+                >
+                  {timestatement.currentState === "APPROVED" && " Potvrdené"}
+                  {timestatement.currentState === "DENIED" && " Zamietnuté"}
+                  {timestatement.currentState === "UPLOADED" && " Čaká na schválenie"}
+                  {["UNKNOWN", null].includes(timestatement.currentState) &&
+                    "🟦 Bez stavu"}
+                </span>
+              </div>
+            ) : (
+              <>
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  onChange={(e) => handleUpload(p.id, e)}
+                  style={{ marginTop: 6 }}
+                />
+              </>
+            )}
           </div>
         </>
       );

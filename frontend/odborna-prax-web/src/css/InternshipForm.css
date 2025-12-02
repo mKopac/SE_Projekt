@@ -1,0 +1,83 @@
+.practice-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  min-width: 340px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.practice-form h3 {
+  margin-top: 0;
+  color: #1a1a1a;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.practice-form input,
+.practice-form select,
+.practice-form textarea {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.practice-form input:focus,
+.practice-form select:focus,
+.practice-form textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 3px rgba(0, 123, 255, 0.4);
+  outline: none;
+}
+
+.date-row {
+  display: flex;
+  gap: 10px;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.btn-save {
+  background-color: #007bff;
+  color: #fff;
+  padding: 12px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-save:hover {
+  background-color: #005fcc;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

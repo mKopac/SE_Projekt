@@ -1,0 +1,1 @@
+ALTER TABLE `internship` ADD `description` TEXT NOT NULL AFTER `date_end`;

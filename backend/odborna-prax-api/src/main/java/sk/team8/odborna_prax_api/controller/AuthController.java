@@ -10,8 +10,6 @@ import sk.team8.odborna_prax_api.Entity.*;
 import sk.team8.odborna_prax_api.dao.UserRepository;
 import sk.team8.odborna_prax_api.dto.*;
 import sk.team8.odborna_prax_api.service.*;
-import sk.team8.odborna_prax_api.dto.CompanyRegisterRequest;
-import sk.team8.odborna_prax_api.service.CompanyRegistrationService;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -40,7 +38,11 @@ public class AuthController {
             AuthTokenService authTokenService,
             EmailService emailService,
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder, StudentRegistrationService studentRegistrationService, CompanyRegistrationService companyRegistrationService, PasswordChangeService passwordChangeService, UserService userService
+            PasswordEncoder passwordEncoder,
+            StudentRegistrationService studentRegistrationService,
+            CompanyRegistrationService companyRegistrationService,
+            PasswordChangeService passwordChangeService,
+            UserService userService
     ) {
         this.adminRegistrationService = adminRegistrationService;
         this.authService = authService;
@@ -65,6 +67,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
         }
     }
+
     @PostMapping("/register/student")
     public ResponseEntity<?> registerStudent(@RequestBody @Valid StudentRegisterRequest request) {
         studentRegistrationService.registerStudent(request);
@@ -72,7 +75,6 @@ public class AuthController {
                 Map.of("message", "Registrácia prebehla úspešne. Potvrdzovací e-mail bol odoslaný.")
         );
     }
-
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
@@ -182,7 +184,6 @@ public class AuthController {
         response.sendRedirect("http://localhost:5173/login?verification=success");
     }
 
-
     @PostMapping("/register/company")
     public ResponseEntity<?> registerCompany(@Valid @RequestBody CompanyRegisterRequest request) {
         companyRegistrationService.registerCompany(request);
@@ -267,5 +268,35 @@ public class AuthController {
                     .body(Map.of("error", "Chyba pri načítavaní firiem"));
         }
     }
+
+        @GetMapping("/me")
+    public ResponseEntity<?> me(org.springframework.security.core.Authentication authentication) {
+
+        // ak JWT filter nepustil request, authentication bude null alebo neautentikovaný
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Unauthorized or missing token"));
+        }
+
+        String email = authentication.getName();  // v JwtAuthFilter dávame do principal e-mail
+
+        Optional<User> userOpt = userRepository.findByEmail(email);
+
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "User not found"));
+        }
+
+        User user = userOpt.get();
+
+        return ResponseEntity.ok(Map.of(
+                "id", user.getId(),
+                "email", user.getEmail(),
+                "firstName", user.getFirstName(),
+                "lastName", user.getLastName(),
+                "role", user.getRole()
+        ));
+    }
+
 
 }

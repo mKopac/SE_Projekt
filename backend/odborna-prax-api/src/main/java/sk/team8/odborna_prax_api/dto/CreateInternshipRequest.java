@@ -10,4 +10,5 @@ public class CreateInternshipRequest {
     public Date dateStart;
     public Date dateEnd;
     public String description;
+    public String internshipType;
 }

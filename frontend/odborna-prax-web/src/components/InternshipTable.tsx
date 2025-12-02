@@ -236,47 +236,108 @@ const handleUpload = async (internshipId: number, e: React.ChangeEvent<HTMLInput
   }
 };
 
+const handleUploadContract = async (internshipId: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const form = new FormData();
+  form.append("file", file);
+
+  const res = await fetch(
+    `${baseUrl}/documents/upload/contract?internshipId=${internshipId}`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: form
+    }
+  );
+
+  if (res.ok) {
+    alert("Zmluva bola nahraná.");
+    loadDocuments(internshipId);
+  } else {
+    alert("Chyba pri nahrávaní zmluvy.");
+  }
+};
+
 const renderDocuments = (internshipId: number) => {
   const docs = documents[internshipId] || [];
 
-  if (docs.length === 0) {
-    return (
-      <>
-        <strong>Nahrať výkaz o činnosti:</strong><br/>
-        <input
-          type="file"
-          accept="application/pdf"
-          onChange={(e) => handleUpload(internshipId, e)}
-        />
-      </>
-    );
-  }
-
-  const doc = docs[0];
+  // rozdelenie dokumentov podľa typu
+  const contract = docs.find(d => d.documentType === "CONTRACT");
+  const timestatement = docs.find(d => d.documentType === "TIMESTATEMENT");
 
   return (
-    <>
-      <strong>Nahraný výkaz o činnosti:</strong>
-      <div className="document-item" style={{ marginTop: 8 }}>
-        <a
-          href={`${baseUrl}/documents/${doc.documentId}/download`}
-          target="_blank"
-          rel="noreferrer"
-          className="doc-link"
-        >
-          {doc.fileName}
-        </a>
+    <div style={{ marginTop: 10 }}>
 
-        <span className={`state-badge ${doc.currentState.toLowerCase()}`}>
-          {doc.currentState === "APPROVED" && "✔️ Potvrdené"}
-          {doc.currentState === "DENIED" && "❌ Zamietnuté"}
-          {doc.currentState === "PENDING" && "⏳ Čaká na schválenie"}
-          {["UNKNOWN", null].includes(doc.currentState) && "🟦 Bez stavu"}
-        </span>
+      {/* === CONTRACT (ZMLUVA) === */}
+      <div style={{ marginBottom: 15 }}>
+        <strong>Zmluva o praxi:</strong><br/>
+
+        {/* Ak existuje zmluva */}
+        {contract ? (
+          <div className="document-item" style={{ marginTop: 8 }}>
+            <a
+              href={`${baseUrl}/documents/${contract.documentId}/download`}
+              target="_blank"
+              rel="noreferrer"
+              className="doc-link"
+            >
+              {contract.fileName}
+            </a>
+          </div>
+        ) : (
+          <>
+            <span style={{ color: "#666" }}>Zmluva zatiaľ nebola nahraná.</span><br/>
+            <input
+              type="file"
+              accept=".pdf,.doc,.docx"
+              onChange={(e) => handleUploadContract(internshipId, e)}
+              style={{ marginTop: 6 }}
+            />
+          </>
+        )}
       </div>
-    </>
+
+
+      {/* === TIMESTATEMENT (VÝKAZ ČINNOSTI) === */}
+      <div>
+        <strong>Výkaz o činnosti:</strong><br/>
+
+        {timestatement ? (
+          <div className="document-item" style={{ marginTop: 8 }}>
+            <a
+              href={`${baseUrl}/documents/${timestatement.documentId}/download`}
+              target="_blank"
+              rel="noreferrer"
+              className="doc-link"
+            >
+              {timestatement.fileName}
+            </a>
+
+            <span className={`state-badge ${timestatement.currentState?.toLowerCase()}`}>
+              {timestatement.currentState === "APPROVED" && "✔️ Potvrdené"}
+              {timestatement.currentState === "DENIED" && "❌ Zamietnuté"}
+              {timestatement.currentState === "UPLOADED" && "⏳ Čaká na schválenie"}
+              {["UNKNOWN", null].includes(timestatement.currentState) && "🟦 Bez stavu"}
+            </span>
+          </div>
+        ) : (
+          <>
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={(e) => handleUpload(internshipId, e)}
+              style={{ marginTop: 6 }}
+            />
+          </>
+        )}
+      </div>
+
+    </div>
   );
 };
+
 
 
 

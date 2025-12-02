@@ -12,7 +12,8 @@ interface InternshipDTO {
   semester: number;
   dateStart: string;
   dateEnd: string;
-  status: string; // 🔥 pridane
+  status: string;
+  description: string;
 }
 
 type NewInternship = Omit<InternshipDTO, "status">; // 🔥 FE formulár nepozná status
@@ -59,7 +60,8 @@ const Dashboard: React.FC = () => {
 
           return {
             ...i,
-            status
+            status,
+            description: i.description ?? ""
           };
         });
 
@@ -76,7 +78,8 @@ const Dashboard: React.FC = () => {
   const handleAddInternship = (i: NewInternship) => {
     const newEntry: InternshipDTO = {
       ...i,
-      status: "CREATED" // 🔥 FE default
+      status: "CREATED",
+       description: i.description ?? "",
     };
 
     setInternships(prev => [...prev, newEntry]);

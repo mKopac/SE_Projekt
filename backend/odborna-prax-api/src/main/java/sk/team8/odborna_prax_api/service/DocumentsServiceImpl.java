@@ -94,4 +94,46 @@ public class DocumentsServiceImpl implements DocumentsService {
             throw new RuntimeException("Document file missing on server");
         }
     }
+
+    public void uploadContract(Integer internshipId, MultipartFile file, String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Internship internship = internshipRepository.findById(internshipId)
+                .orElseThrow(() -> new RuntimeException("Internship not found"));
+
+        // autorizácia
+        if (internship.getStudent().getId() != user.getId()) {
+            throw new RuntimeException("Unauthorized: student does not own this internship.");
+        }
+
+        DocumentType type = documentTypeRepository.findById(1) // CONTRACT
+                .orElseThrow(() -> new RuntimeException("DocumentType CONTRACT not found"));
+
+        try {
+            Files.createDirectories(Paths.get("uploads"));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create uploads folder");
+        }
+
+        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        Path filePath = Paths.get("uploads").resolve(fileName);
+
+        try {
+            Files.copy(file.getInputStream(), filePath);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save contract file");
+        }
+
+        Documents document = new Documents(
+                type,
+                internship,
+                fileName,
+                new Timestamp(System.currentTimeMillis())
+        );
+
+        documentsRepository.save(document);
+    }
+
 }

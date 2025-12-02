@@ -8,4 +8,6 @@ public interface DocumentsService {
     void uploadTimestatement(Integer internshipId, MultipartFile file, String email);
 
     DocumentDownloadResponse downloadDocument(Integer documentId);
+
+    void uploadContract(Integer internshipId, MultipartFile file, String name);
 }

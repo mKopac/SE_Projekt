@@ -18,7 +18,7 @@ interface Internship {
 }
 
 interface Props {
-  onAdd: (internship: Internship) => void;
+  onAdd: (internship: any) => void;
 }
 
 const baseUrl = "http://localhost:8080";
@@ -43,6 +43,7 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
     semester: number;
     dateStart: string;
     dateEnd: string;
+    internshipType: string;
     description: string;
   };
 
@@ -53,6 +54,7 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
     semester: 1,
     dateStart: "",
     dateEnd: "",
+    internshipType: "",
     description: "",
   });
 
@@ -181,6 +183,7 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
       semester: 1,
       dateStart: "",
       dateEnd: "",
+      internshipType: "",
       description: "",
     });
 
@@ -257,7 +260,33 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
           <input type="date" name="dateEnd" value={form.dateEnd} onChange={handleChange} required />
         </div>
       </div>
+         <div className="mt-4">
+  <label className="font-semibold">Typ praxe:</label>
 
+  <div className="flex gap-4 mt-2">
+    <label>
+      <input
+        type="radio"
+        name="internshipType"
+        value="new"
+        checked={form.internshipType === "new"}
+        onChange={() => setForm({ ...form, internshipType: "new" })}
+      />
+      &nbsp;Nová prax
+    </label>
+
+    <label>
+      <input
+        type="radio"
+        name="internshipType"
+        value="existing"
+        checked={form.internshipType === "existing"}
+        onChange={() => setForm({ ...form, internshipType: "existing" })}
+      />
+      &nbsp;Existujúca prax
+    </label>
+  </div>
+</div>   
       <div className="form-group">
         <label>Popis:</label>
         <textarea

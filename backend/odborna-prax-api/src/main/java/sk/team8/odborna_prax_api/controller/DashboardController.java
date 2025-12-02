@@ -2,6 +2,8 @@ package sk.team8.odborna_prax_api.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,9 @@ import sk.team8.odborna_prax_api.service.AuthService;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -186,9 +191,7 @@ public class DashboardController {
         return ResponseEntity.ok(result);
     }
 
-    // ============================================================
-    // POMOCNÉ ENDPOINTY PRE FRONTEND (študenti, mentori, firmy)
-    // ============================================================
+
 
     @GetMapping("/students")
     public ResponseEntity<?> getStudents(@RequestHeader("Authorization") String authHeader) {
@@ -221,9 +224,7 @@ public class DashboardController {
         return ResponseEntity.ok(companies);
     }
 
-    // ============================================================
-    // CREATE INTERNSHIP + STATE CREATED
-    // ============================================================
+
 
     @PostMapping("/internship")
     @Transactional
@@ -275,6 +276,33 @@ public class DashboardController {
             );
 
             stateChangeRepository.save(change);
+
+
+            if ("new".equalsIgnoreCase(request.internshipType)) {
+
+                Files.createDirectories(Paths.get("documents"));
+
+                String fileName = "Zmluva_prax_" + internship.getId() + ".docx";
+                Path filePath = Paths.get("documents").resolve(fileName);
+
+                Resource resource = new ClassPathResource("contracts/contract_template.docx");
+
+                Files.copy(resource.getInputStream(), filePath);
+
+                DocumentType contractType = new DocumentType();
+                contractType.setId(1); // CONTRACT
+
+                Documents document = new Documents(
+                        contractType,
+                        internship,
+                        fileName,
+                        new Timestamp(System.currentTimeMillis())
+                );
+
+                documentsRepository.save(document);
+
+            } else if ("existing".equalsIgnoreCase(request.internshipType)) {
+            }
 
             return ResponseEntity.ok(Map.of(
                     "message", "Internship created",
@@ -485,20 +513,35 @@ public class DashboardController {
         List<Map<String, Object>> response = new ArrayList<>();
 
         for (Documents d : docs) {
-            TimestatementStateChange lastState =
-                    timestatementStateChangeRepository
-                            .findTopByDocumentIdOrderByStateChangedAtDesc(d.getId())
-                            .orElse(null);
 
-            String stateName = lastState != null
-                    ? lastState.getTimestatementState().getName()
-                    : "UNKNOWN";
+            // Rozlíšime typ dokumentu
+            String documentType = d.getDocumentType().getName();
 
-            response.add(Map.of(
-                    "documentId", d.getId(),
-                    "fileName", d.getDocumentName(),
-                    "currentState", stateName
-            ));
+            // Default stav
+            String stateName = null;
+
+            if ("TIMESTATEMENT".equalsIgnoreCase(documentType)) {
+
+                // TIMESTATEMENT má stav
+                TimestatementStateChange lastState =
+                        timestatementStateChangeRepository
+                                .findTopByDocumentIdOrderByStateChangedAtDesc(d.getId())
+                                .orElse(null);
+
+                stateName = (lastState != null)
+                        ? lastState.getTimestatementState().getName()
+                        : "UNKNOWN";
+            }
+
+            Map<String, Object> item = new HashMap<>();
+            item.put("documentId", d.getId());
+            item.put("fileName", d.getDocumentName());
+            item.put("documentType", documentType);
+            item.put("currentState", stateName);
+            item.put("type", documentType );
+
+
+            response.add(item);
         }
 
         return ResponseEntity.ok(response);

@@ -1,7 +1,9 @@
 package sk.team8.odborna_prax_api.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.core.io.Resource;
@@ -29,13 +31,49 @@ public class DocumentController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/contracts/template")
+    public ResponseEntity<Resource> downloadContractTemplate() {
+        try {
+            Resource resource = new ClassPathResource("contracts/contract_template.docx");
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(
+                            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"Zmluva_prax_template.docx\"")
+                    .body(resource);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/upload/contract")
+    public ResponseEntity<?> uploadContract(
+            @RequestParam Integer internshipId,
+            @RequestPart("file") MultipartFile file,
+            Principal principal
+    ) {
+        documentsService.uploadContract(internshipId, file, principal.getName());
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/{id}/download")
     public ResponseEntity<Resource> download(@PathVariable Integer id) {
 
         DocumentDownloadResponse response = documentsService.downloadDocument(id);
 
+        // zisti content-type
+        String contentType = "application/octet-stream";
+        if (response.getFileName().endsWith(".pdf")) {
+            contentType = "application/pdf";
+        } else if (response.getFileName().endsWith(".docx")) {
+            contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        } else if (response.getFileName().endsWith(".doc")) {
+            contentType = "application/msword";
+        }
+
         return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
+                .contentType(MediaType.parseMediaType(contentType))
                 .header(
                         HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"" + response.getFileName() + "\""

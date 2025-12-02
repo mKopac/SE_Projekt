@@ -43,3 +43,20 @@
   font-size: 24px;
   cursor: pointer;
 }
+
+.dashboard-container {
+  max-width: 1400px;   
+  margin: 0 auto;
+  width: 100%;
+  padding: 20px 40px;
+}
+
+.dashboard h2 {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.dashboard table {
+  width: 100%;        
+}
+

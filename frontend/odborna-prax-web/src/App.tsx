@@ -1,4 +1,5 @@
 import "./App.css";
+import "./i18n";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import LoginForm from "./forms/LoginForm";

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import LoginForm from "./forms/LoginForm";
 import RegisterForm from "./forms/RegisterForm";
+import FaqPage from "./pages/FaqPage";
 import DashboardPage from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -30,7 +31,7 @@ function App() {
           element={<RegisterForm onSubmit={handleRegister} />}
         />
         <Route path="/reset-password" element={<ResetPasswordForm />} />
-
+        <Route path="/faq" element={<FaqPage />} />
         <Route
           path="/dashboard"
           element={

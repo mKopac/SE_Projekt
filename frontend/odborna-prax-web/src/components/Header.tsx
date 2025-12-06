@@ -35,10 +35,11 @@ const Header: React.FC = () => {
     navigate("/login");
   };
 
-  const handleHomeClick = () => navigate("/");
-  const handleProfileClick = () => navigate("/profile");
-  const handleDashboardClick = () => navigate("/dashboard");
+  const handleHomeClick = () => navigate('/');
+  const handleProfileClick = () => navigate('/profile');
+  const handleDashboardClick = () => navigate('/dashboard');
   const handleAdminClick = () => navigate("/admin/users");
+  const handleFaqClick = () => navigate('/faq');
 
   const currentPath = location.pathname;
 
@@ -97,9 +98,10 @@ const Header: React.FC = () => {
       <div className="topbar-center">Systém na evidenciu praxe</div>
 
       <div className="topbar-right">
-        <a className="faq-link" href="#faq" onClick={(e) => e.preventDefault()}>
-          FAQ?
-        </a>
+
+        <button className="faq" onClick={handleFaqClick}>
+          FAQ
+        </button>
 
         {isLoggedIn ? (
           <>

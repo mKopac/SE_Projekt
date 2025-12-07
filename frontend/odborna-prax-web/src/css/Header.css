@@ -1,22 +1,36 @@
-/* General Topbar Layout */
+/* HEADER / TOPBAR */
+
 .topbar {
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background-color: #ffffff;
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  padding: 0.8rem 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
-  font-family: "Segoe UI", sans-serif;
+  font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  border-bottom: 2px solid #d6ede1;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-/* Left side (logo or title) */
+/* Left side (logo) */
 .topbar-left {
-  font-weight: 600;
-  color: #004aad;
-  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   cursor: pointer;
+}
+
+.topbar-left img {
+  height: 48px;
+}
+
+.topbar-left span {
+  font-weight: 600;
+  color: #1b5e20;
 }
 
 /* Center title */
@@ -25,95 +39,114 @@
   text-align: center;
   font-weight: 600;
   font-size: 1.2rem;
-  color: #222;
+  color: #184f33;
 }
 
 /* Right side buttons and links */
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-}
-
-/* FAQ link styling */
-.faq-link {
-  text-decoration: none;
-  color: #0078d4;
-  font-weight: 500;
-  transition: color 0.2s ease;
-  padding: 0.4rem 0.6rem;
-  border-radius: 6px;
-}
-
-.faq-link:hover {
-  color: #005fa3;
-  background-color: #f1f5ff;
+  gap: 0.6rem;
 }
 
 /* General button styles */
 .topbar-right button {
   border: none;
   cursor: pointer;
-  padding: 0.5rem 1rem;
-  font-size: 0.95rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.9rem;
   font-weight: 500;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  border-radius: 999px;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+/* FAQ button */
+.faq-button {
+  background-color: transparent;
+  color: #1b5e20;
+  border: 1px solid #a5d6b5;
+}
+
+.faq-button:hover {
+  background-color: #e5f6ea;
 }
 
 /* Profile & Dashboard buttons */
 .profile-button,
 .dashboard-button {
-  background-color: #0078d4;
-  color: white;
+  background-color: #32b467;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(50, 180, 103, 0.35);
 }
 
 .profile-button:hover,
 .dashboard-button:hover {
-  background-color: #005fa3;
+  background-color: #278650;
 }
 
 /* Home button */
 .home-button {
-  background-color: #2e7d32; /* green tone */
-  color: white;
+  background-color: #ffffff;
+  color: #278650;
+  border: 1px solid #32b467;
 }
 
 .home-button:hover {
-  background-color: #256628;
+  background-color: #e7f7ee;
 }
 
-/* Logout button — red with black text */
+/* Logout button — red */
 .logout-button {
-  background-color: #ff4d4f;
-  color: black;
+  background-color: #ffebee;
+  color: #c62828;
   font-weight: 600;
+  border: 1px solid #ffcdd2;
 }
 
 .logout-button:hover {
-  background-color: #d9363e;
+  background-color: #ffcdd2;
 }
 
 /* Login link */
 .login-link {
   text-decoration: none;
-  color: #fff;
-  background-color: #0078d4;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  color: #ffffff;
+  background-color: #32b467;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
   font-weight: 500;
-  transition: background 0.2s ease;
+  font-size: 0.9rem;
+  transition: background 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 2px 6px rgba(50, 180, 103, 0.35);
 }
 
 .login-link:hover {
-  background-color: #005fa3;
+  background-color: #278650;
 }
 
-/* Responsive adjustments */
+/* Admin button */
+.admin-button {
+  background-color: #184f33;
+  color: white;
+  font-weight: 500;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  transition: background-color 0.18s ease;
+}
+
+.admin-button:hover {
+  background-color: #123923;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
   .topbar {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 0.5rem;
   }
 
@@ -123,26 +156,57 @@
 
   .topbar-right {
     flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .topbar-right button,
-  .login-link {
-    padding: 0.45rem 0.8rem;
-    font-size: 0.9rem;
+    justify-content: flex-start;
   }
 }
 
-/* Admin button */
-.admin-button {
-  background-color: #004aad;
-  color: white;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
+/* Wrapper */
+.lang-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Button that opens dropdown */
+.lang-button {
+  border: none;
+  background: #e8e8e8;
+  padding: 0.4rem 0.7rem;
   border-radius: 6px;
-  transition: background-color 0.2s ease;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
 }
 
-.admin-button:hover {
-  background-color: #00367a;
+/* Dropdown menu container */
+.lang-menu {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  width: 120px;
+
+  display: flex;
+  flex-direction: column;   
+  gap: 0;                    
+  
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  z-index: 999;
+}
+
+/* Dropdown item */
+.lang-option {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  background: white;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: block;           
+}
+
+.lang-option:hover {
+  background: #f5f5f5;
 }

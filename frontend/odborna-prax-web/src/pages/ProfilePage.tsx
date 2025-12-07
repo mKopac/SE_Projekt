@@ -1,13 +1,13 @@
 import React from 'react';
 import Header from './../components/Header';
+import Profile from './../components/Profile';
 import Footer from './../components/Footer';
-import Profile from "./../components/Profile";
 
-const ProfilePage: React.FC = () => {
+const LandingPage: React.FC = () => {
   return (
     <div className="page-root">
       <Header />
-      <main className="main-content">
+      <main className="main-content landing-main">
         <Profile />
       </main>
       <Footer />
@@ -15,4 +15,4 @@ const ProfilePage: React.FC = () => {
   );
 };
 
-export default ProfilePage;
+export default LandingPage;

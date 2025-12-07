@@ -12,27 +12,27 @@ type Slide = {
 
 const slides: Slide[] = [
   {
-    title: '🏁 Vitajte v systéme na evidenciu praxe',
-    text: 'Moderný nástroj pre študentov, mentorov a školy. Jednoduchý. Prehľadný. Efektívny.',
+    title: 'Vitajte v systéme na evidenciu praxe FPVaI UKF Nitra',
+    text: 'Moderný nástroj pre študentov a firmy, ktorý umožňuje evidenciu odbornej praxe na jednom mieste.',
   },
   {
-    title: '⚙️ Ako systém funguje?',
-    text: 'Zaregistrujte sa, vyberte si prax, získajte potvrdenie a hodnotenie od mentora.',
-  },
-  {
-    title: '🎓 Pre študentov',
+    title: 'Pre študentov',
     text: 'Sledujte stav praxe, komunikujte s mentormi, získajte spätnú väzbu – všetko na jednom mieste.',
   },
   {
-    title: '🏢 Pre firmy a mentorov',
+    title: 'Pre firmy',
     text: 'Schvaľujte praxe, zadávajte úlohy, hodnotte študentov bez papierovačiek.',
   },
   {
-    title: '🔍 Filtrovanie praxe',
+    title: 'Ako systém funguje?',
+    text: 'Zaregistrujte sa, vyberte si prax, získajte potvrdenie a hodnotenie od mentora.',
+  },
+  {
+    title: 'Filtrovanie praxe',
     text: 'Vyfiltrujte si prax podľa odboru, lokality, typu práce a dostupnosti.',
   },
   {
-    title: '🚀 Začnite ešte dnes',
+    title: 'Začnite ešte dnes',
     text: 'Zaregistrujte sa alebo sa prihláste a začnite evidovať svoju prax.',
     buttons: [
       { label: 'Zaregistrovať sa', link: '/register' },
@@ -41,7 +41,7 @@ const slides: Slide[] = [
   },
 ];
 
-const AUTO_INTERVAL = 5000;
+const AUTO_INTERVAL = 20000;
 
 const Slideshow: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -73,21 +73,27 @@ const Slideshow: React.FC = () => {
         {slide.buttons && (
           <div className="slide-buttons">
             {slide.buttons.map((btn, index) => (
-              <Link key={index} to={btn.link} className="slide-btn">
+              <Link
+                key={index}
+                to={btn.link}
+                className={`slide-btn ${index === 1 ? 'slide-btn-secondary' : ''}`}
+              >
                 {btn.label}
               </Link>
             ))}
           </div>
         )}
 
-        <div className="slide-nav">
-          <button onClick={prevSlide}>← Predchádzajúca</button>
-          <button onClick={nextSlide}>Ďalšia →</button>
-        </div>
-      </div>
+        <div className="slide-footer">
+          <div className="slide-nav">
+            <button onClick={prevSlide}>← Predchádzajúca</button>
+            <button onClick={nextSlide}>Ďalšia →</button>
+          </div>
 
-      <div className="slide-info">
-        Snímka {currentSlide + 1} z {slides.length}
+          <div className="slide-info">
+            {currentSlide + 1} / {slides.length}
+          </div>
+        </div>
       </div>
     </section>
   );

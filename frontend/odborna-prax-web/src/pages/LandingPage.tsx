@@ -2,12 +2,13 @@ import React from 'react';
 import Header from './../components/Header';
 import Slideshow from './../components/Slideshow';
 import Footer from './../components/Footer';
+import "../css/LandingPage.css";
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="page-root">
+    <div className="landing-page">
       <Header />
-      <main className="main-content">
+      <main className="landing-main">
         <Slideshow />
       </main>
       <Footer />

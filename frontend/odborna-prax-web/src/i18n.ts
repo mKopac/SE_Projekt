@@ -8,25 +8,29 @@ i18n
   .use(LanguageDetector)   // detects language (localStorage, navigator, etc.)
   .use(initReactI18next)   // connects with React
   .init({
-    fallbackLng: "en",     // default language - english
+    fallbackLng: "en",     // default eng
+    supportedLngs: ["sk", "en"],
+    load: "currentOnly",
     debug: false,
 
-    ns: ["shared", "dashboard", "profile"],
+    ns: ["shared", "dashboard", "profile", "faq"],
     defaultNS: "shared",
 
     backend: {
-      // This is the default path for CRA/Vite when using public/
       loadPath: "/locales/{{lng}}/{{ns}}.json"
     },
 
     detection: {
-      // Useful defaults: language stored in localStorage, then browser
       order: ["localStorage", "navigator"],
       caches: ["localStorage"]
     },
 
     interpolation: {
-      escapeValue: false // React already escapes
+      escapeValue: false
+    },
+
+    react: {
+      useSuspense: false
     }
   });
 

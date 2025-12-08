@@ -44,6 +44,7 @@ public class DocumentsServiceImpl implements DocumentsService {
     private final TimestatementStateChangeRepository timestatementStateChangeRepository;
     private final InternshipRepository internshipRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
     @Override
     public void uploadTimestatement(Integer internshipId, MultipartFile file, String email) {
@@ -95,6 +96,7 @@ public class DocumentsServiceImpl implements DocumentsService {
         );
 
         timestatementStateChangeRepository.save(stateChange);
+        notifyMentorAboutUpload(internship, user, "výkaz (timestatement)");
     }
 
     @Override
@@ -154,6 +156,8 @@ public class DocumentsServiceImpl implements DocumentsService {
         );
 
         documentsRepository.save(document);
+        notifyMentorAboutUpload(internship, user, "zmluvu (contract)");
+
 
     }
 
@@ -293,5 +297,30 @@ public class DocumentsServiceImpl implements DocumentsService {
             }
         }
     }
+
+    private void notifyMentorAboutUpload(Internship internship, User student, String documentTypeDisplayName) {
+        User mentor = internship.getMentor();
+        if (mentor == null) {
+            return;
+        }
+
+        String mentorEmail = mentor.getEmail();
+        if (mentorEmail == null || mentorEmail.isBlank()) {
+            return;
+        }
+
+        String studentFullName = student.getFirstName() + " " + student.getLastName();
+
+        String subject = "Nový dokument od študenta " + studentFullName;
+        String body =
+                "Dobrý deň,\n\n" +
+                        "študent " + studentFullName + " (" + student.getEmail() + ") " +
+                        "nahral " + documentTypeDisplayName + " k odbornej praxi.\n\n" +
+                        "S pozdravom\n" +
+                        "Systém odbornej praxe";
+
+        emailService.sendEmail(mentorEmail, subject, body);
+    }
+
 
 }

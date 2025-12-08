@@ -103,7 +103,6 @@ public class DocumentsServiceImpl implements DocumentsService {
         Internship internship = internshipRepository.findById(internshipId)
                 .orElseThrow(() -> new RuntimeException("Internship not found"));
 
-        // autorizácia
         if (internship.getStudent().getId() != user.getId()) {
             throw new RuntimeException("Unauthorized: student does not own this internship.");
         }
@@ -134,6 +133,18 @@ public class DocumentsServiceImpl implements DocumentsService {
         );
 
         documentsRepository.save(document);
+
+        TimestatementState stateUploaded = timestatementStateRepository.findById(1)
+                .orElseThrow(() -> new RuntimeException("TimestatementState UPLOADED not found"));
+
+        TimestatementStateChange stateChange = new TimestatementStateChange(
+                document,
+                stateUploaded,
+                user,
+                new Timestamp(System.currentTimeMillis())
+        );
+
+        timestatementStateChangeRepository.save(stateChange);
     }
 
 }

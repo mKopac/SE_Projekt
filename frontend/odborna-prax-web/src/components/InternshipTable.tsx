@@ -37,8 +37,7 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [localData, setLocalData] = useState<Internship[]>(initialInternships);
 
-const [documents, setDocuments] = useState<Record<number, any[]>>({});
-
+  const [documents, setDocuments] = useState<Record<number, any[]>>({});
 
   // filtre
   const [search, setSearch] = useState("");
@@ -84,11 +83,14 @@ const [documents, setDocuments] = useState<Record<number, any[]>>({});
       .then(data => {
         const mapped = data.map((d: any) => d.internship);
         setInternships(mapped);
+        setLocalData(mapped);
       })
-      .catch(() => setInternships([]));
-    setLocalData(internships);
+      .catch(() => {
+        setInternships([]);
+        setLocalData([]);
+      });
 
-  }, [search, filterCompany, filterMentor, filterYear, filterSemester, internships]);
+  }, [search, filterCompany, filterMentor, filterYear, filterSemester]);
 
   const getCompanyName = (id: number) =>
     companies.find(c => c.id === id)?.name || "—";
@@ -104,20 +106,66 @@ const [documents, setDocuments] = useState<Record<number, any[]>>({});
     return s ? `${s.firstName} ${s.lastName}` : "—";
   };
 
-const toggleExpand = (id: number) => {
-  setExpandedId(prev => {
-    const newValue = prev === id ? null : id;
-
-    // ak rozklikávame (otvárame), načítaj dokumenty
-    if (newValue !== null) {
-      loadDocuments(newValue);
+  const loadDocuments = async (internshipId: number) => {
+    try {
+      const res = await fetch(
+        `${baseUrl}/dashboard/internships/${internshipId}/documents`,
+        { headers }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setDocuments(prev => ({ ...prev, [internshipId]: data }));
+      } else {
+        setDocuments(prev => ({ ...prev, [internshipId]: [] }));
+      }
+    } catch {
+      setDocuments(prev => ({ ...prev, [internshipId]: [] }));
     }
+  };
 
-    return newValue;
-  });
-};
+  const toggleExpand = (id: number) => {
+    setExpandedId(prev => {
+      const newValue = prev === id ? null : id;
 
+      // ak rozklikávame (otvárame), načítaj dokumenty
+      if (newValue !== null) {
+        loadDocuments(newValue);
+      }
 
+      return newValue;
+    });
+  };
+
+  const handleDownloadDocument = async (documentId: number, fileName: string) => {
+    try {
+      const res = await fetch(`${baseUrl}/documents/${documentId}/download`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        alert("Chyba pri sťahovaní dokumentu.");
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error(e);
+      alert("Chyba pri komunikácii so serverom.");
+    }
+  };
 
   const handleCompanyDecision = async (id: number, decision: "ACCEPT" | "REJECT") => {
     try {
@@ -196,99 +244,91 @@ const toggleExpand = (id: number) => {
     });
   }, [localData, search, filterCompany, filterMentor, filterYear, filterSemester]);
 
-const loadDocuments = async (internshipId: number) => {
-  try {
-    const res = await fetch(`${baseUrl}/dashboard/internships/${internshipId}/documents`, { headers });
+  const handleUpload = async (internshipId: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const form = new FormData();
+    form.append("file", file);
+
+    const res = await fetch(
+      `${baseUrl}/documents/upload/timestatement?internshipId=${internshipId}`,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: form
+      }
+    );
+
     if (res.ok) {
-      const data = await res.json();
-      setDocuments(prev => ({ ...prev, [internshipId]: data }));
+      alert("Výkaz bol nahraný.");
+      loadDocuments(internshipId);
     } else {
-      setDocuments(prev => ({ ...prev, [internshipId]: [] }));
+      alert("Chyba pri nahrávaní.");
     }
-  } catch {
-    setDocuments(prev => ({ ...prev, [internshipId]: [] }));
-  }
-};
+  };
 
+  const handleUploadContract = async (internshipId: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
+    const form = new FormData();
+    form.append("file", file);
 
-const handleUpload = async (internshipId: number, e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
+    const res = await fetch(
+      `${baseUrl}/documents/upload/contract?internshipId=${internshipId}`,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: form
+      }
+    );
 
-  const form = new FormData();
-  form.append("file", file);
-
-  const res = await fetch(
-    `${baseUrl}/documents/upload/timestatement?internshipId=${internshipId}`,
-    {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: form
+    if (res.ok) {
+      alert("Zmluva bola nahraná.");
+      loadDocuments(internshipId);
+    } else {
+      alert("Chyba pri nahrávaní zmluvy.");
     }
-  );
+  };
 
-  if (res.ok) {
-    alert("Výkaz bol nahraný.");
-    loadDocuments(internshipId);
-  } else {
-    alert("Chyba pri nahrávaní.");
-  }
-};
-
-const handleUploadContract = async (internshipId: number, e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
-
-  const form = new FormData();
-  form.append("file", file);
-
-  const res = await fetch(
-    `${baseUrl}/documents/upload/contract?internshipId=${internshipId}`,
-    {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: form
-    }
-  );
-
-  if (res.ok) {
-    alert("Zmluva bola nahraná.");
-    loadDocuments(internshipId);
-  } else {
-    alert("Chyba pri nahrávaní zmluvy.");
-  }
-};
-
-const renderDocuments = (internshipId: number) => {
+  const renderDocuments = (internshipId: number) => {
   const docs = documents[internshipId] || [];
 
   // rozdelenie dokumentov podľa typu
-  const contract = docs.find(d => d.documentType === "CONTRACT");
-  const timestatement = docs.find(d => d.documentType === "TIMESTATEMENT");
+  const contract = docs.find((d: any) => d.documentType === "CONTRACT");
+  const timestatement = docs.find((d: any) => d.documentType === "TIMESTATEMENT");
 
   return (
     <div style={{ marginTop: 10 }}>
 
       {/* === CONTRACT (ZMLUVA) === */}
       <div style={{ marginBottom: 15 }}>
-        <strong>Zmluva o praxi:</strong><br/>
+        <strong>Zmluva o praxi:</strong><br />
 
-        {/* Ak existuje zmluva */}
         {contract ? (
           <div className="document-item" style={{ marginTop: 8 }}>
-            <a
-              href={`${baseUrl}/documents/${contract.documentId}/download`}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
               className="doc-link"
+              onClick={() =>
+                handleDownloadDocument(contract.documentId, contract.fileName)
+              }
             >
               {contract.fileName}
-            </a>
+            </button>
+
+            <span className={`state-badge ${contract.currentState?.toLowerCase()}`}>
+              {contract.currentState === "APPROVED" && "Potvrdená"}
+              {contract.currentState === "DENIED" && "Zamietnutá"}
+              {contract.currentState === "UPLOADED" && "Čaká na schválenie"}
+              {["UNKNOWN", null, undefined].includes(contract.currentState) &&
+                "Bez stavu"}
+            </span>
           </div>
         ) : (
           <>
-            <span style={{ color: "#666" }}>Zmluva zatiaľ nebola nahraná.</span><br/>
+            <span style={{ color: "#666" }}>Zmluva zatiaľ nebola nahraná.</span><br />
             <input
               type="file"
               accept=".pdf,.doc,.docx"
@@ -299,37 +339,44 @@ const renderDocuments = (internshipId: number) => {
         )}
       </div>
 
-
       {/* === TIMESTATEMENT (VÝKAZ ČINNOSTI) === */}
       <div>
-        <strong>Výkaz o činnosti:</strong><br/>
+        <strong>Výkaz o činnosti:</strong><br />
 
         {timestatement ? (
           <div className="document-item" style={{ marginTop: 8 }}>
-            <a
-              href={`${baseUrl}/documents/${timestatement.documentId}/download`}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
               className="doc-link"
+              onClick={() =>
+                handleDownloadDocument(timestatement.documentId, timestatement.fileName)
+              }
             >
               {timestatement.fileName}
-            </a>
+            </button>
 
             <span className={`state-badge ${timestatement.currentState?.toLowerCase()}`}>
-              {timestatement.currentState === "APPROVED" && "✔️ Potvrdené"}
-              {timestatement.currentState === "DENIED" && "❌ Zamietnuté"}
-              {timestatement.currentState === "UPLOADED" && "⏳ Čaká na schválenie"}
-              {["UNKNOWN", null].includes(timestatement.currentState) && "🟦 Bez stavu"}
+              {timestatement.currentState === "APPROVED" && "Potvrdené"}
+              {timestatement.currentState === "DENIED" && "Zamietnuté"}
+              {timestatement.currentState === "UPLOADED" && "Čaká na schválenie"}
+              {["UNKNOWN", null, undefined].includes(timestatement.currentState) &&
+                "Nepodarilo sa nájsť stav"}
             </span>
           </div>
         ) : (
           <>
-            <input
-              type="file"
-              accept="application/pdf"
-              onChange={(e) => handleUpload(internshipId, e)}
-              style={{ marginTop: 6 }}
-            />
+            {contract && contract.currentState === "APPROVED" ? (
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={(e) => handleUpload(internshipId, e)}
+                style={{ marginTop: 6 }}
+              />
+            ) : (
+              <span style={{ color: "#666" }}>
+                Výkaz o činnosti môžeš nahrať až po schválení zmluvy o praxi.
+              </span>
+            )}
           </>
         )}
       </div>
@@ -337,11 +384,6 @@ const renderDocuments = (internshipId: number) => {
     </div>
   );
 };
-
-
-
-
-
 
 
   return (
@@ -394,7 +436,11 @@ const renderDocuments = (internshipId: number) => {
 
         <select
           value={filterSemester}
-          onChange={e => setFilterSemester(e.target.value === "ALL" ? "ALL" : Number(e.target.value))}
+          onChange={e =>
+            setFilterSemester(
+              e.target.value === "ALL" ? "ALL" : Number(e.target.value)
+            )
+          }
         >
           <option value="ALL">Všetky semestre</option>
           {Array.from(new Set(localData.map(i => i.semester))).map(sem => (
@@ -435,7 +481,7 @@ const renderDocuments = (internshipId: number) => {
             document.body.appendChild(a);
             a.click();
             a.remove();
-        }}
+          }}
         >
           Export CSV
         </button>
@@ -490,93 +536,15 @@ const renderDocuments = (internshipId: number) => {
                         <p><strong>Dátum začiatku:</strong> {p.dateStart}</p>
                         <p><strong>Dátum konca:</strong> {p.dateEnd}</p>
 
-                        {/* ➕ PRIDANÉ – POPIS PRAXE */}
                         <p><strong>Popis praxe:</strong> {p.description || "—"}</p>
 
                         <p><strong>Stav praxe:</strong> {p.status}</p>
-{role === "STUDENT" && (
-  <div style={{ marginTop: 20 }}>
-    {(() => {
-      const docs = documents[p.id] || [];
-      const contract = docs.find((d) => d.documentType === "CONTRACT");
-      const timestatement = docs.find((d) => d.documentType === "TIMESTATEMENT");
 
-      return (
-        <>
-          {/* ====== CONTRACT – Zmluva o praxi ====== */}
-          <div style={{ marginBottom: 16 }}>
-            <strong>Zmluva o praxi:</strong>
-            <br />
-            {contract ? (
-              <div className="document-item" style={{ marginTop: 8 }}>
-                <a
-                  href={`${baseUrl}/documents/${contract.documentId}/download`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="doc-link"
-                >
-                  {contract.fileName}
-                </a>
-              </div>
-            ) : (
-              <>
-                <span style={{ color: "#666" }}>
-                  Zmluva zatiaľ nebola nahraná.
-                </span>
-                <br />
-                <input
-                  type="file"
-                  accept=".pdf,.doc,.docx"
-                  onChange={(e) => handleUploadContract(p.id, e)}
-                  style={{ marginTop: 6 }}
-                />
-              </>
-            )}
-          </div>
-
-          {/* ====== TIMESTATEMENT – Výkaz o činnosti ====== */}
-          <div>
-            <strong>Výkaz o činnosti:</strong>
-            <br />
-            {timestatement ? (
-              <div className="document-item" style={{ marginTop: 8 }}>
-                <a
-                  href={`${baseUrl}/documents/${timestatement.documentId}/download`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="doc-link"
-                >
-                  {timestatement.fileName}
-                </a>
-
-                <span
-                  className={`state-badge ${timestatement.currentState?.toLowerCase()}`}
-                >
-                  {timestatement.currentState === "APPROVED" && " Potvrdené"}
-                  {timestatement.currentState === "DENIED" && " Zamietnuté"}
-                  {timestatement.currentState === "UPLOADED" && " Čaká na schválenie"}
-                  {["UNKNOWN", null].includes(timestatement.currentState) &&
-                    "🟦 Bez stavu"}
-                </span>
-              </div>
-            ) : (
-              <>
-                <input
-                  type="file"
-                  accept="application/pdf"
-                  onChange={(e) => handleUpload(p.id, e)}
-                  style={{ marginTop: 6 }}
-                />
-              </>
-            )}
-          </div>
-        </>
-      );
-    })()}
-  </div>
-)}
-
-
+                        {role === "STUDENT" && (
+                          <div style={{ marginTop: 20 }}>
+                            {renderDocuments(p.id)}
+                          </div>
+                        )}
 
                         {role === "COMPANY" && p.status === "CREATED" && (
                           <div style={{ marginTop: 15 }}>

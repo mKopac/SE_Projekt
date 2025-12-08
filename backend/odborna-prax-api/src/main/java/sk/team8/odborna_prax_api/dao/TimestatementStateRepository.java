@@ -4,6 +4,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import sk.team8.odborna_prax_api.Entity.TimestatementState;
 
+import java.util.Optional;
+
 @Repository
 public interface TimestatementStateRepository extends JpaRepository<TimestatementState, Integer> {
+    Optional<TimestatementState> findByName(String name);
+
 }

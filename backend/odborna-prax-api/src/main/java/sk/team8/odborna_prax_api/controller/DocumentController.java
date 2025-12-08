@@ -34,15 +34,18 @@ public class DocumentController {
     @GetMapping("/contracts/template")
     public ResponseEntity<Resource> downloadContractTemplate() {
         try {
-
             Resource resource = new ClassPathResource("documents/Ziadost_o_prax.docx");
+
+            // tu je názov už čistý ASCII
+            String safeFileName = "Ziadost_o_prax.docx";
 
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(
                             "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-
-                    .header(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\"Ziadost_o_prax.docx\"")
+                    .header(
+                            HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"" + safeFileName + "\""
+                    )
                     .body(resource);
 
         } catch (Exception e) {
@@ -65,13 +68,23 @@ public class DocumentController {
 
         DocumentDownloadResponse response = documentsService.downloadDocument(id);
 
-        // zisti content-type
+        String originalName = response.getFileName();
+        String extension = "";
+
+        int dot = originalName.lastIndexOf('.');
+        if (dot != -1) {
+            extension = originalName.substring(dot); // vrátane bodky
+        }
+
+        // vždy ASCII názov do hlavičky
+        String safeFileName = "document" + extension;
+
         String contentType = "application/octet-stream";
-        if (response.getFileName().endsWith(".pdf")) {
+        if (originalName.endsWith(".pdf")) {
             contentType = "application/pdf";
-        } else if (response.getFileName().endsWith(".docx")) {
+        } else if (originalName.endsWith(".docx")) {
             contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-        } else if (response.getFileName().endsWith(".doc")) {
+        } else if (originalName.endsWith(".doc")) {
             contentType = "application/msword";
         }
 
@@ -79,8 +92,46 @@ public class DocumentController {
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(
                         HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + response.getFileName() + "\""
+                        "attachment; filename=\"" + safeFileName + "\""
                 )
                 .body(response.getResource());
+    }
+
+    @GetMapping("/contracts/generated")
+    public ResponseEntity<Resource> downloadGeneratedContract(
+            @RequestParam Integer internshipId,
+            Principal principal
+    ) {
+        try {
+            DocumentDownloadResponse response =
+                    documentsService.generateContractForInternship(internshipId, principal.getName());
+
+            String originalName = response.getFileName();
+            String extension = "";
+
+            int dot = originalName.lastIndexOf('.');
+            if (dot != -1) {
+                extension = originalName.substring(dot);
+            }
+
+            // ASCII názov pre vygenerovanú zmluvu
+            String safeFileName = "contract_" + internshipId + extension;
+
+            String contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+            if (originalName.endsWith(".doc")) {
+                contentType = "application/msword";
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(
+                            HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"" + safeFileName + "\""
+                    )
+                    .body(response.getResource());
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

@@ -168,7 +168,7 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
     const token = localStorage.getItem("token");
 
     const resTemplate = await fetch(
-      `${baseUrl}/documents/contracts/template`,
+      `${baseUrl}/documents/contracts/generated?internshipId=${data.internshipId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -184,7 +184,7 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = "Ziadost_o_prax.docx"; // názov súboru pre usera
+      a.download = "Ziadost_o_prax.docx";
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -194,6 +194,7 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
     console.error("Chyba pri sťahovaní šablóny:", e);
   }
 }
+
     onAdd({
       id: data.internshipId,
       studentId: currentUserId,

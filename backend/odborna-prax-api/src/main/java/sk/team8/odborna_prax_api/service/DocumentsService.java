@@ -10,4 +10,6 @@ public interface DocumentsService {
     DocumentDownloadResponse downloadDocument(Integer documentId);
 
     void uploadContract(Integer internshipId, MultipartFile file, String name);
+
+    DocumentDownloadResponse generateContractForInternship(Integer internshipId, String userEmail);
 }

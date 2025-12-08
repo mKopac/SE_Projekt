@@ -485,32 +485,23 @@ public class DashboardController {
 
         for (Documents d : docs) {
 
-            // Rozlíšime typ dokumentu
             String documentType = d.getDocumentType().getName();
 
-            // Default stav
-            String stateName = null;
+            TimestatementStateChange lastState =
+                    timestatementStateChangeRepository
+                            .findTopByDocumentIdOrderByStateChangedAtDesc(d.getId())
+                            .orElse(null);
 
-            if ("TIMESTATEMENT".equalsIgnoreCase(documentType)) {
-
-                // TIMESTATEMENT má stav
-                TimestatementStateChange lastState =
-                        timestatementStateChangeRepository
-                                .findTopByDocumentIdOrderByStateChangedAtDesc(d.getId())
-                                .orElse(null);
-
-                stateName = (lastState != null)
-                        ? lastState.getTimestatementState().getName()
-                        : "UNKNOWN";
-            }
+            String stateName = (lastState != null)
+                    ? lastState.getTimestatementState().getName()
+                    : "UNKNOWN";
 
             Map<String, Object> item = new HashMap<>();
             item.put("documentId", d.getId());
             item.put("fileName", d.getDocumentName());
             item.put("documentType", documentType);
             item.put("currentState", stateName);
-            item.put("type", documentType );
-
+            item.put("type", documentType);
 
             response.add(item);
         }

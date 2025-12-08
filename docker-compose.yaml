@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: odborna-prax-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: internship_management
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: app_password
+    ports:
+      - "3306:3306" # ak máš lokálny MySQL, zmeň napr. na "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+
+  backend:
+    build:
+      context: ./backend/odborna-prax-api
+      dockerfile: Dockerfile
+    container_name: odborna-prax-backend
+    restart: always
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/internship_management?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: app_user
+      SPRING_DATASOURCE_PASSWORD: app_password
+      # prípadne ďalšie, napr. JWT secret:
+      # JWT_SECRET: "nejaky-super-tajny-kluc"
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend/odborna-prax-web
+      dockerfile: Dockerfile
+      target: dev          # <- spustí dev stage s HMR
+    container_name: odborna-prax-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/odborna-prax-web:/app    # live kód
+      - /app/node_modules                   # nech node_modules ostanú z kontajnera
+
+volumes:
+  db_data:

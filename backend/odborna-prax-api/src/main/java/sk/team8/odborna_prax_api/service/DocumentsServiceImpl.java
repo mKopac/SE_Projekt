@@ -115,6 +115,7 @@ public class DocumentsServiceImpl implements DocumentsService {
         }
     }
 
+    @Override
     public void uploadContract(Integer internshipId, MultipartFile file, String email) {
 
         User user = userRepository.findByEmail(email)
@@ -127,7 +128,7 @@ public class DocumentsServiceImpl implements DocumentsService {
             throw new RuntimeException("Unauthorized: student does not own this internship.");
         }
 
-        DocumentType type = documentTypeRepository.findById(1) // CONTRACT
+        DocumentType type = documentTypeRepository.findById(1)
                 .orElseThrow(() -> new RuntimeException("DocumentType CONTRACT not found"));
 
         try {
@@ -154,17 +155,6 @@ public class DocumentsServiceImpl implements DocumentsService {
 
         documentsRepository.save(document);
 
-        TimestatementState stateUploaded = timestatementStateRepository.findById(1)
-                .orElseThrow(() -> new RuntimeException("TimestatementState UPLOADED not found"));
-
-        TimestatementStateChange stateChange = new TimestatementStateChange(
-                document,
-                stateUploaded,
-                user,
-                new Timestamp(System.currentTimeMillis())
-        );
-
-        timestatementStateChangeRepository.save(stateChange);
     }
 
     @Override

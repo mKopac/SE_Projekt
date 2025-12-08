@@ -1,5 +1,6 @@
 package sk.team8.odborna_prax_api.controller;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
@@ -9,10 +10,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sk.team8.odborna_prax_api.Entity.Documents;
+import sk.team8.odborna_prax_api.Entity.TimestatementState;
+import sk.team8.odborna_prax_api.Entity.TimestatementStateChange;
+import sk.team8.odborna_prax_api.Entity.User;
 import sk.team8.odborna_prax_api.dto.DocumentDownloadResponse;
 import sk.team8.odborna_prax_api.service.DocumentsService;
+import sk.team8.odborna_prax_api.dao.DocumentsRepository;
+import sk.team8.odborna_prax_api.dao.TimestatementStateRepository;
+import sk.team8.odborna_prax_api.dao.TimestatementStateChangeRepository;
+import sk.team8.odborna_prax_api.dao.UserRepository;
 
 import java.security.Principal;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.sql.Timestamp;
+
+
+
 
 @RestController
 @RequestMapping("/documents")
@@ -20,6 +37,10 @@ import java.security.Principal;
 public class DocumentController {
 
     private final DocumentsService documentsService;
+    private final UserRepository userRepository;
+    private final DocumentsRepository documentsRepository;
+    private final TimestatementStateRepository timestatementStateRepository;
+    private final TimestatementStateChangeRepository timestatementStateChangeRepository;
 
     @PostMapping("/upload/timestatement")
     public ResponseEntity<?> uploadTimestatement(
@@ -134,4 +155,57 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @PostMapping("/{id}/company-decision")
+    @Transactional
+    public ResponseEntity<?> companyDocumentDecision(
+            @PathVariable int id,
+            @RequestParam("state") String state,
+            Principal principal
+    ) {
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!"COMPANY".equalsIgnoreCase(user.getRole().getName())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Only company can change document state"));
+        }
+
+        Documents doc = documentsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Document not found"));
+
+        // skontroluje ze ci dokument patri tej firme
+        if (doc.getInternship() == null
+                || doc.getInternship().getCompany() == null
+                || !Objects.equals(doc.getInternship().getCompany().getId(), user.getCompany().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Document does not belong to your company"));
+        }
+
+        String stateName = state.toUpperCase(Locale.ROOT);
+        Set<String> allowed = Set.of("APPROVED", "DENIED");
+
+        if (!allowed.contains(stateName)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Unsupported state. Allowed: " + allowed));
+        }
+
+        TimestatementState ts = timestatementStateRepository.findByName(stateName)
+                .orElseThrow(() -> new RuntimeException("State " + stateName + " not found"));
+
+        TimestatementStateChange change = new TimestatementStateChange();
+        change.setDocument(doc);
+        change.setTimestatementState(ts);
+        change.setEmployee(user);
+        change.setStateChangedAt(new Timestamp(System.currentTimeMillis()));
+
+        timestatementStateChangeRepository.save(change);
+
+        return ResponseEntity.ok(Map.of(
+                "documentId", doc.getId(),
+                "newState", stateName
+        ));
+    }
+
+
+
 }

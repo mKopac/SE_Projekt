@@ -167,7 +167,10 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
     }
   };
 
-  const handleCompanyDecision = async (id: number, decision: "ACCEPT" | "REJECT") => {
+  const handleCompanyDecision = async (
+  id: number,
+  decision: "ACCEPT" | "REJECT" | "APPROVED" | "DENIED"
+) => {
     try {
       const res = await fetch(
         `${baseUrl}/dashboard/internship/${id}/company-decision?decision=${decision}`,
@@ -181,8 +184,7 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
         return;
       }
 
-      const newState: string =
-        data?.newState ?? (decision === "ACCEPT" ? "ACCEPTED" : "REJECTED");
+      const newState: string = data?.newState ?? decision;
 
       setLocalData(prev =>
         prev.map(i => (i.id === id ? { ...i, status: newState } : i))
@@ -192,7 +194,7 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
     } catch {
       alert("Chyba pri komunikácii so serverom.");
     }
-  };
+};
 
   const handleAdminStateChange = async (id: number) => {
     try {
@@ -292,17 +294,83 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
     }
   };
 
-  const renderDocuments = (internshipId: number) => {
+    const handleDocumentDecision = async (
+    documentId: number,
+    internshipId: number,
+    decision: "APPROVED" | "DENIED"
+  ) => {
+    try {
+      const res = await fetch(
+        `${baseUrl}/documents/${documentId}/company-decision?state=${decision}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        alert(data?.error ?? "Chyba pri zmene stavu dokumentu.");
+        return;
+      }
+
+      const newState: string = data?.newState ?? decision;
+
+      setDocuments(prev => {
+        const docsForInternship = prev[internshipId] || [];
+        const updatedDocs = docsForInternship.map((d: any) =>
+          d.documentId === documentId ? { ...d, currentState: newState } : d
+        );
+        return {
+          ...prev,
+          [internshipId]: updatedDocs,
+        };
+      });
+
+      alert("Stav dokumentu bol úspešne zmenený.");
+    } catch (e) {
+      console.error(e);
+      alert("Chyba pri komunikácii so serverom.");
+    }
+  };
+
+  const renderDocuments = (internship: Internship) => {
+  const internshipId = internship.id;
   const docs = documents[internshipId] || [];
 
-  // rozdelenie dokumentov podľa typu
+  const isStudent = role === "STUDENT";
+  const isCompany = role === "COMPANY";
+
   const contract = docs.find((d: any) => d.documentType === "CONTRACT");
   const timestatement = docs.find((d: any) => d.documentType === "TIMESTATEMENT");
+
+
+  const getContractStatus = () => {
+    if (!contract) return "Zmluva zatiaľ nebola nahraná.";
+    if (internship.status === "CREATED") return "Čaká na schválenie firmy.";
+    if (internship.status === "ACCEPTED") return "Zmluva schválená";
+    if (internship.status === "REJECTED") return "Zmluva zamietnutá";
+
+    return "Zmluva schválená";
+  };
+
+  const getTimestatementStatus = () => {
+    if (!timestatement) return "Výkaz zatiaľ nebol nahraný.";
+
+    if (timestatement.currentState === "UPLOADED") return "Čaká na schválenie firmy";
+    if (timestatement.currentState === "APPROVED") return "Výkaz schválený";
+    if (timestatement.currentState === "DENIED") return "Výkaz zamietnutý";
+
+    return "Neznámy stav výkazu";
+  };
 
   return (
     <div style={{ marginTop: 10 }}>
 
-      {/* === CONTRACT (ZMLUVA) === */}
+
       <div style={{ marginBottom: 15 }}>
         <strong>Zmluva o praxi:</strong><br />
 
@@ -311,35 +379,45 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
             <button
               type="button"
               className="doc-link"
-              onClick={() =>
-                handleDownloadDocument(contract.documentId, contract.fileName)
-              }
+              onClick={() => handleDownloadDocument(contract.documentId, contract.fileName)}
             >
               {contract.fileName}
             </button>
 
-            <span className={`state-badge ${contract.currentState?.toLowerCase()}`}>
-              {contract.currentState === "APPROVED" && "Potvrdená"}
-              {contract.currentState === "DENIED" && "Zamietnutá"}
-              {contract.currentState === "UPLOADED" && "Čaká na schválenie"}
-              {["UNKNOWN", null, undefined].includes(contract.currentState) &&
-                "Bez stavu"}
-            </span>
+            <span className="state-badge">{getContractStatus()}</span>
+
+            {isCompany && internship.status === "CREATED" && (
+              <div style={{ marginTop: 8 }}>
+                <button className="btn-accept" onClick={() => handleCompanyDecision(internshipId, "ACCEPT")}>
+                  Schváliť prax
+                </button>
+
+                <button className="btn-reject" onClick={() => handleCompanyDecision(internshipId, "REJECT")}>
+                  Zamietnuť prax
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <>
-            <span style={{ color: "#666" }}>Zmluva zatiaľ nebola nahraná.</span><br />
-            <input
-              type="file"
-              accept=".pdf,.doc,.docx"
-              onChange={(e) => handleUploadContract(internshipId, e)}
-              style={{ marginTop: 6 }}
-            />
+            {isStudent ? (
+              <>
+                <span style={{ color: "#666" }}>Zmluva zatiaľ nebola nahraná.</span><br />
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => handleUploadContract(internshipId, e)}
+                  style={{ marginTop: 6 }}
+                />
+              </>
+            ) : (
+              <span style={{ color: "#666" }}>Zmluva zatiaľ nebola nahraná.</span>
+            )}
           </>
         )}
       </div>
 
-      {/* === TIMESTATEMENT (VÝKAZ ČINNOSTI) === */}
+
       <div>
         <strong>Výkaz o činnosti:</strong><br />
 
@@ -348,42 +426,74 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
             <button
               type="button"
               className="doc-link"
-              onClick={() =>
-                handleDownloadDocument(timestatement.documentId, timestatement.fileName)
-              }
+              onClick={() => handleDownloadDocument(timestatement.documentId, timestatement.fileName)}
             >
               {timestatement.fileName}
             </button>
 
-            <span className={`state-badge ${timestatement.currentState?.toLowerCase()}`}>
-              {timestatement.currentState === "APPROVED" && "Potvrdené"}
-              {timestatement.currentState === "DENIED" && "Zamietnuté"}
-              {timestatement.currentState === "UPLOADED" && "Čaká na schválenie"}
-              {["UNKNOWN", null, undefined].includes(timestatement.currentState) &&
-                "Nepodarilo sa nájsť stav"}
-            </span>
+            <span className="state-badge">{getTimestatementStatus()}</span>
+
+            {/* Firma schvaľuje výkaz, iba ak prax je ACCEPTED */}
+            {isCompany &&
+              internship.status === "ACCEPTED" &&
+              timestatement.currentState === "UPLOADED" && (
+                <div style={{ marginTop: 8 }}>
+                  <button
+                    className="btn-accept"
+                    onClick={() =>
+                      handleDocumentDecision(
+                        timestatement.documentId,
+                        internshipId,
+                        "APPROVED"
+                      )
+                    }
+                  >
+                    Schváliť výkaz
+                  </button>
+
+                  <button
+                    className="btn-reject"
+                    onClick={() =>
+                      handleDocumentDecision(
+                        timestatement.documentId,
+                        internshipId,
+                        "DENIED"
+                      )
+                    }
+                  >
+                    Zamietnuť výkaz
+                  </button>
+                </div>
+            )}
+
           </div>
         ) : (
           <>
-            {contract && contract.currentState === "APPROVED" ? (
-              <input
-                type="file"
-                accept="application/pdf"
-                onChange={(e) => handleUpload(internshipId, e)}
-                style={{ marginTop: 6 }}
-              />
+            {isStudent ? (
+              <>
+                {internship.status === "ACCEPTED" ? (
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    onChange={(e) => handleUpload(internshipId, e)}
+                    style={{ marginTop: 6 }}
+                  />
+                ) : (
+                  <span style={{ color: "#666" }}>Výkaz môžeš nahrať až po schválení zmluvy.</span>
+                )}
+              </>
             ) : (
-              <span style={{ color: "#666" }}>
-                Výkaz o činnosti môžeš nahrať až po schválení zmluvy o praxi.
-              </span>
+              <span style={{ color: "#666" }}>Výkaz zatiaľ nebol nahraný.</span>
             )}
           </>
         )}
       </div>
-
     </div>
   );
 };
+
+
+
 
 
   return (
@@ -540,26 +650,9 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
 
                         <p><strong>Stav praxe:</strong> {p.status}</p>
 
-                        {role === "STUDENT" && (
+                        {["STUDENT", "COMPANY", "ADMIN"].includes(role) && (
                           <div style={{ marginTop: 20 }}>
-                            {renderDocuments(p.id)}
-                          </div>
-                        )}
-
-                        {role === "COMPANY" && p.status === "CREATED" && (
-                          <div style={{ marginTop: 15 }}>
-                            <button
-                              className="btn-accept"
-                              onClick={() => handleCompanyDecision(p.id, "ACCEPT")}
-                            >
-                              Potvrdiť prax
-                            </button>
-                            <button
-                              className="btn-reject"
-                              onClick={() => handleCompanyDecision(p.id, "REJECT")}
-                            >
-                              Zamietnuť prax
-                            </button>
+                            {renderDocuments(p)}  
                           </div>
                         )}
 

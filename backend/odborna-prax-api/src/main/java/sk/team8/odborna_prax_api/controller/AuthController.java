@@ -87,13 +87,17 @@ public class AuthController {
             return ResponseEntity.ok(Map.of(
                     "access_token", token,
                     "token_type", "Bearer",
+                    "passwordNeedsChange", user.isPasswordNeedsChange(),
+                    "password_needs_change", user.isPasswordNeedsChange(),
                     "user", Map.of(
                             "id", user.getId(),
                             "email", user.getEmail(),
                             "firstName", user.getFirstName(),
                             "lastName", user.getLastName(),
                             "role", user.getRole().getName(),
-                            "suspended", user.isSuspended()
+                            "suspended", user.isSuspended(),
+                            "passwordNeedsChange", user.isPasswordNeedsChange(),
+                            "password_needs_change", user.isPasswordNeedsChange()
                     )
             ));
         } catch (IllegalArgumentException e) {
@@ -223,6 +227,48 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Nastala chyba pri zmene hesla."));
         }
+    }
+
+    @PostMapping("/force-change-password")
+    public ResponseEntity<?> forceChangePassword(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody ChangePasswordRequest request) {
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Missing or invalid Authorization header"));
+        }
+
+        String token = authHeader.substring(7);
+        if (!authService.isTokenValid(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Invalid or expired token"));
+        }
+
+        String email = authService.extractEmailFromToken(token);
+        User user = authService.findUserByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Používateľ neexistuje."));
+
+        if (!user.isPasswordNeedsChange()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", "Zmena hesla nie je povolená."));
+        }
+
+        if (request.getNewPassword() == null || request.getNewPassword().isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Nové heslo nesmie byť prázdne."));
+        }
+
+        if (!request.getNewPassword().equals(request.getRepeatNewPassword())) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Heslá sa nezhodujú."));
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setPasswordNeedsChange(false);
+        userRepository.save(user);
+
+        return ResponseEntity.ok(Map.of("message", "Heslo bolo úspešne zmenené."));
     }
 
     @GetMapping("/study-programs")

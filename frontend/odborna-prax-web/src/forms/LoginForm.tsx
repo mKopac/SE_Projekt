@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, Navigate, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "./../css/LoginForm.css";
@@ -14,9 +14,9 @@ export const LoginForm: React.FC<Props> = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
-
-  const token = localStorage.getItem("token");
-  if (token) return <Navigate to="/dashboard" replace />;
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [repeatNewPassword, setRepeatNewPassword] = useState("");
 
   useEffect(() => {
     const registered = searchParams.get("registered");
@@ -60,13 +60,19 @@ export const LoginForm: React.FC<Props> = () => {
       if (response.ok) {
         const data = await response.json();
 
-        // 🔐 uloží token aj používateľa
+        //uloží token aj používateľa
         localStorage.setItem("token", data.access_token);
         if (data.user) {
           localStorage.setItem("user", JSON.stringify(data.user));
         }
 
-        // 🔀 presmerovanie podľa roly
+        //presmerovanie podľa roly
+        if (data.passwordNeedsChange) {
+          setShowChangePassword(true);
+          return;
+        }
+
+        //presmerovanie podľa role
         if (data.user?.role === "ADMIN") {
           window.location.href = "/admin/users";
         } else {
@@ -191,6 +197,75 @@ export const LoginForm: React.FC<Props> = () => {
                 </button>
               </div>
             </form>
+            {showChangePassword && (
+              <div className="force-password-overlay">
+                <div className="force-password-modal">
+                  <h3>Zmena hesla je povinná</h3>
+                  <p>Z bezpečnostných dôvodov si musíte zmeniť heslo.</p>
+
+                  <input
+                    type="password"
+                    placeholder="Nové heslo"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="text-input"
+                  />
+
+                  <input
+                    type="password"
+                    placeholder="Zopakujte nové heslo"
+                    value={repeatNewPassword}
+                    onChange={(e) => setRepeatNewPassword(e.target.value)}
+                    className="text-input"
+                  />
+
+                  <button
+                    onClick={async () => {
+                      if (!newPassword || !repeatNewPassword) {
+                        alert("Zadajte obe heslá");
+                        return;
+                      }
+
+                      if (newPassword !== repeatNewPassword) {
+                        alert("Heslá sa nezhodujú");
+                        return;
+                      }
+
+                      try {
+                        const res = await fetch(
+                          "http://localhost:8080/auth/force-change-password",
+                          {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json",
+                              Authorization: `Bearer ${localStorage.getItem("token")}`,
+                            },
+                            body: JSON.stringify({
+                              newPassword,
+                              repeatNewPassword,
+                            }),
+                          }
+                        );
+
+                        if (!res.ok) {
+                          const err = await res.json();
+                          alert(err.error || "Zmena hesla zlyhala");
+                          return;
+                        }
+
+                        setShowChangePassword(false);
+                        window.location.href = "/dashboard";
+                      } catch {
+                        alert("Server momentálne nie je dostupný.");
+                      }
+                    }}
+                  >
+                    Zmeniť heslo
+                  </button>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
       </main>

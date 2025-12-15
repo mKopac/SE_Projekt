@@ -3,12 +3,15 @@ import { Link, Navigate, useSearchParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "./../css/LoginForm.css";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   onSubmit?: (email: string, password: string) => void;
 };
 
 export const LoginForm: React.FC<Props> = () => {
+  const { t } = useTranslation("login");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -23,30 +26,28 @@ export const LoginForm: React.FC<Props> = () => {
     const verification = searchParams.get("verification");
 
     if (registered === "success") {
-      setInfoMessage(
-        "Registrácia prebehla úspešne. Potvrdzovací e-mail bol odoslaný."
-      );
+      setInfoMessage(t("loginForm.info.registeredSuccess"));
     }
 
     if (verification === "success") {
-      setInfoMessage("Váš účet bol aktivovaný. Teraz sa môžete prihlásiť.");
+      setInfoMessage(t("loginForm.info.verificationSuccess"));
     }
 
     if (verification === "error") {
-      setInfoMessage("Overovací odkaz je neplatný alebo expiroval.");
+      setInfoMessage(t("loginForm.info.verificationError"));
     }
-  }, [searchParams]);
+  }, [searchParams, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
     if (!email) {
-      setError("Zadajte email.");
+      setError(t("loginForm.validation.emailRequired"));
       return;
     }
     if (!password) {
-      setError("Zadajte heslo.");
+      setError(t("loginForm.validation.passwordRequired"));
       return;
     }
 
@@ -76,14 +77,14 @@ export const LoginForm: React.FC<Props> = () => {
         const err = await response.json();
         setError(
           err.error ||
-          err.message ||
-          err.detail ||
-          "Prihlásenie zlyhalo."
+            err.message ||
+            err.detail ||
+            t("loginForm.errors.loginFailed")
         );
       }
     } catch (error) {
       console.error("Chyba pri prihlasovaní:", error);
-      setError("Server momentálne nie je dostupný.");
+      setError(t("loginForm.errors.serverUnavailable"));
     }
   };
 
@@ -91,12 +92,12 @@ export const LoginForm: React.FC<Props> = () => {
     e.preventDefault();
 
     if (!email) {
-      alert("Najprv zadajte svoj e-mail.");
+      alert(t("loginForm.forgotPassword.enterEmailFirst"));
       return;
     }
 
     const confirmed = window.confirm(
-      `Chcete odoslať odkaz na obnovenie hesla na e-mail: ${email}?`
+      t("loginForm.forgotPassword.confirmSend", { email })
     );
 
     if (!confirmed) return;
@@ -112,14 +113,14 @@ export const LoginForm: React.FC<Props> = () => {
       );
 
       if (response.ok) {
-        alert("Odkaz na obnovenie hesla bol odoslaný na váš e-mail.");
+        alert(t("loginForm.forgotPassword.sentOk"));
       } else {
         const err = await response.json();
-        alert(err.error || "Nepodarilo sa odoslať odkaz.");
+        alert(err.error || t("loginForm.forgotPassword.sendFailed"));
       }
     } catch (error) {
       console.error(error);
-      alert("Server momentálne nie je dostupný.");
+      alert(t("loginForm.forgotPassword.serverUnavailable"));
     }
   };
 
@@ -130,8 +131,8 @@ export const LoginForm: React.FC<Props> = () => {
       <main className="main-content">
         <div className="login-box-outer">
           <div className="login-box">
-            <button className="logo-btn" aria-label="Logo tlačidlo">
-              Logo?
+            <button className="logo-btn" aria-label={t("loginForm.logoAria")}>
+              {t("loginForm.logoPlaceholder")}
             </button>
 
             {infoMessage && (
@@ -142,39 +143,39 @@ export const LoginForm: React.FC<Props> = () => {
                   className="form-info-close"
                   onClick={() => setInfoMessage(null)}
                 >
-                  X
+                  {t("loginForm.info.close")}
                 </button>
               </div>
             )}
 
             <form className="login-form" onSubmit={handleSubmit} noValidate>
               <label className="input-label">
-                Email
+                {t("loginForm.fields.emailLabel")}
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="text-input"
-                  placeholder="email@priklad.sk"
+                  placeholder={t("loginForm.fields.emailPlaceholder")}
                   required
                 />
               </label>
 
               <label className="input-label">
-                Heslo
+                {t("loginForm.fields.passwordLabel")}
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="text-input"
-                  placeholder="Heslo"
+                  placeholder={t("loginForm.fields.passwordPlaceholder")}
                   required
                 />
               </label>
 
               <div className="small-links">
                 <a href="#forgot" onClick={handleForgotPassword}>
-                  Zabudnuté heslo? Zmeňte si ho tu.
+                  {t("loginForm.forgotPassword.link")}
                 </a>
               </div>
 
@@ -182,12 +183,12 @@ export const LoginForm: React.FC<Props> = () => {
 
               <div className="actions-row">
                 <div className="register-note">
-                  Ešte nemáte účet?
+                  {t("loginForm.registerNote.text")}
                   <br />
-                  <Link to="/register">Zaregistrujte sa.</Link>
+                  <Link to="/register">{t("loginForm.registerNote.link")}</Link>
                 </div>
                 <button type="submit" className="submit-btn">
-                  Prihlásiť
+                  {t("loginForm.submit")}
                 </button>
               </div>
             </form>

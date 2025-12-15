@@ -1,0 +1,24 @@
+{
+  "header": {
+    "title": "Systém na evidenciu praxe",
+    "dashboard": "Dashboard",
+    "profile": "Profil",
+    "home": "Domov",
+    "faq": "FAQ",
+    "adminUsers": "Správa používateľov",
+    "logout": "Odhlásiť",
+    "login": "Prihlásiť"
+    },
+
+  "footer": {
+    "faculty": "Fakulta prírodných vied a informatiky",
+    "university": "Univerzita Konštantína Filozofa v Nitre",
+    "copyright": "© {{year}} FPVaI UKF Nitra",
+    "address": "Trieda Andreja Hlinku 1, 949 74 Nitra",
+    "emailLabel": "Email: {{email}}",
+    "website": "www.fpvai.ukf.sk",
+    "gdpr": "Ochrana osobných údajov (GDPR)",
+    "terms": "Podmienky používania",
+    "contactAdmin": "Kontakt na administrátora"
+  }
+}

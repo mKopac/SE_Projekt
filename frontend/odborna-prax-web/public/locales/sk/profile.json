@@ -1,0 +1,67 @@
+{
+  "_SECTION_PROFILE": "Profile",
+
+  "title": "Môj profil",
+
+  "loading": {
+    "profile": "Načítavam profil..."
+  },
+
+  "common": {
+    "empty": "—"
+  },
+
+  "labels": {
+    "firstName": "Meno",
+    "lastName": "Priezvisko",
+    "email": "Email (nemenný)",
+    "emailAlternate": "Alternatívny email",
+    "phoneNumber": "Telefón",
+    "address": "Adresa",
+    "city": "Mesto",
+    "zip": "PSČ",
+    "role": "Typ účtu",
+    "studyProgram": "Študijný program",
+    "department": "Katedra",
+    "companyName": "Názov firmy"
+  },
+
+  "select": {
+    "studyProgram": "-- Vyber odbor --",
+    "department": "-- Vyber katedru --"
+  },
+
+  "actions": {
+    "edit": "Upraviť"
+  },
+
+  "messages": {
+    "savedOk": "Údaje boli úspešne uložené."
+  },
+
+  "errors": {
+    "profileLoad": "Chyba pri načítavaní profilu",
+    "studyProgramsLoad": "Chyba pri načítavaní študijných odborov",
+    "departmentsLoad": "Chyba pri načítavaní katedier",
+    "saveChanges": "Chyba pri ukladaní zmien"
+  },
+
+  "password": {
+    "title": "Zmena hesla",
+    "fields": {
+      "old": { "label": "Staré heslo:" },
+      "new": { "label": "Nové heslo:" },
+      "confirm": { "label": "Potvrdenie hesla:" }
+    },
+    "actions": {
+      "submit": "Zmeniť heslo"
+    },
+    "messages": {
+      "changedOk": "Heslo bolo úspešne zmenené."
+    },
+    "errors": {
+      "mismatch": "Nové heslá sa nezhodujú.",
+      "changeFailed": "Nepodarilo sa zmeniť heslo."
+    }
+  }
+}

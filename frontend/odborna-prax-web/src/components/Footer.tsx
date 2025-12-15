@@ -1,7 +1,9 @@
 import React from 'react';
 import "../css/Footer.css";
+import { useTranslation } from "react-i18next";
 
 const Footer: React.FC = () => {
+  const { t } = useTranslation("shared");
   const year = new Date().getFullYear();
 
   return (
@@ -9,23 +11,23 @@ const Footer: React.FC = () => {
       <div className="footer-content">
 
         <div className="footer-left">
-          <strong>Fakulta prírodných vied a informatiky</strong><br />
-          Univerzita Konštantína Filozofa v Nitre<br />
-          <span>© {year} FPVaI UKF Nitra</span>
+          <strong>{t("footer.faculty")}</strong><br />
+          {t("footer.university")}<br />
+          <span>{t("footer.copyright", { year })}</span>
         </div>
 
         <div className="footer-center">
-          <span>Trieda Andreja Hlinku 1, 949 74 Nitra</span><br />
-          <span>Email: dfpv@ukf.sk</span><br />
+          <span>{t("footer.address")}</span><br />
+          <span>{t("footer.emailLabel", { email: "dfpv@ukf.sk" })}</span><br />
           <a href="https://www.fpvai.ukf.sk/" target="_blank" rel="noreferrer">
-            www.fpvai.ukf.sk
+            {t("footer.website")}
           </a>
         </div>
 
         <div className="footer-right">
-          <a href="/gdpr">Ochrana osobných údajov (GDPR)</a><br />
-          <a href="/terms">Podmienky používania</a><br />
-          <a href="/contact">Kontakt na administrátora</a>
+          <a href="/gdpr">{t("footer.gdpr")}</a><br />
+          <a href="/terms">{t("footer.terms")}</a><br />
+          <a href="/contact">{t("footer.contactAdmin")}</a>
         </div>
 
       </div>

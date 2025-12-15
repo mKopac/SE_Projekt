@@ -1,0 +1,67 @@
+{
+  "_SECTION_PROFILE": "Profile",
+
+  "title": "My profile",
+
+  "loading": {
+    "profile": "Loading profile..."
+  },
+
+  "common": {
+    "empty": "—"
+  },
+
+  "labels": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email (read-only)",
+    "emailAlternate": "Alternative email",
+    "phoneNumber": "Phone",
+    "address": "Address",
+    "city": "City",
+    "zip": "ZIP",
+    "role": "Account type",
+    "studyProgram": "Study program",
+    "department": "Department",
+    "companyName": "Company name"
+  },
+
+  "select": {
+    "studyProgram": "-- Select program --",
+    "department": "-- Select department --"
+  },
+
+  "actions": {
+    "edit": "Edit"
+  },
+
+  "messages": {
+    "savedOk": "Your changes have been saved successfully."
+  },
+
+  "errors": {
+    "profileLoad": "Error while loading the profile",
+    "studyProgramsLoad": "Error while loading study programs",
+    "departmentsLoad": "Error while loading departments",
+    "saveChanges": "Error while saving changes"
+  },
+
+  "password": {
+    "title": "Change password",
+    "fields": {
+      "old": { "label": "Old password:" },
+      "new": { "label": "New password:" },
+      "confirm": { "label": "Confirm password:" }
+    },
+    "actions": {
+      "submit": "Change password"
+    },
+    "messages": {
+      "changedOk": "Password changed successfully."
+    },
+    "errors": {
+      "mismatch": "The new passwords do not match.",
+      "changeFailed": "Failed to change the password."
+    }
+  }
+}

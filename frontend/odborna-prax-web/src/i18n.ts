@@ -4,17 +4,19 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import HttpBackend from "i18next-http-backend";
 
 i18n
-  .use(HttpBackend)        // loads translations from /public/locales
-  .use(LanguageDetector)   // detects language (localStorage, navigator, etc.)
-  .use(initReactI18next)   // connects with React
+  .use(HttpBackend)
+  .use(LanguageDetector)
+  .use(initReactI18next)
   .init({
-    fallbackLng: "en",     // default eng
+    fallbackLng: "en",
     supportedLngs: ["sk", "en"],
     load: "currentOnly",
     debug: false,
 
-    ns: ["shared", "dashboard", "profile", "faq"],
+    ns: ["shared", "dashboard", "profile", "faq", "landing", "login", "usermgmt"],
     defaultNS: "shared",
+
+    keySeparator: ".",               
 
     backend: {
       loadPath: "/locales/{{lng}}/{{ns}}.json"
@@ -34,4 +36,3 @@ i18n
     }
   });
 
-export default i18n;

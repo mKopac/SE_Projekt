@@ -7,7 +7,7 @@ import logo from "../assets/fpvai.png";
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation("shared");
 
   const [isLangOpen, setIsLangOpen] = useState(false);
 
@@ -47,7 +47,7 @@ const Header: React.FC = () => {
     if (currentPath === "/profile") {
       return (
         <button className="dashboard-button" onClick={handleDashboardClick}>
-          Dashboard
+          {t("header.dashboard")}
         </button>
       );
     }
@@ -55,14 +55,14 @@ const Header: React.FC = () => {
     if (currentPath === "/" || currentPath === "/dashboard") {
       return (
         <button className="profile-button" onClick={handleProfileClick}>
-          Profile
+          {t("header.profile")}
         </button>
       );
     }
 
     return (
       <button className="profile-button" onClick={handleProfileClick}>
-        Profile
+        {t("header.profile")}
       </button>
     );
   };
@@ -71,13 +71,13 @@ const Header: React.FC = () => {
     if (currentPath === "/") {
       return (
         <button className="dashboard-button" onClick={handleDashboardClick}>
-          Dashboard
+          {t("header.dashboard")}
         </button>
       );
     }
     return (
       <button className="home-button" onClick={handleHomeClick}>
-        Home
+        {t("header.home")}
       </button>
     );
   };
@@ -100,7 +100,7 @@ const Header: React.FC = () => {
         />
       </div>
 
-      <div className="topbar-center">Systém na evidenciu praxe</div>
+      <div className="topbar-center">{t("header.title")}</div>
 
       <div className="topbar-right">
         <div className="lang-dropdown">
@@ -133,26 +133,26 @@ const Header: React.FC = () => {
         </div>
 
         <button className="faq" onClick={handleFaqClick}>
-          FAQ
+          {t("header.faq")}
         </button>
 
         {isLoggedIn ? (
           <>
             {isAdmin && (
               <button className="admin-button" onClick={handleAdminClick}>
-                Správa používateľov
+                {t("header.adminUsers")}
               </button>
             )}
 
             {renderNavButton()}
 
             <button className="logout-button" onClick={handleLogout}>
-              Logout
+              {t("header.logout")}
             </button>
           </>
         ) : (
           <Link to="/login" className="login-link">
-            Login
+            {t("header.login")}
           </Link>
         )}
 

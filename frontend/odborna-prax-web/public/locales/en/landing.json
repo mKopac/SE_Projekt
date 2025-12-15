@@ -1,0 +1,41 @@
+{
+  "_SLIDESHOW": "SLIDESHOW",
+
+  "slideshow": {
+    "slides": [
+      {
+        "title": "Welcome to the FPVaI UKF Nitra internship records system",
+        "text": "A modern tool for students and companies that keeps internship records in one place."
+      },
+      {
+        "title": "For students",
+        "text": "Track your internship status, communicate with mentors, and receive feedback — all in one place."
+      },
+      {
+        "title": "For companies",
+        "text": "Approve internships, assign tasks, and evaluate students without paperwork."
+      },
+      {
+        "title": "How does the system work?",
+        "text": "Register, choose an internship, and receive confirmation and evaluation from your mentor."
+      },
+      {
+        "title": "Internship filtering",
+        "text": "Filter internships by field of study, location, job type, and availability."
+      },
+      {
+        "title": "Get started today",
+        "text": "Register or log in and start tracking your internship.",
+        "buttons": [
+          { "label": "Sign up", "link": "/register" },
+          { "label": "Log in", "link": "/login" }
+        ]
+      }
+    ],
+
+    "nav": {
+      "prev": "← Previous",
+      "next": "Next →"
+    }
+  }
+}

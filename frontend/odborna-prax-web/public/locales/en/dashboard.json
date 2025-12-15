@@ -1,0 +1,146 @@
+{
+  "_Dashboard": "Dashboard",
+
+  "dashboard": {
+    "title": "Internship overview",
+
+    "loading": "Loading data...",
+    "errorPrefix": "Error:",
+
+    "auth": {
+      "missingToken": "Missing authentication token."
+    },
+
+    "actions": {
+      "addInternship": "Add internship",
+      "close": "×"
+    }
+  },
+
+  "_InternshipTable": "InternshipTable",
+
+  "internshipTable": {
+    "search": {
+      "placeholder": "Search..."
+    },
+
+    "filters": {
+      "allCompanies": "All companies",
+      "allMentors": "All mentors",
+      "allYears": "All years",
+      "allSemesters": "All semesters"
+    },
+
+    "export": {
+      "csv": "Export CSV",
+      "failed": "Export failed – you may not have permission or the token expired."
+    },
+
+    "table": {
+      "student": "Student",
+      "company": "Company",
+      "mentor": "Mentor",
+      "start": "Start",
+      "end": "End",
+      "year": "Academic year",
+      "semester": "Semester",
+      "status": "Status",
+      "noResults": "No results."
+    },
+
+    "detail": {
+      "student": "Student",
+      "company": "Company",
+      "mentor": "Mentor",
+      "year": "Academic year",
+      "semester": "Semester",
+      "start": "Start date",
+      "end": "End date",
+      "description": "Internship description",
+      "status": "Internship status",
+      "noDescription": "—"
+    },
+
+    "documents": {
+      "contract": "Internship contract",
+      "contractMissing": "The contract has not been uploaded yet.",
+      "timestatement": "Activity report",
+      "uploaded": "Report uploaded.",
+      "uploadError": "Upload failed.",
+      "approved": "✔️ Approved",
+      "denied": "❌ Denied",
+      "waiting": "⏳ Waiting for approval",
+      "noState": "🟦 No state"
+    },
+
+    "companyActions": {
+      "accept": "Accept internship",
+      "reject": "Reject internship",
+      "stateChanged": "Internship status updated successfully.",
+      "stateError": "Error while changing internship status.",
+      "serverError": "Server communication error."
+    },
+
+    "admin": {
+      "approved": "Approved",
+      "denied": "Denied",
+      "passed": "Successfully completed",
+      "failed": "Failed",
+      "ok": "OK"
+    }
+  },
+  
+  "_SECTION_INTERNSHIPFORM": "InternshipForm",
+
+  "internshipForm": {
+    "title": "New internship",
+
+    "fields": {
+      "company": {
+        "label": "Company:",
+        "placeholder": "Start typing…"
+      },
+      "mentor": {
+        "label": "Mentor:",
+        "firstSelectCompany": "-- Select a company first --"
+      },
+      "academicYear": {
+        "label": "Academic year:"
+      },
+      "semester": {
+        "label": "Semester:"
+      },
+      "start": {
+        "label": "Start:"
+      },
+      "end": {
+        "label": "End:"
+      },
+      "type": {
+        "label": "Internship type:",
+        "new": "New internship",
+        "existing": "Existing internship"
+      },
+      "description": {
+        "label": "Description:"
+      }
+    },
+
+    "actions": {
+      "save": "Save internship"
+    },
+
+    "alerts": {
+      "userLoadFailed": "Failed to load the current user.",
+      "mustSelectCompany": "You must select a company from the list!",
+      "saveError": "Error while saving the internship: {{error}}",
+      "unknownError": "Unknown error",
+      "createdOk": "Internship was created successfully!"
+    },
+
+    "console": {
+      "templateDownloadFailed": "Downloading the contract template failed",
+      "templateDownloadError": "Error while downloading the template:"
+    }
+  }
+}

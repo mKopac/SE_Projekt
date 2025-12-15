@@ -1,0 +1,146 @@
+{
+  "_Dashboard": "Dashboard",
+
+  "dashboard": {
+    "title": "Prehľad praxí",
+
+    "loading": "Načítavam dáta...",
+    "errorPrefix": "Chyba:",
+
+    "auth": {
+      "missingToken": "Chýba autentifikačný token."
+    },
+
+    "actions": {
+      "addInternship": "Pridať prax",
+      "close": "×"
+    }
+  },
+
+  "_InternshipTable": "InternshipTable",
+
+  "internshipTable": {
+    "search": {
+      "placeholder": "Hľadať..."
+    },
+
+    "filters": {
+      "allCompanies": "Všetky firmy",
+      "allMentors": "Všetci mentori",
+      "allYears": "Všetky roky",
+      "allSemesters": "Všetky semestre"
+    },
+
+    "export": {
+      "csv": "Export CSV",
+      "failed": "Export sa nepodaril – nemáš oprávnenie alebo token expiroval."
+    },
+
+    "table": {
+      "student": "Študent",
+      "company": "Firma",
+      "mentor": "Mentor",
+      "start": "Začiatok",
+      "end": "Koniec",
+      "year": "Ak. rok",
+      "semester": "Semester",
+      "status": "Stav",
+      "noResults": "Žiadne výsledky."
+    },
+
+    "detail": {
+      "student": "Študent",
+      "company": "Firma",
+      "mentor": "Mentor",
+      "year": "Akademický rok",
+      "semester": "Semester",
+      "start": "Dátum začiatku",
+      "end": "Dátum konca",
+      "description": "Popis praxe",
+      "status": "Stav praxe",
+      "noDescription": "—"
+    },
+
+    "documents": {
+      "contract": "Zmluva o praxi",
+      "contractMissing": "Zmluva zatiaľ nebola nahraná.",
+      "timestatement": "Výkaz o činnosti",
+      "uploaded": "Výkaz bol nahraný.",
+      "uploadError": "Chyba pri nahrávaní.",
+      "approved": "✔️ Potvrdené",
+      "denied": "❌ Zamietnuté",
+      "waiting": "⏳ Čaká na schválenie",
+      "noState": "🟦 Bez stavu"
+    },
+
+    "companyActions": {
+      "accept": "Potvrdiť prax",
+      "reject": "Zamietnuť prax",
+      "stateChanged": "Stav praxe bol úspešne zmenený.",
+      "stateError": "Chyba pri zmene stavu praxe.",
+      "serverError": "Chyba pri komunikácii so serverom."
+    },
+
+    "admin": {
+      "approved": "Schválená",
+      "denied": "Zamietnutá",
+      "passed": "Úspešne absolvovaná",
+      "failed": "Neúspešne absolvovaná",
+      "ok": "OK"
+    }
+  },
+  
+  "_SECTION_INTERNSHIPFORM": "InternshipForm",
+
+  "internshipForm": {
+    "title": "Nová prax",
+
+    "fields": {
+      "company": {
+        "label": "Firma:",
+        "placeholder": "Začni písať…"
+      },
+      "mentor": {
+        "label": "Mentor:",
+        "firstSelectCompany": "-- Najprv vyber firmu --"
+      },
+      "academicYear": {
+        "label": "Akademický rok:"
+      },
+      "semester": {
+        "label": "Semester:"
+      },
+      "start": {
+        "label": "Začiatok:"
+      },
+      "end": {
+        "label": "Koniec:"
+      },
+      "type": {
+        "label": "Typ praxe:",
+        "new": "Nová prax",
+        "existing": "Existujúca prax"
+      },
+      "description": {
+        "label": "Popis:"
+      }
+    },
+
+    "actions": {
+      "save": "Uložiť prax"
+    },
+
+    "alerts": {
+      "userLoadFailed": "Nepodarilo sa načítať používateľa.",
+      "mustSelectCompany": "Musíš vybrať firmu zo zoznamu!",
+      "saveError": "Chyba pri ukladaní praxe: {{error}}",
+      "unknownError": "Neznáma chyba",
+      "createdOk": "Prax bola úspešne vytvorená!"
+    },
+
+    "console": {
+      "templateDownloadFailed": "Zlyhalo sťahovanie šablóny zmluvy",
+      "templateDownloadError": "Chyba pri sťahovaní šablóny:"
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "_SLIDESHOW": "SLIDESHOW",
+
+  "slideshow": {
+    "slides": [
+      {
+        "title": "Vitajte v systéme na evidenciu praxe FPVaI UKF Nitra",
+        "text": "Moderný nástroj pre študentov a firmy, ktorý umožňuje evidenciu odbornej praxe na jednom mieste."
+      },
+      {
+        "title": "Pre študentov",
+        "text": "Sledujte stav praxe, komunikujte s mentormi, získajte spätnú väzbu – všetko na jednom mieste."
+      },
+      {
+        "title": "Pre firmy",
+        "text": "Schvaľujte praxe, zadávajte úlohy, hodnotte študentov bez papierovačiek."
+      },
+      {
+        "title": "Ako systém funguje?",
+        "text": "Zaregistrujte sa, vyberte si prax, získajte potvrdenie a hodnotenie od mentora."
+      },
+      {
+        "title": "Filtrovanie praxe",
+        "text": "Vyfiltrujte si prax podľa odboru, lokality, typu práce a dostupnosti."
+      },
+      {
+        "title": "Začnite ešte dnes",
+        "text": "Zaregistrujte sa alebo sa prihláste a začnite evidovať svoju prax.",
+        "buttons": [
+          { "label": "Zaregistrovať sa", "link": "/register" },
+          { "label": "Prihlásiť sa", "link": "/login" }
+        ]
+      }
+    ],
+
+    "nav": {
+      "prev": "← Predchádzajúca",
+      "next": "Ďalšia →"
+    }
+  }
+}

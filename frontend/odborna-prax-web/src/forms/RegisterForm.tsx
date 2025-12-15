@@ -5,6 +5,9 @@ import Footer from "../components/Footer";
 import { http } from "../api/http";
 import { useNavigate } from "react-router-dom";
 import "./../css/RegisterForm.css";
+import { useTranslation } from "react-i18next";
+
+
 
 export type RegisterFormData = {
   accountType: "Študent" | "Firma";
@@ -40,6 +43,7 @@ interface Company {
 }
 
 export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
+  const { t } = useTranslation("login");
   const [formData, setFormData] = useState<RegisterFormData>({
     accountType: "Študent",
     firmType: "existujuca",
@@ -115,17 +119,17 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
     setError(null);
 
     if (!formData.firstName || !formData.lastName) {
-      setError("Zadajte meno a priezvisko.");
+      setError(t("registerForm.errors.nameRequired"));
       return;
     }
 
     if (!formData.studentEmail) {
-      setError("Zadajte e-mail.");
+      setError(t("registerForm.errors.emailRequired"));
       return;
     }
 
     if (!formData.consent) {
-      setError("Musíte súhlasiť so spracovaním osobných údajov.");
+      setError(t("registerForm.consent.requiredError"));
       return;
     }
 
@@ -188,11 +192,11 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
       <main className="main-content">
         <div className="login-box-outer register-outer">
           <div className="login-box register-box">
-            <h2 className="form-title">Registrácia</h2>
+            <h2 className="form-title">{t("registerForm.title")}</h2>
 
             <form className="register-form" onSubmit={handleSubmit} noValidate>
               <div className="form-row">
-                <label>Vyberte si typ účtu</label>
+                <label>{t("registerForm.accountType.label")}</label>
                 <div className="radio-group">
                   {["Študent", "Firma"].map((type) => (
                     <label key={type}>
@@ -203,7 +207,9 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                         checked={formData.accountType === type}
                         onChange={handleChange}
                       />
-                      {type}
+                      {type === "Študent"
+                        ? t("registerForm.accountType.student")
+                        : t("registerForm.accountType.company")}
                     </label>
                   ))}
                 </div>
@@ -211,13 +217,15 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
 
               {!isFirma && (
                 <div className="form-row">
-                  <label>Vyberte študijný odbor</label>
+                  <label>{t("registerForm.studyProgram.label")}</label>
                   <select
                     name="studyProgramId"
                     value={formData.studyProgramId || ""}
                     onChange={handleChange}
                   >
-                    <option value="">-- Vyber odbor --</option>
+                    <option value="">
+                      {t("registerForm.studyProgram.placeholder")}
+                    </option>
                     {studyPrograms.map((program) => (
                       <option key={program.id} value={program.id}>
                         {program.name}
@@ -229,7 +237,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
 
               <div className="form-row two-cols">
                 <label>
-                  Meno
+                  {t("registerForm.personal.firstName")}
                   <input
                     name="firstName"
                     value={formData.firstName}
@@ -238,7 +246,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                   />
                 </label>
                 <label>
-                  Priezvisko
+                  {t("registerForm.personal.lastName")}
                   <input
                     name="lastName"
                     value={formData.lastName}
@@ -250,7 +258,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
 
               {isFirma && (
                 <div className="form-row">
-                  <label>Typ firmy</label>
+                  <label>{t("registerForm.company.firmType")}</label>
                   <div className="radio-group">
                     <label>
                       <input
@@ -260,7 +268,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                         checked={formData.firmType === "existujuca"}
                         onChange={handleChange}
                       />
-                      Existujúca firma
+                      {t("registerForm.company.existing")}
                     </label>
                     <label>
                       <input
@@ -270,7 +278,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                         checked={formData.firmType === "nova"}
                         onChange={handleChange}
                       />
-                      Nová firma
+                      {t("registerForm.company.new")}
                     </label>
                   </div>
                 </div>
@@ -278,13 +286,15 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
 
               {isFirma && formData.firmType === "existujuca" && (
                 <div className="form-row">
-                  <label>Vyberte firmu</label>
+                  <label>{t("registerForm.company.selectCompany")}</label>
                   <select
                     name="companyId"
                     value={formData.companyId || ""}
                     onChange={handleChange}
                   >
-                    <option value="">-- Vyber firmu --</option>
+                    <option value="">
+                      {t("registerForm.company.selectPlaceholder")}
+                    </option>
                     {companies.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.name}
@@ -297,7 +307,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
               {isFirma && formData.firmType === "nova" && (
                 <>
                   <label>
-                    Názov firmy
+                    {t("registerForm.company.name")}
                     <input
                       name="firmName"
                       value={formData.firmName || ""}
@@ -306,7 +316,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                     />
                   </label>
                   <label>
-                    IČO
+                    {t("registerForm.company.ico")}
                     <input
                       name="ico"
                       value={formData.ico || ""}
@@ -315,7 +325,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                     />
                   </label>
                   <label>
-                    Ulica
+                    {t("registerForm.company.street")}
                     <input
                       name="street"
                       value={formData.street || ""}
@@ -327,7 +337,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
               )}
 
               <label>
-                Email
+                {t("registerForm.contact.email")}
                 <input
                   name="studentEmail"
                   value={formData.studentEmail}
@@ -338,7 +348,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
 
               {!isFirma && (
                 <label>
-                  Alternatívny email
+                  {t("registerForm.contact.altEmail")}
                   <input
                     name="altEmail"
                     value={formData.altEmail}
@@ -349,7 +359,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
               )}
 
               <label>
-                Telefón
+                {t("registerForm.contact.phone")}
                 <input
                   name="phone"
                   value={formData.phone}
@@ -359,7 +369,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
               </label>
 
               <label>
-                Adresa
+                {t("registerForm.contact.address")}
                 <input
                   name="address"
                   value={formData.address}
@@ -370,7 +380,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
 
               <div className="form-row two-cols">
                 <label>
-                  Mesto
+                  {t("registerForm.contact.city")}
                   <input
                     name="city"
                     value={formData.city}
@@ -379,7 +389,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                   />
                 </label>
                 <label>
-                  PSČ
+                  {t("registerForm.contact.zip")}
                   <input
                     name="zip"
                     value={formData.zip}
@@ -401,18 +411,20 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
                     id="consent"
                   />
                   <label htmlFor="consent">
-                    Súhlasím so spracovaním osobných údajov
+                    {t("registerForm.consent.label")}
                   </label>
                 </div>
 
                 <button type="submit" className="submit-btn" disabled={loading}>
-                  {loading ? "Odosielam..." : "Odoslať"}
+                  {loading
+                    ? t("registerForm.submit.loading")
+                    : t("registerForm.submit.default")}
                 </button>
               </div>
 
               <div className="back-link-row">
                 <Link to="/" className="back-link">
-                  ← Späť na prihlásenie
+                  {t("registerForm.back")}
                 </Link>
               </div>
             </form>

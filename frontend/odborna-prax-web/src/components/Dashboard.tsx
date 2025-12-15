@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import InternshipTable from "./InternshipTable";
 import InternshipForm from "../forms/InternshipForm";
 import "./../css/Dashboard.css";
+import { useTranslation } from "react-i18next";
 
 interface InternshipDTO {
   id: number;
@@ -16,9 +17,11 @@ interface InternshipDTO {
   description: string;
 }
 
-type NewInternship = Omit<InternshipDTO, "status">; // 🔥 FE formulár nepozná status
+type NewInternship = Omit<InternshipDTO, "status">;
 
 const Dashboard: React.FC = () => {
+  const { t } = useTranslation("dashboard");
+
   const [internships, setInternships] = useState<InternshipDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +32,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      setError("Missing authentication token.");
+      setError(t("dashboard.auth.missingToken"));
       setLoading(false);
       return;
     }
@@ -72,30 +75,35 @@ const Dashboard: React.FC = () => {
         setError(err.message);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   // === Add new internship ===
   const handleAddInternship = (i: NewInternship) => {
     const newEntry: InternshipDTO = {
       ...i,
       status: "CREATED",
-       description: i.description ?? "",
+      description: i.description ?? ""
     };
 
     setInternships(prev => [...prev, newEntry]);
     setShowModal(false);
   };
 
-  if (loading) return <p>Načítavam dáta...</p>;
-  if (error) return <p className="error-text">Chyba: {error}</p>;
+  if (loading) return <p>{t("dashboard.loading")}</p>;
+  if (error)
+    return (
+      <p className="error-text">
+        {t("dashboard.errorPrefix")} {error}
+      </p>
+    );
 
   return (
     <div className="dashboard">
-      <h2>Prehľad praxí</h2>
+      <h2>{t("dashboard.title")}</h2>
 
       {role === "STUDENT" && (
         <button className="add-button" onClick={() => setShowModal(true)}>
-          Pridať prax
+          {t("dashboard.actions.addInternship")}
         </button>
       )}
 
@@ -107,7 +115,7 @@ const Dashboard: React.FC = () => {
               className="close-button"
               onClick={() => setShowModal(false)}
             >
-              ×
+              {t("dashboard.actions.close")}
             </button>
 
             <InternshipForm onAdd={handleAddInternship} />
@@ -115,7 +123,6 @@ const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {/* 🔥 Passing role + statuses into table */}
       <InternshipTable internships={internships} role={role} />
     </div>
   );

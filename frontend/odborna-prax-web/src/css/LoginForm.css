@@ -118,3 +118,19 @@ html, body {
   border-top: 1px solid #ddd;
   box-sizing: border-box;
 }
+
+.force-password-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+}
+
+.force-password-modal {
+  background: white;
+  padding: 2rem;
+  max-width: 400px;
+  margin: 10% auto;
+  border-radius: 6px;
+}
+

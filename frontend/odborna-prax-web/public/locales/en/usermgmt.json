@@ -1,0 +1,47 @@
+{
+  "_SECTION_USERMGMT": "User management",
+
+  "title": "User management",
+
+  "table": {
+    "id": "ID",
+    "user": "User",
+    "email": "Email",
+    "status": "Status",
+    "action": "Action"
+  },
+
+  "status": {
+    "active": "Active",
+    "suspended": "Suspended"
+  },
+
+  "actions": {
+    "openCreateAdmin": "+ Create admin",
+    "suspend": "Suspend",
+    "reactivate": "Reactivate"
+  },
+
+  "create": {
+    "title": "Create an admin account",
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phoneNumber": "Phone number"
+    },
+    "actions": {
+      "create": "Create",
+      "cancel": "Cancel"
+    }
+  },
+
+  "alerts": {
+    "createdOk": "The admin account has been created. A verification email has been sent.",
+    "createFailed": "Error while creating the admin."
+  },
+
+  "errors": {
+    "loadUsersConsole": "Error while loading users:"
+  }
+}

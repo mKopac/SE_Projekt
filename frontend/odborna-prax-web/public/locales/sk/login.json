@@ -1,0 +1,144 @@
+{
+    "loginForm": {
+    "info": {
+      "registeredSuccess": "Registrácia prebehla úspešne. Potvrdzovací e-mail bol odoslaný.",
+      "verificationSuccess": "Váš účet bol aktivovaný. Teraz sa môžete prihlásiť.",
+      "verificationError": "Overovací odkaz je neplatný alebo expiroval.",
+      "close": "X"
+    },
+    "logoAria": "Logo tlačidlo",
+    "logoPlaceholder": "Logo?",
+    "fields": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "email@priklad.sk",
+      "passwordLabel": "Heslo",
+      "passwordPlaceholder": "Heslo"
+    },
+    "forgotPassword": {
+      "link": "Zabudnuté heslo? Zmeňte si ho tu.",
+      "enterEmailFirst": "Najprv zadajte svoj e-mail.",
+      "confirmSend": "Chcete odoslať odkaz na obnovenie hesla na e-mail: {{email}}?",
+      "sentOk": "Odkaz na obnovenie hesla bol odoslaný na váš e-mail.",
+      "sendFailed": "Nepodarilo sa odoslať odkaz.",
+      "serverUnavailable": "Server momentálne nie je dostupný."
+    },
+    "validation": {
+      "emailRequired": "Zadajte email.",
+      "passwordRequired": "Zadajte heslo."
+    },
+    "errors": {
+      "loginFailed": "Prihlásenie zlyhalo.",
+      "serverUnavailable": "Server momentálne nie je dostupný."
+    },
+    "registerNote": {
+      "text": "Ešte nemáte účet?",
+      "link": "Zaregistrujte sa."
+    },
+    "submit": "Prihlásiť"
+    },
+
+  "_RegisterForm": "RegisterForm",
+
+  "registerForm": {
+    "title": "Registrácia",
+
+    "accountType": {
+      "label": "Vyberte si typ účtu",
+      "student": "Študent",
+      "company": "Firma"
+    },
+
+    "studyProgram": {
+      "label": "Vyberte študijný odbor",
+      "placeholder": "-- Vyber odbor --"
+    },
+
+    "personal": {
+      "firstName": "Meno",
+      "lastName": "Priezvisko"
+    },
+
+    "company": {
+      "firmType": "Typ firmy",
+      "existing": "Existujúca firma",
+      "new": "Nová firma",
+      "selectCompany": "Vyberte firmu",
+      "selectPlaceholder": "-- Vyber firmu --",
+      "name": "Názov firmy",
+      "ico": "IČO",
+      "street": "Ulica"
+    },
+
+    "contact": {
+      "email": "Email",
+      "altEmail": "Alternatívny email",
+      "phone": "Telefón",
+      "address": "Adresa",
+      "city": "Mesto",
+      "zip": "PSČ"
+    },
+
+    "consent": {
+      "label": "Súhlasím so spracovaním osobných údajov",
+      "requiredError": "Musíte súhlasiť so spracovaním osobných údajov."
+    },
+
+    "errors": {
+      "nameRequired": "Zadajte meno a priezvisko.",
+      "emailRequired": "Zadajte e-mail.",
+      "registerFailed": "Registrácia zlyhala. Skontrolujte údaje alebo skúste neskôr."
+    },
+
+    "submit": {
+      "default": "Odoslať",
+      "loading": "Odosielam..."
+    },
+
+    "back": "← Späť na prihlásenie"
+  },
+
+  "_SECTION_RESETPASSWORDFORM": "ResetPasswordForm",
+
+  "resetPasswordForm": {
+    "title": "Obnovenie hesla",
+    "backToLogin": "Späť na prihlásenie",
+
+    "loading": {
+      "verifyingLink": "Načítavam overenie odkazu..."
+    },
+
+    "invalid": {
+      "title": "Reset hesla nie je možný"
+    },
+
+    "fields": {
+      "newPassword": {
+        "label": "Nové heslo",
+        "placeholder": "Zadajte nové heslo"
+      },
+      "confirmPassword": {
+        "label": "Potvrdenie hesla",
+        "placeholder": "Zopakujte heslo"
+      }
+    },
+
+    "actions": {
+      "saving": "Ukladám...",
+      "submit": "Obnoviť heslo"
+    },
+
+    "confirm": {
+      "success": "Heslo bolo úspešne zmenené."
+    },
+
+    "errors": {
+      "invalidLink": "Odkaz na reset hesla je neplatný.",
+      "invalidOrExpired": "Odkaz na reset hesla je neplatný alebo expiroval.",
+      "verifyError": "Chyba pri overovaní odkazu.",
+      "fillAllFields": "Vyplňte všetky polia.",
+      "passwordMismatch": "Heslá sa nezhodujú.",
+      "resetFailed": "Reset hesla zlyhal.",
+      "serverUnavailable": "Server momentálne nie je dostupný."
+    }
+  }
+}

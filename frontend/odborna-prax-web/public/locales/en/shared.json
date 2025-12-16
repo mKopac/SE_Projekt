@@ -1,0 +1,24 @@
+{
+  "header": {
+    "title": "Internship Management System",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "home": "Home",
+    "faq": "FAQ",
+    "adminUsers": "User management",
+    "logout": "Log out",
+    "login": "Log in"
+  },
+
+  "footer": {
+    "faculty": "Faculty of Natural Sciences and Informatics",
+    "university": "Constantine the Philosopher University in Nitra",
+    "copyright": "© {{year}} FPVaI UKF Nitra",
+    "address": "Trieda Andreja Hlinku 1, 949 74 Nitra",
+    "emailLabel": "Email: {{email}}",
+    "website": "www.fpvai.ukf.sk",
+    "gdpr": "Personal data protection (GDPR)",
+    "terms": "Terms of use",
+    "contactAdmin": "Contact the administrator"
+  }
+}

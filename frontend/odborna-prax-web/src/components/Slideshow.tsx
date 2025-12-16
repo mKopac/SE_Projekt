@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import './../css/Slideshow.css';
 import { manualStrategy, autoStrategy } from './slideStrategies';
 import type { SlideStrategy } from './slideStrategies';
+import { useTranslation } from "react-i18next";
 
 type Slide = {
   title: string;
@@ -10,40 +11,13 @@ type Slide = {
   buttons?: { label: string; link: string }[];
 };
 
-const slides: Slide[] = [
-  {
-    title: '🏁 Vitajte v systéme na evidenciu praxe',
-    text: 'Moderný nástroj pre študentov, mentorov a školy. Jednoduchý. Prehľadný. Efektívny.',
-  },
-  {
-    title: '⚙️ Ako systém funguje?',
-    text: 'Zaregistrujte sa, vyberte si prax, získajte potvrdenie a hodnotenie od mentora.',
-  },
-  {
-    title: '🎓 Pre študentov',
-    text: 'Sledujte stav praxe, komunikujte s mentormi, získajte spätnú väzbu – všetko na jednom mieste.',
-  },
-  {
-    title: '🏢 Pre firmy a mentorov',
-    text: 'Schvaľujte praxe, zadávajte úlohy, hodnotte študentov bez papierovačiek.',
-  },
-  {
-    title: '🔍 Filtrovanie praxe',
-    text: 'Vyfiltrujte si prax podľa odboru, lokality, typu práce a dostupnosti.',
-  },
-  {
-    title: '🚀 Začnite ešte dnes',
-    text: 'Zaregistrujte sa alebo sa prihláste a začnite evidovať svoju prax.',
-    buttons: [
-      { label: 'Zaregistrovať sa', link: '/register' },
-      { label: 'Prihlásiť sa', link: '/login' },
-    ],
-  },
-];
-
-const AUTO_INTERVAL = 5000;
+const AUTO_INTERVAL = 20000;
 
 const Slideshow: React.FC = () => {
+  const { t } = useTranslation("landing");
+
+  const slides = t("slideshow.slides", { returnObjects: true }) as Slide[];
+
   const [currentSlide, setCurrentSlide] = useState(0);
   const strategy: SlideStrategy = autoStrategy(AUTO_INTERVAL);
 
@@ -60,7 +34,7 @@ const Slideshow: React.FC = () => {
       setCurrentSlide((prev) => strategy.next(prev, slides.length));
     }, AUTO_INTERVAL);
     return () => clearInterval(timer);
-  }, []);
+  }, [strategy, slides.length]);
 
   const slide = slides[currentSlide];
 
@@ -73,21 +47,27 @@ const Slideshow: React.FC = () => {
         {slide.buttons && (
           <div className="slide-buttons">
             {slide.buttons.map((btn, index) => (
-              <Link key={index} to={btn.link} className="slide-btn">
+              <Link
+                key={index}
+                to={btn.link}
+                className={`slide-btn ${index === 1 ? 'slide-btn-secondary' : ''}`}
+              >
                 {btn.label}
               </Link>
             ))}
           </div>
         )}
 
-        <div className="slide-nav">
-          <button onClick={prevSlide}>← Predchádzajúca</button>
-          <button onClick={nextSlide}>Ďalšia →</button>
-        </div>
-      </div>
+        <div className="slide-footer">
+          <div className="slide-nav">
+            <button onClick={prevSlide}>{t("slideshow.nav.prev")}</button>
+            <button onClick={nextSlide}>{t("slideshow.nav.next")}</button>
+          </div>
 
-      <div className="slide-info">
-        Snímka {currentSlide + 1} z {slides.length}
+          <div className="slide-info">
+            {currentSlide + 1} / {slides.length}
+          </div>
+        </div>
       </div>
     </section>
   );

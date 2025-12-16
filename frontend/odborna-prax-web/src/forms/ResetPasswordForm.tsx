@@ -1,10 +1,13 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "./../css/LoginForm.css";
 
 export const ResetPasswordForm = () => {
+  const { t } = useTranslation("login");
+
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const [valid, setValid] = useState(false);
@@ -12,14 +15,14 @@ export const ResetPasswordForm = () => {
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-const [message, setMessage] = useState<string | null>(null);
-const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!token) {
-      setError("Odkaz na reset hesla je neplatný.");
+      setError(t("resetPasswordForm.errors.invalidLink"));
       setChecked(true);
       return;
     }
@@ -28,57 +31,55 @@ const [error, setError] = useState<string | null>(null);
       .then((res) => res.json())
       .then((data) => {
         if (data.valid) setValid(true);
-        else setError("Odkaz na reset hesla je neplatný alebo expiroval.");
+        else setError(t("resetPasswordForm.errors.invalidOrExpired"));
       })
-      .catch(() => setError("Chyba pri overovaní odkazu."))
+      .catch(() => setError(t("resetPasswordForm.errors.verifyError")))
       .finally(() => setChecked(true));
-  }, [token]);
+  }, [token, t]);
 
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  setError(null);
-  setMessage(null);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setMessage(null);
 
-  if (!password || !confirm) {
-    setError("Vyplňte všetky polia.");
-    return;
-  }
-  if (password !== confirm) {
-    setError("Heslá sa nezhodujú.");
-    return;
-  }
-
-  try {
-    setLoading(true);
-    const response = await fetch("http://localhost:8080/auth/reset-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, newPassword: password }),
-    });
-
-    if (response.ok) {
-  const confirmed = window.confirm(
-    "Heslo bolo úspešne zmenené."
-  );
-
-  if (confirmed) {
-    window.location.href = "/login";
-  } else {
-    window.location.href = "/login";
-  }
-  return;
-}
- else {
-      const err = await response.json();
-      setError(err.error || "Reset hesla zlyhal.");
+    if (!password || !confirm) {
+      setError(t("resetPasswordForm.errors.fillAllFields"));
+      return;
     }
-  } catch (error) {
-    setError("Server momentálne nie je dostupný.");
-  } finally {
-    setLoading(false);
-  }
-};
+    if (password !== confirm) {
+      setError(t("resetPasswordForm.errors.passwordMismatch"));
+      return;
+    }
 
+    try {
+      setLoading(true);
+      const response = await fetch("http://localhost:8080/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, newPassword: password }),
+      });
+
+      if (response.ok) {
+        const confirmed = window.confirm(
+          t("resetPasswordForm.confirm.success")
+        );
+
+        if (confirmed) {
+          window.location.href = "/login";
+        } else {
+          window.location.href = "/login";
+        }
+        return;
+      } else {
+        const err = await response.json();
+        setError(err.error || t("resetPasswordForm.errors.resetFailed"));
+      }
+    } catch (error) {
+      setError(t("resetPasswordForm.errors.serverUnavailable"));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!checked) {
     return (
@@ -86,7 +87,9 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         <Header />
         <main className="main-content">
           <div className="login-box-outer">
-            <div className="login-box">Načítavam overenie odkazu...</div>
+            <div className="login-box">
+              {t("resetPasswordForm.loading.verifyingLink")}
+            </div>
           </div>
         </main>
         <Footer />
@@ -101,9 +104,9 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         <main className="main-content">
           <div className="login-box-outer">
             <div className="login-box">
-              <h2>Reset hesla nie je možný</h2>
+              <h2>{t("resetPasswordForm.invalid.title")}</h2>
               <p>{error}</p>
-              <Link to="/login">Späť na prihlásenie</Link>
+              <Link to="/login">{t("resetPasswordForm.backToLogin")}</Link>
             </div>
           </div>
         </main>
@@ -111,35 +114,36 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       </div>
     );
   }
+
   return (
     <div className="page-root">
       <Header />
       <main className="main-content">
         <div className="login-box-outer">
           <div className="login-box">
-            <h2>Obnovenie hesla</h2>
+            <h2>{t("resetPasswordForm.title")}</h2>
 
             <form className="login-form" onSubmit={handleSubmit} noValidate>
               <label className="input-label">
-                Nové heslo
+                {t("resetPasswordForm.fields.newPassword.label")}
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="text-input"
-                  placeholder="Zadajte nové heslo"
+                  placeholder={t("resetPasswordForm.fields.newPassword.placeholder")}
                   required
                 />
               </label>
 
               <label className="input-label">
-                Potvrdenie hesla
+                {t("resetPasswordForm.fields.confirmPassword.label")}
                 <input
                   type="password"
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   className="text-input"
-                  placeholder="Zopakujte heslo"
+                  placeholder={t("resetPasswordForm.fields.confirmPassword.placeholder")}
                   required
                 />
               </label>
@@ -148,9 +152,11 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
               {message && <div className="form-success">{message}</div>}
 
               <div className="actions-row">
-                <Link to="/login">Späť na prihlásenie</Link>
+                <Link to="/login">{t("resetPasswordForm.backToLogin")}</Link>
                 <button type="submit" className="submit-btn" disabled={loading}>
-                  {loading ? "Ukladám..." : "Obnoviť heslo"}
+                  {loading
+                    ? t("resetPasswordForm.actions.saving")
+                    : t("resetPasswordForm.actions.submit")}
                 </button>
               </div>
             </form>

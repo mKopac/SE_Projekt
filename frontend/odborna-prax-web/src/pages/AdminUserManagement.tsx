@@ -3,6 +3,7 @@ import axios from "axios";
 import "../css/Dashboard.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { useTranslation } from "react-i18next";
 
 interface User {
   id: number;
@@ -13,6 +14,8 @@ interface User {
 }
 
 export default function AdminUserManagement() {
+  const { t } = useTranslation("usermgmt");
+
   const [users, setUsers] = useState<User[]>([]);
   const token = localStorage.getItem("token");
 
@@ -29,7 +32,7 @@ export default function AdminUserManagement() {
       });
       setUsers(res.data);
     } catch (err) {
-      console.error("Chyba pri načítaní používateľov:", err);
+      console.error(t("errors.loadUsersConsole"), err);
     }
   };
 
@@ -61,14 +64,14 @@ export default function AdminUserManagement() {
 
       <main className="main-content">
         <div className="dashboard-container">
-          <h2 className="page-title">Správa používateľov</h2>
+          <h2 className="page-title">{t("title")}</h2>
 
           <div className="actions-top">
             <button
               className="btn create-admin"
               onClick={() => setShowCreateForm(true)}
             >
-              + Vytvoriť admina
+              {t("actions.openCreateAdmin")}
             </button>
           </div>
 
@@ -76,11 +79,11 @@ export default function AdminUserManagement() {
             <table className="styled-table">
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Používateľ</th>
-                  <th>Email</th>
-                  <th>Status</th>
-                  <th>Akcia</th>
+                  <th>{t("table.id")}</th>
+                  <th>{t("table.user")}</th>
+                  <th>{t("table.email")}</th>
+                  <th>{t("table.status")}</th>
+                  <th>{t("table.action")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -93,9 +96,13 @@ export default function AdminUserManagement() {
                     <td>{u.email}</td>
                     <td>
                       {u.suspended ? (
-                        <span className="status suspended">Pozastavený</span>
+                        <span className="status suspended">
+                          {t("status.suspended")}
+                        </span>
                       ) : (
-                        <span className="status active">Aktívny</span>
+                        <span className="status active">
+                          {t("status.active")}
+                        </span>
                       )}
                     </td>
                     <td>
@@ -104,14 +111,14 @@ export default function AdminUserManagement() {
                           className="btn reactivate"
                           onClick={() => handleReactivate(u.id)}
                         >
-                          Reaktivovať
+                          {t("actions.reactivate")}
                         </button>
                       ) : (
                         <button
                           className="btn suspend"
                           onClick={() => handleSuspend(u.id)}
                         >
-                          Pozastaviť
+                          {t("actions.suspend")}
                         </button>
                       )}
                     </td>
@@ -124,7 +131,7 @@ export default function AdminUserManagement() {
 
         {showCreateForm && (
           <div className="create-admin-container">
-            <h3>Vytvoriť admin účet</h3>
+            <h3>{t("create.title")}</h3>
 
             <form
               className="create-admin-form"
@@ -149,11 +156,11 @@ export default function AdminUserManagement() {
                 );
 
                 if (res.ok) {
-                  alert("Admin účet bol vytvorený. Overovací email bol odoslaný.");
+                  alert(t("alerts.createdOk"));
                   setShowCreateForm(false);
                   fetchUsers();
                 } else {
-                  let errorMessage = "Chyba pri vytváraní admina.";
+                  let errorMessage = t("alerts.createFailed");
 
                   try {
                     const err = await res.json();
@@ -165,7 +172,7 @@ export default function AdminUserManagement() {
               }}
             >
               <label>
-                Meno
+                {t("create.fields.firstName")}
                 <input
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
@@ -174,7 +181,7 @@ export default function AdminUserManagement() {
               </label>
 
               <label>
-                Priezvisko
+                {t("create.fields.lastName")}
                 <input
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
@@ -183,7 +190,7 @@ export default function AdminUserManagement() {
               </label>
 
               <label>
-                Email
+                {t("create.fields.email")}
                 <input
                   type="email"
                   value={email}
@@ -193,7 +200,7 @@ export default function AdminUserManagement() {
               </label>
 
               <label>
-                Telefónne číslo
+                {t("create.fields.phoneNumber")}
                 <input
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
@@ -202,14 +209,14 @@ export default function AdminUserManagement() {
 
               <div className="form-buttons">
                 <button type="submit" className="btn create">
-                  Vytvoriť
+                  {t("create.actions.create")}
                 </button>
                 <button
                   type="button"
                   className="btn cancel"
                   onClick={() => setShowCreateForm(false)}
                 >
-                  Zrušiť
+                  {t("create.actions.cancel")}
                 </button>
               </div>
             </form>

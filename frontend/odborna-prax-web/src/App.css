@@ -4,37 +4,29 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
+  scrollbar-gutter: stable;
+}
+
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #f3fbf7; /* very light green background */
 }
 
 #root {
   width: 100%;
 }
 
-.app-layout {
+.page-root {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
 }
 
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-  height: 64px;
-
-  background-color: #ffffff;
-  border-bottom: 1px solid #ddd;
-
-  position: sticky;   
-  top: 0;
-  z-index: 1000;
-  flex-shrink: 0;
-}
+/* Leave .topbar out here – it's in Header.css now */
 
 .main-content {
   flex: 1 1 auto;
-  padding: 24px;
+  padding: 0; /* landing page handles its own padding via .slideshow */
   overflow-y: auto;
 }
 
@@ -47,3 +39,4 @@ footer {
   border-top: 1px solid #ddd;
   flex-shrink: 0;
 }
+

@@ -1,9 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import './../css/InternshipForm.css';
+import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import "./../css/InternshipForm.css";
 
-interface Company { id: number; name: string; }
-interface Mentor { id: number; firstName: string; lastName: string; }
-interface Student { id: number; firstName: string; lastName: string; }
+interface Company {
+  id: number;
+  name: string;
+}
+interface Mentor {
+  id: number;
+  firstName: string;
+  lastName: string;
+}
+interface Student {
+  id: number;
+  firstName: string;
+  lastName: string;
+}
 
 interface Internship {
   id: number;
@@ -24,6 +36,8 @@ interface Props {
 const baseUrl = "http://localhost:8080";
 
 const InternshipForm: React.FC<Props> = ({ onAdd }) => {
+  const { t } = useTranslation("dashboard");
+
   const [companies, setCompanies] = useState<Company[]>([]);
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
   const [companyInput, setCompanyInput] = useState("");
@@ -60,19 +74,19 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
 
   useEffect(() => {
     fetch(`${baseUrl}/dashboard/companies`, { headers })
-      .then(res => res.ok ? res.json() : [])
-      .then(data => {
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
         setCompanies(Array.isArray(data) ? data : []);
         setFilteredCompanies(Array.isArray(data) ? data : []);
       });
 
     fetch(`${baseUrl}/dashboard/mentors`, { headers })
-      .then(res => res.ok ? res.json() : [])
-      .then(data => setMentors(Array.isArray(data) ? data : []));
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setMentors(Array.isArray(data) ? data : []));
 
     fetch(`${baseUrl}/auth/me`, { headers })
-      .then(res => res.ok ? res.json() : null)
-      .then(user => setCurrentUserId(user?.id ?? null));
+      .then((res) => (res.ok ? res.json() : null))
+      .then((user) => setCurrentUserId(user?.id ?? null));
 
     const now = new Date();
     let startYear: number;
@@ -84,8 +98,7 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
       endYear = now.getFullYear();
       startYear = endYear - 1;
     }
-    setForm(prev => ({ ...prev, academicYear: `${startYear}/${endYear}` }));
-
+    setForm((prev) => ({ ...prev, academicYear: `${startYear}/${endYear}` }));
   }, []);
 
   // FULLTEXT FILTER
@@ -93,7 +106,7 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
     setCompanyInput(text);
     setShowDropdown(true);
 
-    const filtered = companies.filter(c =>
+    const filtered = companies.filter((c) =>
       c.name.toLowerCase().includes(text.toLowerCase())
     );
     setFilteredCompanies(filtered);
@@ -101,25 +114,26 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
 
   const selectCompany = (company: Company) => {
     setCompanyInput(company.name);
-    setForm(prev => ({ ...prev, companyId: company.id }));
+    setForm((prev) => ({ ...prev, companyId: company.id }));
     setShowDropdown(false);
 
     fetch(`${baseUrl}/dashboard/mentors?companyId=${company.id}`, { headers })
-      .then(res => res.ok ? res.json() : [])
-      .then(data => {
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
         setMentors(data);
         setFilteredMentors(data);
       });
   };
 
-
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      [name]: name === "semester" ? Number(value) : value
+      [name]: name === "semester" ? Number(value) : value,
     }));
   };
 
@@ -127,12 +141,12 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
     e.preventDefault();
 
     if (!currentUserId) {
-      alert("Nepodarilo sa načítať používateľa.");
+      alert(t("internshipForm.alerts.userLoadFailed"));
       return;
     }
 
     if (form.companyId === 0) {
-      alert("Musíš vybrať firmu zo zoznamu!");
+      alert(t("internshipForm.alerts.mustSelectCompany"));
       return;
     }
 
@@ -158,42 +172,47 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
     const data = await res.json();
 
     if (!res.ok) {
-      alert("Chyba pri ukladaní praxe: " + (data.error ?? "Neznáma chyba"));
+      alert(
+        t("internshipForm.alerts.saveError", {
+          error: data.error ?? t("internshipForm.alerts.unknownError"),
+        })
+      );
       return;
     }
 
-    alert("Prax bola úspešne vytvorená!");
-   if (form.internshipType === "new") {
-  try {
-    const token = localStorage.getItem("token");
+    alert(t("internshipForm.alerts.createdOk"));
 
-    const resTemplate = await fetch(
-      `${baseUrl}/documents/contracts/generated?internshipId=${data.internshipId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
+    if (form.internshipType === "new") {
+      try {
+        const token = localStorage.getItem("token");
+
+        const resTemplate = await fetch(
+          `${baseUrl}/documents/contracts/template`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!resTemplate.ok) {
+          console.error(t("internshipForm.console.templateDownloadFailed"));
+        } else {
+          const blob = await resTemplate.blob();
+          const url = window.URL.createObjectURL(blob);
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "Ziadost_o_prax.docx"; // názov súboru pre usera
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
         }
+      } catch (e) {
+        console.error(t("internshipForm.console.templateDownloadError"), e);
       }
-    );
-
-    if (!resTemplate.ok) {
-      console.error("Zlyhalo sťahovanie šablóny zmluvy");
-    } else {
-      const blob = await resTemplate.blob();
-      const url = window.URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "Ziadost_o_prax.docx";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
     }
-  } catch (e) {
-    console.error("Chyba pri sťahovaní šablóny:", e);
-  }
-}
 
     onAdd({
       id: data.internshipId,
@@ -223,13 +242,13 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
 
   return (
     <form className="practice-form" onSubmit={handleSubmit}>
-      <h3>Nová prax</h3>
+      <h3>{t("internshipForm.title")}</h3>
 
       <div className="form-group" style={{ position: "relative" }}>
-        <label>Firma:</label>
+        <label>{t("internshipForm.fields.company.label")}</label>
         <input
           type="text"
-          placeholder="Začni písať…"
+          placeholder={t("internshipForm.fields.company.placeholder")}
           value={companyInput}
           onChange={(e) => handleCompanySearch(e.target.value)}
           onFocus={() => setShowDropdown(true)}
@@ -252,7 +271,7 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
       </div>
 
       <div className="form-group">
-        <label>Mentor:</label>
+        <label>{t("internshipForm.fields.mentor.label")}</label>
         <select
           name="mentorId"
           value={form.mentorId}
@@ -260,66 +279,89 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
           required
           disabled={form.companyId === 0}
         >
-          <option value="">-- Najprv vyber firmu --</option>
-          {mentors.map(m => (
-            <option key={m.id} value={m.id}>{m.firstName} {m.lastName}</option>
+          <option value="">
+            {t("internshipForm.fields.mentor.firstSelectCompany")}
+          </option>
+          {mentors.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.firstName} {m.lastName}
+            </option>
           ))}
         </select>
-
       </div>
 
       <div className="form-group">
-        <label>Akademický rok:</label>
+        <label>{t("internshipForm.fields.academicYear.label")}</label>
         <input name="academicYear" value={form.academicYear} readOnly />
       </div>
 
       <div className="form-group">
-        <label>Semester:</label>
+        <label>{t("internshipForm.fields.semester.label")}</label>
         <select name="semester" value={form.semester} onChange={handleChange}>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <option key={n} value={n}>{n}</option>)}
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+            <option key={n} value={n}>
+              {n}
+            </option>
+          ))}
         </select>
       </div>
 
       <div className="date-row">
         <div className="form-group">
-          <label>Začiatok:</label>
-          <input type="date" name="dateStart" value={form.dateStart} onChange={handleChange} required />
+          <label>{t("internshipForm.fields.start.label")}</label>
+          <input
+            type="date"
+            name="dateStart"
+            value={form.dateStart}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         <div className="form-group">
-          <label>Koniec:</label>
-          <input type="date" name="dateEnd" value={form.dateEnd} onChange={handleChange} required />
+          <label>{t("internshipForm.fields.end.label")}</label>
+          <input
+            type="date"
+            name="dateEnd"
+            value={form.dateEnd}
+            onChange={handleChange}
+            required
+          />
         </div>
       </div>
-         <div className="mt-4">
-  <label className="font-semibold">Typ praxe:</label>
 
-  <div className="flex gap-4 mt-2">
-    <label>
-      <input
-        type="radio"
-        name="internshipType"
-        value="new"
-        checked={form.internshipType === "new"}
-        onChange={() => setForm({ ...form, internshipType: "new" })}
-      />
-      &nbsp;Nová prax
-    </label>
+      <div className="mt-4">
+        <label className="font-semibold">
+          {t("internshipForm.fields.type.label")}
+        </label>
 
-    <label>
-      <input
-        type="radio"
-        name="internshipType"
-        value="existing"
-        checked={form.internshipType === "existing"}
-        onChange={() => setForm({ ...form, internshipType: "existing" })}
-      />
-      &nbsp;Existujúca prax
-    </label>
-  </div>
-</div>   
+        <div className="flex gap-4 mt-2">
+          <label>
+            <input
+              type="radio"
+              name="internshipType"
+              value="new"
+              checked={form.internshipType === "new"}
+              onChange={() => setForm({ ...form, internshipType: "new" })}
+            />
+            &nbsp;{t("internshipForm.fields.type.new")}
+          </label>
+
+          <label>
+            <input
+              type="radio"
+              name="internshipType"
+              value="existing"
+              checked={form.internshipType === "existing"}
+              onChange={() => setForm({ ...form, internshipType: "existing" })}
+            />
+            &nbsp;{t("internshipForm.fields.type.existing")}
+          </label>
+        </div>
+      </div>
+
       <div className="form-group">
-        <label>Popis:</label>
+        <label>{t("internshipForm.fields.description.label")}</label>
         <textarea
           name="description"
           value={form.description}
@@ -328,7 +370,9 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
         ></textarea>
       </div>
 
-      <button type="submit" className="btn-save">Uložiť prax</button>
+      <button type="submit" className="btn-save">
+        {t("internshipForm.actions.save")}
+      </button>
     </form>
   );
 };

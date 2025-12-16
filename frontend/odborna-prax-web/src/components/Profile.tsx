@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import "./../css/Profile.css";
 
 interface UserProfile {
@@ -27,6 +28,8 @@ interface Department {
 }
 
 const Profile: React.FC = () => {
+  const { t } = useTranslation("profile");
+
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [editingField, setEditingField] = useState<string | null>(null);
   const [fieldValue, setFieldValue] = useState<string>("");
@@ -47,7 +50,7 @@ const Profile: React.FC = () => {
         const res = await fetch("http://localhost:8080/account/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) throw new Error("Chyba pri načítavaní profilu");
+        if (!res.ok) throw new Error(t("errors.profileLoad"));
         const data = await res.json();
         setProfile(data);
       } catch (error: any) {
@@ -55,7 +58,7 @@ const Profile: React.FC = () => {
       }
     };
     fetchProfile();
-  }, []);
+  }, [t]);
 
   // Načítanie študijných programov
   useEffect(() => {
@@ -65,7 +68,7 @@ const Profile: React.FC = () => {
         const res = await fetch("http://localhost:8080/account/study-programs", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) throw new Error("Chyba pri načítavaní študijných odborov");
+        if (!res.ok) throw new Error(t("errors.studyProgramsLoad"));
         const data = await res.json();
         setStudyPrograms(data);
       } catch (error) {
@@ -73,7 +76,7 @@ const Profile: React.FC = () => {
       }
     };
     fetchStudyPrograms();
-  }, []);
+  }, [t]);
 
   // Načítanie katedier
   useEffect(() => {
@@ -83,7 +86,7 @@ const Profile: React.FC = () => {
         const res = await fetch("http://localhost:8080/account/departments", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) throw new Error("Chyba pri načítavaní katedier");
+        if (!res.ok) throw new Error(t("errors.departmentsLoad"));
         const data = await res.json();
         setDepartments(data);
       } catch (error) {
@@ -91,7 +94,7 @@ const Profile: React.FC = () => {
       }
     };
     fetchDepartments();
-  }, []);
+  }, [t]);
 
   const handleEditClick = (field: keyof UserProfile) => {
     if (!profile) return;
@@ -116,8 +119,8 @@ const Profile: React.FC = () => {
         body: JSON.stringify({ [editingField]: fieldValue }),
       });
 
-      if (!res.ok) throw new Error("Chyba pri ukladaní zmien");
-      setMessage("Údaje boli úspešne uložené.");
+      if (!res.ok) throw new Error(t("errors.saveChanges"));
+      setMessage(t("messages.savedOk"));
     } catch (error: any) {
       setMessage(error.message);
     }
@@ -129,7 +132,7 @@ const Profile: React.FC = () => {
     e.preventDefault();
 
     if (newPassword !== confirmPassword) {
-      setPasswordMessage("Nové heslá sa nezhodujú.");
+      setPasswordMessage(t("password.errors.mismatch"));
       return;
     }
 
@@ -150,10 +153,10 @@ const Profile: React.FC = () => {
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || "Nepodarilo sa zmeniť heslo.");
+        throw new Error(errorData.error || t("password.errors.changeFailed"));
       }
 
-      setPasswordMessage("Heslo bolo úspešne zmenené.");
+      setPasswordMessage(t("password.messages.changedOk"));
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -162,22 +165,21 @@ const Profile: React.FC = () => {
     }
   };
 
-
-  if (!profile) return <p>Načítavam profil...</p>;
+  if (!profile) return <p>{t("loading.profile")}</p>;
 
   const labels: Record<keyof UserProfile, string> = {
-    firstName: "Meno",
-    lastName: "Priezvisko",
-    email: "Email (nemenný)",
-    emailAlternate: "Alternatívny email",
-    phoneNumber: "Telefón",
-    address: "Adresa",
-    city: "Mesto",
-    zip: "PSČ",
-    role: "Typ účtu",
-    studyProgram: "Študijný program",
-    department: "Katedra",
-    companyName: "Názov firmy",
+    firstName: t("labels.firstName"),
+    lastName: t("labels.lastName"),
+    email: t("labels.email"),
+    emailAlternate: t("labels.emailAlternate"),
+    phoneNumber: t("labels.phoneNumber"),
+    address: t("labels.address"),
+    city: t("labels.city"),
+    zip: t("labels.zip"),
+    role: t("labels.role"),
+    studyProgram: t("labels.studyProgram"),
+    department: t("labels.department"),
+    companyName: t("labels.companyName"),
   };
 
   const readOnlyFields: (keyof UserProfile)[] = ["email", "role"];
@@ -221,7 +223,7 @@ const Profile: React.FC = () => {
   return (
     <div className="profile-wrapper">
       <div className="profile-container-wide">
-        <h2>Môj profil</h2>
+        <h2>{t("title")}</h2>
         {message && <div className="profile-message">{message}</div>}
 
         <div className="profile-grid">
@@ -232,7 +234,9 @@ const Profile: React.FC = () => {
             return (
               <div
                 key={key}
-                className={`profile-grid-item ${isReadOnly ? "readonly-field" : ""}`}
+                className={`profile-grid-item ${
+                  isReadOnly ? "readonly-field" : ""
+                }`}
               >
                 <strong>{labels[key] || key}:</strong>
 
@@ -243,7 +247,7 @@ const Profile: React.FC = () => {
                         value={fieldValue || ""}
                         onChange={(e) => setFieldValue(e.target.value)}
                       >
-                        <option value="">-- Vyber odbor --</option>
+                        <option value="">{t("select.studyProgram")}</option>
                         {studyPrograms.map((program) => (
                           <option key={program.id} value={program.name}>
                             {program.name}
@@ -255,7 +259,7 @@ const Profile: React.FC = () => {
                         value={fieldValue || ""}
                         onChange={(e) => setFieldValue(e.target.value)}
                       >
-                        <option value="">-- Vyber katedru --</option>
+                        <option value="">{t("select.department")}</option>
                         {departments.map((dep) => (
                           <option key={dep.id} value={dep.name}>
                             {dep.name}
@@ -270,16 +274,23 @@ const Profile: React.FC = () => {
                       />
                     )}
 
-                    <button className="save-btn" onClick={handleFieldSave}>💾</button>
-                    <button className="cancel-btn" onClick={() => setEditingField(null)}>✖</button>
+                    <button className="save-btn" onClick={handleFieldSave}>
+                      💾
+                    </button>
+                    <button
+                      className="cancel-btn"
+                      onClick={() => setEditingField(null)}
+                    >
+                      ✖
+                    </button>
                   </span>
                 ) : (
                   <>
-                    <span>{value || "—"}</span>
+                    <span>{value || t("common.empty")}</span>
                     {!isReadOnly && (
                       <button
                         className="edit-btn"
-                        title="Upraviť"
+                        title={t("actions.edit")}
                         onClick={() => handleEditClick(key)}
                       >
                         ✏️
@@ -293,22 +304,41 @@ const Profile: React.FC = () => {
         </div>
 
         <div className="password-section">
-          <h3>Zmena hesla</h3>
-          {passwordMessage && <div className="profile-message">{passwordMessage}</div>}
+          <h3>{t("password.title")}</h3>
+          {passwordMessage && (
+            <div className="profile-message">{passwordMessage}</div>
+          )}
           <form onSubmit={handlePasswordChange} className="password-form">
             <div className="form-group">
-              <label>Staré heslo:</label>
-              <input type="password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} required />
+              <label>{t("password.fields.old.label")}</label>
+              <input
+                type="password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                required
+              />
             </div>
             <div className="form-group">
-              <label>Nové heslo:</label>
-              <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
+              <label>{t("password.fields.new.label")}</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+              />
             </div>
             <div className="form-group">
-              <label>Potvrdenie hesla:</label>
-              <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+              <label>{t("password.fields.confirm.label")}</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
             </div>
-            <button type="submit" className="password-save-btn">Zmeniť heslo</button>
+            <button type="submit" className="password-save-btn">
+              {t("password.actions.submit")}
+            </button>
           </form>
         </div>
       </div>

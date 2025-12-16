@@ -1,0 +1,139 @@
+{
+  "title": "FAQ for Professional Internship (AI)",
+  "intro": "The most common questions about the internship process, agreements, evaluation, and poster presentation.",
+  "items": [
+    {
+      "question": "How do I find a company for my professional internship?",
+      "answer": {
+        "paragraphs": [
+          "The company should provide work that helps you develop your IT skills. You must find an internship placement yourself; sometimes the university offers opportunities as well."
+        ],
+        "bullets": [
+          "The internship must be verifiable – supervisors may randomly check companies and contact them.",
+          "Make sure all contact details in the agreement (name, email, phone) are correct."
+        ]
+      }
+    },
+    {
+      "question": "Can I complete my internship in a foreign company?",
+      "answer": {
+        "paragraphs": [
+          "Yes, but the internship must be verifiable:"
+        ],
+        "bullets": [
+          "The company must have a functional website.",
+          "The workplace may contact the company by phone – the contact person must be able to communicate in Slovak or English.",
+          "Verification may also include checking social media and similar sources."
+        ]
+      }
+    },
+    {
+      "question": "Why do I need to sign an internship agreement?",
+      "answer": {
+        "paragraphs": [
+          "The internship agreement confirms that you are actually completing the internship and protects the faculty from illegal (undeclared) work.",
+          "Without a valid agreement (or an alternative contract), the internship cannot be recognized."
+        ]
+      }
+    },
+    {
+      "question": "How should I attend the internship and when should I enroll in the subject 'Professional Internship'?",
+      "answer": {
+        "bullets": [
+          "You must attend the internship in accordance with the workplace instructions (working hours, attendance, communication rules, etc.).",
+          "Enroll in the course 'Professional Internship' only in the semester in which you expect to finish the internship or have already completed enough hours (minimum 150).",
+          "The internship must not start before you begin the academic level you are studying."
+        ]
+      }
+    },
+    {
+      "question": "How does the internship defense work?",
+      "answer": {
+        "paragraphs": [
+          "The internship defense takes place in the form of a poster presentation:"
+        ],
+        "bullets": [
+          "At the end of the semester, you create a poster presenting your internship and results.",
+          "You register for the defense date via aplikovanainformatika.sk.",
+          "At the defense, you must have your poster prepared and displayed; you explain what you did and what you achieved.",
+          "After the discussion, you may pack up – the defense is complete."
+        ]
+      }
+    },
+    {
+      "question": "What alternatives exist to the internship agreement (e.g., part-time job or full-time employment)?",
+      "answer": {
+        "paragraphs": [
+          "Instead of an internship agreement, you may use other employment relationships if the work is related to IT:"
+        ],
+        "bullets": [
+          "a part-time student work agreement for at least the required number of hours,",
+          "a work performance contract or work activity contract for the required number of hours,",
+          "a standard employment contract.",
+          "In such cases, you submit the agreement or contract between you and the company (salary may be redacted), and there is no need to sign an agreement with the university."
+        ]
+      }
+    },
+    {
+      "question": "Do I need to complete the internship defense even when using an alternative form (part-time job, full-time job, etc.)?",
+      "answer": {
+        "paragraphs": [
+          "Yes. Alternative forms of internship do not exempt the student from the defense. You must still prepare a poster and defend your internship."
+        ]
+      }
+    },
+    {
+      "question": "What evidence do I need to prove I completed the internship?",
+      "answer": {
+        "paragraphs": [
+          "Evidence is important for the defense and possible verification of the internship:"
+        ],
+        "bullets": [
+          "The Internship Record Sheet + evaluation of the student from the company.",
+          "Photographs of activities (hardware, working with people, trainings) and screenshots of applications or software you developed.",
+          "The poster – a visual presentation of the internship (outputs, projects, solutions)."
+        ]
+      }
+    },
+    {
+      "question": "What materials should I bring to the poster presentation (defense)?",
+      "answer": {
+        "bullets": [
+          "The Internship Record Sheet + student evaluation (confirmed by the company).",
+          "If it is a paid activity: a copy of the contract (salary may be redacted).",
+          "If it is work within your own company, the evaluation process is individual after consulting with the evaluator (e.g., submitting supplier invoices). Work intended only for internal use of your own company cannot be recognized."
+        ]
+      }
+    },
+    {
+      "question": "How should the internship poster look?",
+      "answer": {
+        "bullets": [
+          "A poster in A2 format created for example in Canva, similar to posters of final theses, or a suitable A4 combination (must be readable from a distance).",
+          "It must include: student name, company name, and the activity you performed most often.",
+          "A combination of photos of activities, screenshots of applications, examples of hardware solutions, mobile applications, etc. – all visually supported with text on the poster."
+        ]
+      }
+    },
+    {
+      "question": "What happens during the internship defense at the scheduled date?",
+      "answer": {
+        "bullets": [
+          "You register for the defense date via aplikovanainformatika.sk.",
+          "Prepare what you want to say – focus on what went well, not on what didn't.",
+          "At the defense time, your poster must already be displayed and you must be ready to present.",
+          "After the presentation and discussion, you may pack up – the defense is complete."
+        ]
+      }
+    },
+    {
+      "question": "What happens after the internship defense (post-processing)?",
+      "answer": {
+        "bullets": [
+          "Selected internships may undergo additional verification.",
+          "After the verification process is completed, the grade will be recorded in AIS."
+        ]
+      }
+    }
+  ]
+}

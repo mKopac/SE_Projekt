@@ -1,9 +1,21 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import './../css/InternshipTable.css';
+import React, { useEffect, useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import "./../css/InternshipTable.css";
 
-interface Company { id: number; name: string; }
-interface Mentor { id: number; firstName: string; lastName: string; }
-interface Student { id: number; firstName: string; lastName: string; }
+interface Company {
+  id: number;
+  name: string;
+}
+interface Mentor {
+  id: number;
+  firstName: string;
+  lastName: string;
+}
+interface Student {
+  id: number;
+  firstName: string;
+  lastName: string;
+}
 
 interface Internship {
   id: number;
@@ -15,8 +27,6 @@ interface Internship {
   dateStart: string;
   dateEnd: string;
   status: string;
-
-  /** ➕ PRIDANÉ PRE POPIS */
   description: string;
 }
 
@@ -27,15 +37,22 @@ interface Props {
 
 const baseUrl = "http://localhost:8080";
 
-const InternshipTable: React.FC<Props> = ({ internships: initialInternships, role }) => {
+const InternshipTable: React.FC<Props> = ({
+  internships: initialInternships,
+  role,
+}) => {
+  const { t } = useTranslation("dashboard");
+
   const [companies, setCompanies] = useState<Company[]>([]);
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
 
-  const [internships, setInternships] = useState<Internship[]>(initialInternships);
+  const [internships, setInternships] =
+    useState<Internship[]>(initialInternships);
 
   const [expandedId, setExpandedId] = useState<number | null>(null);
-  const [localData, setLocalData] = useState<Internship[]>(initialInternships);
+  const [localData, setLocalData] =
+    useState<Internship[]>(initialInternships);
 
   const [documents, setDocuments] = useState<Record<number, any[]>>({});
 
@@ -54,17 +71,17 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
 
   useEffect(() => {
     fetch(`${baseUrl}/dashboard/companies`, { headers })
-      .then(res => res.json())
+      .then((res) => res.json())
       .then(setCompanies)
       .catch(() => setCompanies([]));
 
     fetch(`${baseUrl}/dashboard/mentors`, { headers })
-      .then(res => res.json())
+      .then((res) => res.json())
       .then(setMentors)
       .catch(() => setMentors([]));
 
     fetch(`${baseUrl}/dashboard/students`, { headers })
-      .then(res => res.json())
+      .then((res) => res.json())
       .then(setStudents)
       .catch(() => setStudents([]));
   }, []);
@@ -73,36 +90,35 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
     const params = new URLSearchParams();
 
     if (search) params.append("search", search);
-    if (filterCompany !== "ALL") params.append("companyId", String(filterCompany));
+    if (filterCompany !== "ALL")
+      params.append("companyId", String(filterCompany));
     if (filterMentor !== "ALL") params.append("mentorId", String(filterMentor));
     if (filterYear !== "ALL") params.append("academicYear", filterYear);
-    if (filterSemester !== "ALL") params.append("semester", String(filterSemester));
+    if (filterSemester !== "ALL")
+      params.append("semester", String(filterSemester));
 
     fetch(`${baseUrl}/dashboard/internships?${params.toString()}`, { headers })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         const mapped = data.map((d: any) => d.internship);
         setInternships(mapped);
         setLocalData(mapped);
       })
-      .catch(() => {
-        setInternships([]);
-        setLocalData([]);
-      });
-
-  }, [search, filterCompany, filterMentor, filterYear, filterSemester]);
+      .catch(() => setInternships([]));
+    setLocalData(internships);
+  }, [search, filterCompany, filterMentor, filterYear, filterSemester, internships]);
 
   const getCompanyName = (id: number) =>
-    companies.find(c => c.id === id)?.name || "—";
+    companies.find((c) => c.id === id)?.name || "—";
 
   const getMentorName = (id: number | null) => {
     if (!id) return "—";
-    const m = mentors.find(x => x.id === id);
+    const m = mentors.find((x) => x.id === id);
     return m ? `${m.firstName} ${m.lastName}` : "—";
   };
 
   const getStudentName = (id: number) => {
-    const s = students.find(st => st.id === id);
+    const s = students.find((st) => st.id === id);
     return s ? `${s.firstName} ${s.lastName}` : "—";
   };
 
@@ -146,7 +162,7 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
       });
 
       if (!res.ok) {
-        alert("Chyba pri sťahovaní dokumentu.");
+        alert(t("internshipTable.documents.downloadError"));
         return;
       }
 
@@ -163,14 +179,14 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
       window.URL.revokeObjectURL(url);
     } catch (e) {
       console.error(e);
-      alert("Chyba pri komunikácii so serverom.");
+      alert(t("internshipTable.documents.serverError"));
     }
   };
 
   const handleCompanyDecision = async (
-  id: number,
-  decision: "ACCEPT" | "REJECT" | "APPROVED" | "DENIED"
-) => {
+    id: number,
+    decision: "ACCEPT" | "REJECT" | "APPROVED" | "DENIED"
+  ) => {
     try {
       const res = await fetch(
         `${baseUrl}/dashboard/internship/${id}/company-decision?decision=${decision}`,
@@ -180,21 +196,21 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
       const data = await res.json().catch(() => null);
 
       if (!res.ok) {
-        alert(data?.error ?? "Chyba pri zmene stavu praxe.");
+        alert(data?.error ?? t("internshipTable.companyActions.stateError"));
         return;
       }
 
       const newState: string = data?.newState ?? decision;
 
-      setLocalData(prev =>
-        prev.map(i => (i.id === id ? { ...i, status: newState } : i))
+      setLocalData((prev) =>
+        prev.map((i) => (i.id === id ? { ...i, status: newState } : i))
       );
 
-      alert("Stav praxe bol úspešne zmenený.");
+      alert(t("internshipTable.companyActions.stateChanged"));
     } catch {
-      alert("Chyba pri komunikácii so serverom.");
+      alert(t("internshipTable.companyActions.serverError"));
     }
-};
+  };
 
   const handleAdminStateChange = async (id: number) => {
     try {
@@ -206,24 +222,24 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
       const data = await res.json().catch(() => null);
 
       if (!res.ok) {
-        alert(data?.error ?? "Chyba pri zmene stavu praxe.");
+        alert(data?.error ?? t("internshipTable.companyActions.stateError"));
         return;
       }
 
       const newState: string = data?.newState ?? adminState;
 
-      setLocalData(prev =>
-        prev.map(i => (i.id === id ? { ...i, status: newState } : i))
+      setLocalData((prev) =>
+        prev.map((i) => (i.id === id ? { ...i, status: newState } : i))
       );
 
-      alert("Stav praxe bol úspešne zmenený.");
+      alert(t("internshipTable.companyActions.stateChanged"));
     } catch {
-      alert("Chyba pri komunikácii so serverom.");
+      alert(t("internshipTable.companyActions.serverError"));
     }
   };
 
   const filteredData = useMemo(() => {
-    return localData.filter(i => {
+    return localData.filter((i) => {
       const student = getStudentName(i.studentId).toLowerCase();
       const company = getCompanyName(i.companyId).toLowerCase();
       const mentor = getMentorName(i.mentorId).toLowerCase();
@@ -237,12 +253,17 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
         i.dateStart.includes(search) ||
         i.dateEnd.includes(search);
 
-      const companyMatch = filterCompany === "ALL" || i.companyId === filterCompany;
-      const mentorMatch = filterMentor === "ALL" || i.mentorId === filterMentor;
+      const companyMatch =
+        filterCompany === "ALL" || i.companyId === filterCompany;
+      const mentorMatch =
+        filterMentor === "ALL" || i.mentorId === filterMentor;
       const yearMatch = filterYear === "ALL" || i.academicYear === filterYear;
-      const semesterMatch = filterSemester === "ALL" || i.semester === filterSemester;
+      const semesterMatch =
+        filterSemester === "ALL" || i.semester === filterSemester;
 
-      return searchMatch && companyMatch && mentorMatch && yearMatch && semesterMatch;
+      return (
+        searchMatch && companyMatch && mentorMatch && yearMatch && semesterMatch
+      );
     });
   }, [localData, search, filterCompany, filterMentor, filterYear, filterSemester]);
 
@@ -258,19 +279,22 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
       {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
-        body: form
+        body: form,
       }
     );
 
     if (res.ok) {
-      alert("Výkaz bol nahraný.");
+      alert(t("internshipTable.documents.uploaded"));
       loadDocuments(internshipId);
     } else {
-      alert("Chyba pri nahrávaní.");
+      alert(t("internshipTable.documents.uploadError"));
     }
   };
 
-  const handleUploadContract = async (internshipId: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUploadContract = async (
+    internshipId: number,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -282,19 +306,19 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
       {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
-        body: form
+        body: form,
       }
     );
 
     if (res.ok) {
-      alert("Zmluva bola nahraná.");
+      alert(t("internshipTable.contract.uploaded"));
       loadDocuments(internshipId);
     } else {
-      alert("Chyba pri nahrávaní zmluvy.");
+      alert(t("internshipTable.contract.uploadError"));
     }
   };
 
-    const handleDocumentDecision = async (
+  const handleDocumentDecision = async (
     documentId: number,
     internshipId: number,
     decision: "APPROVED" | "DENIED"
@@ -313,7 +337,7 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
       const data = await res.json().catch(() => null);
 
       if (!res.ok) {
-        alert(data?.error ?? "Chyba pri zmene stavu dokumentu.");
+        alert(data?.error ?? t("internshipTable.documents.stateChangeError"));
         return;
       }
 
@@ -330,167 +354,168 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
         };
       });
 
-      alert("Stav dokumentu bol úspešne zmenený.");
+      alert(t("internshipTable.documents.stateChanged"));
     } catch (e) {
       console.error(e);
-      alert("Chyba pri komunikácii so serverom.");
+      alert(t("internshipTable.documents.serverError"));
     }
   };
 
   const renderDocuments = (internship: Internship) => {
-  const internshipId = internship.id;
-  const docs = documents[internshipId] || [];
+    const internshipId = internship.id;
+    const docs = documents[internshipId] || [];
 
-  const isStudent = role === "STUDENT";
-  const isCompany = role === "COMPANY";
+    const isStudent = role === "STUDENT";
+    const isCompany = role === "COMPANY";
 
-  const contract = docs.find((d: any) => d.documentType === "CONTRACT");
-  const timestatement = docs.find((d: any) => d.documentType === "TIMESTATEMENT");
-
-
-  const getContractStatus = () => {
-    if (!contract) return "Zmluva zatiaľ nebola nahraná.";
-    if (internship.status === "CREATED") return "Čaká na schválenie firmy.";
-    if (internship.status === "ACCEPTED") return "Zmluva schválená";
-    if (internship.status === "REJECTED") return "Zmluva zamietnutá";
-
-    return "Zmluva schválená";
-  };
-
-  const getTimestatementStatus = () => {
-    if (!timestatement) return "Výkaz zatiaľ nebol nahraný.";
-
-    if (timestatement.currentState === "UPLOADED") return "Čaká na schválenie firmy";
-    if (timestatement.currentState === "APPROVED") return "Výkaz schválený";
-    if (timestatement.currentState === "DENIED") return "Výkaz zamietnutý";
-
-    return "Neznámy stav výkazu";
-  };
-
-  return (
-    <div style={{ marginTop: 10 }}>
+    const contract = docs.find((d: any) => d.documentType === "CONTRACT");
+    const timestatement = docs.find((d: any) => d.documentType === "TIMESTATEMENT");
 
 
-      <div style={{ marginBottom: 15 }}>
-        <strong>Zmluva o praxi:</strong><br />
+    const getContractStatus = () => {
+      if (!contract) return t("internshipTable.contract.status.missing");
 
-        {contract ? (
-          <div className="document-item" style={{ marginTop: 8 }}>
-            <button
-              type="button"
-              className="doc-link"
-              onClick={() => handleDownloadDocument(contract.documentId, contract.fileName)}
-            >
-              {contract.fileName}
-            </button>
+      if (internship.status === "CREATED") return t("internshipTable.contract.status.waitingCompany");
+      if (internship.status === "ACCEPTED") return t("internshipTable.contract.status.approved");
+      if (internship.status === "REJECTED") return t("internshipTable.contract.status.denied");
+      
+      return t("internshipTable.contract.status.approved");
+    };
 
-            <span className="state-badge">{getContractStatus()}</span>
+    const getTimestatementStatus = () => {
+      if (!timestatement) return t("internshipTable.timestatement.status.missing");
+      
+      if (timestatement.currentState === "UPLOADED") return t("internshipTable.timestatement.status.waitingCompany");
+      if (timestatement.currentState === "APPROVED") return t("internshipTable.timestatement.status.approved");
+      if (timestatement.currentState === "DENIED") return t("internshipTable.timestatement.status.denied");
+      
+      return t("internshipTable.timestatement.status.unknown");
+    };
 
-            {isCompany && internship.status === "CREATED" && (
-              <div style={{ marginTop: 8 }}>
-                <button className="btn-accept" onClick={() => handleCompanyDecision(internshipId, "ACCEPT")}>
-                  Schváliť prax
-                </button>
-
-                <button className="btn-reject" onClick={() => handleCompanyDecision(internshipId, "REJECT")}>
-                  Zamietnuť prax
-                </button>
-              </div>
-            )}
-          </div>
-        ) : (
-          <>
-            {isStudent ? (
-              <>
-                <span style={{ color: "#666" }}>Zmluva zatiaľ nebola nahraná.</span><br />
-                <input
-                  type="file"
-                  accept=".pdf,.doc,.docx"
-                  onChange={(e) => handleUploadContract(internshipId, e)}
-                  style={{ marginTop: 6 }}
-                />
-              </>
-            ) : (
-              <span style={{ color: "#666" }}>Zmluva zatiaľ nebola nahraná.</span>
-            )}
-          </>
-        )}
-      </div>
+    return (
+      <div style={{ marginTop: 10 }}>
 
 
-      <div>
-        <strong>Výkaz o činnosti:</strong><br />
+        <div style={{ marginBottom: 15 }}>
+          <strong>{t("internshipTable.contract.title")}:</strong><br />
 
-        {timestatement ? (
-          <div className="document-item" style={{ marginTop: 8 }}>
-            <button
-              type="button"
-              className="doc-link"
-              onClick={() => handleDownloadDocument(timestatement.documentId, timestatement.fileName)}
-            >
-              {timestatement.fileName}
-            </button>
+          {contract ? (
+            <div className="document-item" style={{ marginTop: 8 }}>
+              <button
+                type="button"
+                className="doc-link"
+                onClick={() => handleDownloadDocument(contract.documentId, contract.fileName)}
+              >
+                {contract.fileName}
+              </button>
 
-            <span className="state-badge">{getTimestatementStatus()}</span>
+              <span className="state-badge">{getContractStatus()}</span>
 
-            {/* Firma schvaľuje výkaz, iba ak prax je ACCEPTED */}
-            {isCompany &&
-              internship.status === "ACCEPTED" &&
-              timestatement.currentState === "UPLOADED" && (
+              {isCompany && internship.status === "CREATED" && (
                 <div style={{ marginTop: 8 }}>
-                  <button
-                    className="btn-accept"
-                    onClick={() =>
-                      handleDocumentDecision(
-                        timestatement.documentId,
-                        internshipId,
-                        "APPROVED"
-                      )
-                    }
-                  >
-                    Schváliť výkaz
+                  <button className="btn-accept" onClick={() => handleCompanyDecision(internshipId, "ACCEPT")}>
+                    Schváliť prax
                   </button>
 
-                  <button
-                    className="btn-reject"
-                    onClick={() =>
-                      handleDocumentDecision(
-                        timestatement.documentId,
-                        internshipId,
-                        "DENIED"
-                      )
-                    }
-                  >
-                    Zamietnuť výkaz
+                  <button className="btn-reject" onClick={() => handleCompanyDecision(internshipId, "REJECT")}>
+                    Zamietnuť prax
                   </button>
                 </div>
-            )}
-
-          </div>
-        ) : (
-          <>
-            {isStudent ? (
-              <>
-                {internship.status === "ACCEPTED" ? (
+              )}
+            </div>
+          ) : (
+            <>
+              {isStudent ? (
+                <>
+                  <span style={{ color: "#666" }}>{t("internshipTable.contract.missing")}</span><br />
                   <input
                     type="file"
-                    accept="application/pdf"
-                    onChange={(e) => handleUpload(internshipId, e)}
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) => handleUploadContract(internshipId, e)}
                     style={{ marginTop: 6 }}
                   />
-                ) : (
-                  <span style={{ color: "#666" }}>Výkaz môžeš nahrať až po schválení zmluvy.</span>
+                </>
+              ) : (
+                <span style={{ color: "#666" }}>{t("internshipTable.contract.missing")}</span>
+              )}
+            </>
+          )}
+        </div>
+
+
+        <div>
+          <strong>{t("internshipTable.timestatement.title")}:</strong><br />
+
+          {timestatement ? (
+            <div className="document-item" style={{ marginTop: 8 }}>
+              <button
+                type="button"
+                className="doc-link"
+                onClick={() => handleDownloadDocument(timestatement.documentId, timestatement.fileName)}
+              >
+                {timestatement.fileName}
+              </button>
+
+              <span className="state-badge">{getTimestatementStatus()}</span>
+
+              {/* Firma schvaľuje výkaz, iba ak prax je ACCEPTED */}
+              {isCompany &&
+                internship.status === "ACCEPTED" &&
+                timestatement.currentState === "UPLOADED" && (
+                  <div style={{ marginTop: 8 }}>
+                    <button
+                      className="btn-accept"
+                      onClick={() =>
+                        handleDocumentDecision(
+                          timestatement.documentId,
+                          internshipId,
+                          "APPROVED"
+                        )
+                      }
+                    >
+                      {t("internshipTable.timestatement.approve")}
+                    </button>
+
+                    <button
+                      className="btn-reject"
+                      onClick={() =>
+                        handleDocumentDecision(
+                          timestatement.documentId,
+                          internshipId,
+                          "DENIED"
+                        )
+                      }
+                    >
+                      {t("internshipTable.timestatement.deny")}
+                    </button>
+                  </div>
                 )}
-              </>
-            ) : (
-              <span style={{ color: "#666" }}>Výkaz zatiaľ nebol nahraný.</span>
-            )}
-          </>
-        )}
+
+            </div>
+          ) : (
+            <>
+              {isStudent ? (
+                <>
+                  {internship.status === "ACCEPTED" ? (
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      onChange={(e) => handleUpload(internshipId, e)}
+                      style={{ marginTop: 6 }}
+                    />
+                  ) : (
+                    <span style={{ color: "#666" }}>Výkaz môžeš nahrať až po schválení zmluvy.</span>
+                  )}
+                </>
+              ) : (
+                <span style={{ color: "#666" }}>Výkaz zatiaľ nebol nahraný.</span>
+              )}
+            </>
+          )}
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 
 
@@ -503,31 +528,37 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
         <input
           type="text"
           className="search-input"
-          placeholder="Hľadať..."
+          placeholder={t("internshipTable.search.placeholder")}
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
         />
 
         <select
           value={filterCompany}
-          onChange={e =>
-            setFilterCompany(e.target.value === "ALL" ? "ALL" : Number(e.target.value))
+          onChange={(e) =>
+            setFilterCompany(
+              e.target.value === "ALL" ? "ALL" : Number(e.target.value)
+            )
           }
         >
-          <option value="ALL">Všetky firmy</option>
-          {companies.map(c => (
-            <option key={c.id} value={c.id}>{c.name}</option>
+          <option value="ALL">{t("internshipTable.filters.allCompanies")}</option>
+          {companies.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
           ))}
         </select>
 
         <select
           value={filterMentor}
-          onChange={e =>
-            setFilterMentor(e.target.value === "ALL" ? "ALL" : Number(e.target.value))
+          onChange={(e) =>
+            setFilterMentor(
+              e.target.value === "ALL" ? "ALL" : Number(e.target.value)
+            )
           }
         >
-          <option value="ALL">Všetci mentori</option>
-          {mentors.map(m => (
+          <option value="ALL">{t("internshipTable.filters.allMentors")}</option>
+          {mentors.map((m) => (
             <option key={m.id} value={m.id}>
               {m.firstName} {m.lastName}
             </option>
@@ -536,25 +567,31 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
 
         <select
           value={filterYear}
-          onChange={e => setFilterYear(e.target.value as string | "ALL")}
+          onChange={(e) => setFilterYear(e.target.value as string | "ALL")}
         >
-          <option value="ALL">Všetky roky</option>
-          {Array.from(new Set(localData.map(i => i.academicYear))).map(year => (
-            <option key={year} value={year}>{year}</option>
-          ))}
+          <option value="ALL">{t("internshipTable.filters.allYears")}</option>
+          {Array.from(new Set(localData.map((i) => i.academicYear))).map(
+            (year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            )
+          )}
         </select>
 
         <select
           value={filterSemester}
-          onChange={e =>
+          onChange={(e) =>
             setFilterSemester(
               e.target.value === "ALL" ? "ALL" : Number(e.target.value)
             )
           }
         >
-          <option value="ALL">Všetky semestre</option>
-          {Array.from(new Set(localData.map(i => i.semester))).map(sem => (
-            <option key={sem} value={sem}>{sem}</option>
+          <option value="ALL">{t("internshipTable.filters.allSemesters")}</option>
+          {Array.from(new Set(localData.map((i) => i.semester))).map((sem) => (
+            <option key={sem} value={sem}>
+              {sem}
+            </option>
           ))}
         </select>
 
@@ -564,21 +601,24 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
             const params = new URLSearchParams();
 
             if (search) params.append("search", search);
-            if (filterCompany !== "ALL") params.append("companyId", String(filterCompany));
-            if (filterMentor !== "ALL") params.append("mentorId", String(filterMentor));
+            if (filterCompany !== "ALL")
+              params.append("companyId", String(filterCompany));
+            if (filterMentor !== "ALL")
+              params.append("mentorId", String(filterMentor));
             if (filterYear !== "ALL") params.append("academicYear", filterYear);
-            if (filterSemester !== "ALL") params.append("semester", String(filterSemester));
+            if (filterSemester !== "ALL")
+              params.append("semester", String(filterSemester));
 
             const url = `${baseUrl}/dashboard/internships/export?${params.toString()}`;
 
             const response = await fetch(url, {
               headers: {
-                Authorization: `Bearer ${token}`
-              }
+                Authorization: `Bearer ${token}`,
+              },
             });
 
             if (!response.ok) {
-              alert("Export sa nepodaril – nemáš oprávnenie alebo token expiroval.");
+              alert(t("internshipTable.export.failed"));
               return;
             }
 
@@ -593,23 +633,22 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
             a.remove();
           }}
         >
-          Export CSV
+          {t("internshipTable.export.csv")}
         </button>
-
       </div>
 
       {/* TABLE */}
       <table className="practice-table">
         <thead>
           <tr>
-            <th>Študent</th>
-            <th>Firma</th>
-            <th>Mentor</th>
-            <th>Začiatok</th>
-            <th>Koniec</th>
-            <th>Ak. rok</th>
-            <th>Semester</th>
-            <th>Stav</th>
+            <th>{t("internshipTable.table.student")}</th>
+            <th>{t("internshipTable.table.company")}</th>
+            <th>{t("internshipTable.table.mentor")}</th>
+            <th>{t("internshipTable.table.start")}</th>
+            <th>{t("internshipTable.table.end")}</th>
+            <th>{t("internshipTable.table.year")}</th>
+            <th>{t("internshipTable.table.semester")}</th>
+            <th>{t("internshipTable.table.status")}</th>
           </tr>
         </thead>
 
@@ -617,13 +656,16 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
           {filteredData.length === 0 ? (
             <tr>
               <td colSpan={8} style={{ textAlign: "center" }}>
-                Žiadne výsledky.
+                {t("internshipTable.table.noResults")}
               </td>
             </tr>
           ) : (
-            filteredData.map(p => (
+            filteredData.map((p) => (
               <React.Fragment key={p.id}>
-                <tr className="clickable-row" onClick={() => toggleExpand(p.id)}>
+                <tr
+                  className="clickable-row"
+                  onClick={() => toggleExpand(p.id)}
+                >
                   <td>{getStudentName(p.studentId)}</td>
                   <td>{getCompanyName(p.companyId)}</td>
                   <td>{getMentorName(p.mentorId)}</td>
@@ -638,45 +680,199 @@ const InternshipTable: React.FC<Props> = ({ internships: initialInternships, rol
                   <tr className="expanded-row">
                     <td colSpan={8}>
                       <div className="expanded-content">
-                        <p><strong>Študent:</strong> {getStudentName(p.studentId)}</p>
-                        <p><strong>Firma:</strong> {getCompanyName(p.companyId)}</p>
-                        <p><strong>Mentor:</strong> {getMentorName(p.mentorId)}</p>
-                        <p><strong>Akademický rok:</strong> {p.academicYear}</p>
-                        <p><strong>Semester:</strong> {p.semester}</p>
-                        <p><strong>Dátum začiatku:</strong> {p.dateStart}</p>
-                        <p><strong>Dátum konca:</strong> {p.dateEnd}</p>
+                        <p>
+                          <strong>{t("internshipTable.detail.student")}:</strong>{" "}
+                          {getStudentName(p.studentId)}
+                        </p>
+                        <p>
+                          <strong>{t("internshipTable.detail.company")}:</strong>{" "}
+                          {getCompanyName(p.companyId)}
+                        </p>
+                        <p>
+                          <strong>{t("internshipTable.detail.mentor")}:</strong>{" "}
+                          {getMentorName(p.mentorId)}
+                        </p>
+                        <p>
+                          <strong>{t("internshipTable.detail.year")}:</strong>{" "}
+                          {p.academicYear}
+                        </p>
+                        <p>
+                          <strong>{t("internshipTable.detail.semester")}:</strong>{" "}
+                          {p.semester}
+                        </p>
+                        <p>
+                          <strong>{t("internshipTable.detail.start")}:</strong>{" "}
+                          {p.dateStart}
+                        </p>
+                        <p>
+                          <strong>{t("internshipTable.detail.end")}:</strong>{" "}
+                          {p.dateEnd}
+                        </p>
 
-                        <p><strong>Popis praxe:</strong> {p.description || "—"}</p>
+                        <p>
+                          <strong>{t("internshipTable.detail.description")}:</strong>{" "}
+                          {p.description || t("internshipTable.detail.noDescription")}
+                        </p>
 
-                        <p><strong>Stav praxe:</strong> {p.status}</p>
+                        <p>
+                          <strong>{t("internshipTable.detail.status")}:</strong> {p.status}
+                        </p>
 
-                        {["STUDENT", "COMPANY", "ADMIN"].includes(role) && (
+                        {/* ================= STUDENT ================= */}
+                        {role === "STUDENT" && (
                           <div style={{ marginTop: 20 }}>
-                            {renderDocuments(p)}  
+                            {(() => {
+                              const docs = documents[p.id] || [];
+                              const contract = docs.find(
+                                (d) => d.documentType === "CONTRACT"
+                              );
+                              const timestatement = docs.find(
+                                (d) => d.documentType === "TIMESTATEMENT"
+                              );
+
+                              return (
+                                <>
+                                  {/* ====== CONTRACT – Zmluva o praxi ====== */}
+                                  <div style={{ marginBottom: 16 }}>
+                                    <strong>{t("internshipTable.documents.contract")}:</strong>
+                                    <br />
+                                    {contract ? (
+                                      <div className="document-item" style={{ marginTop: 8 }}>
+                                        <a
+                                          href={`${baseUrl}/documents/${contract.documentId}/download`}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                          className="doc-link"
+                                        >
+                                          {contract.fileName}
+                                        </a>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <span style={{ color: "#666" }}>
+                                          {t("internshipTable.documents.contractMissing")}
+                                        </span>
+                                        <br />
+                                        <input
+                                          type="file"
+                                          accept=".pdf,.doc,.docx"
+                                          onChange={(e) =>
+                                            handleUploadContract(p.id, e)
+                                          }
+                                          style={{ marginTop: 6 }}
+                                        />
+                                      </>
+                                    )}
+                                  </div>
+
+                                  {/* ====== TIMESTATEMENT – Výkaz ====== */}
+                                  <div>
+                                    <strong>
+                                      {t("internshipTable.documents.timestatement")}:
+                                    </strong>
+                                    <br />
+                                    {timestatement ? (
+                                      <div className="document-item" style={{ marginTop: 8 }}>
+                                        <a
+                                          href={`${baseUrl}/documents/${timestatement.documentId}/download`}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                          className="doc-link"
+                                        >
+                                          {timestatement.fileName}
+                                        </a>
+
+                                        <span
+                                          className={`state-badge ${timestatement.currentState?.toLowerCase()}`}
+                                        >
+                                          {timestatement.currentState === "APPROVED" &&
+                                            t("internshipTable.documents.approved")}
+                                          {timestatement.currentState === "DENIED" &&
+                                            t("internshipTable.documents.denied")}
+                                          {timestatement.currentState === "UPLOADED" &&
+                                            t("internshipTable.documents.waiting")}
+                                          {["UNKNOWN", null].includes(
+                                            timestatement.currentState
+                                          ) &&
+                                            t("internshipTable.documents.noState")}
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <input
+                                        type="file"
+                                        accept="application/pdf"
+                                        onChange={(e) => handleUpload(p.id, e)}
+                                        style={{ marginTop: 6 }}
+                                      />
+                                    )}
+                                  </div>
+                                </>
+                              );
+                            })()}
                           </div>
                         )}
 
-                        {role === "ADMIN" &&
-                          ["ACCEPTED", "APPROVED", "PASSED", "FAILED"]
-                            .includes(p.status.toUpperCase()) && (
+                        {/* ================= COMPANY + ADMIN (spoločné) ================= */}
+                        {["COMPANY", "ADMIN"].includes(role) && (
+                          <div style={{ marginTop: 20 }}>
+                            {renderDocuments(p)}
+                          </div>
+                        )}
+
+                        {/* ================= COMPANY ACTIONS ================= */}
+                        {role === "COMPANY" && p.status === "CREATED" && (
                           <div style={{ marginTop: 15 }}>
-                            <select
-                              value={adminState}
-                              onChange={e => setAdminState(e.target.value)}
-                            >
-                              <option value="APPROVED">Schválená</option>
-                              <option value="DENIED">Zamietnutá</option>
-                              <option value="PASSED">Úspešne absolvovaná</option>
-                              <option value="FAILED">Neúspešne absolvovaná</option>
-                            </select>
                             <button
-                              className="btn-ok"
-                              onClick={() => handleAdminStateChange(p.id)}
+                              className="btn-accept"
+                              onClick={() =>
+                                handleCompanyDecision(p.id, "ACCEPT")
+                              }
                             >
-                              OK
+                              {t("internshipTable.companyActions.accept")}
+                            </button>
+                            <button
+                              className="btn-reject"
+                              onClick={() =>
+                                handleCompanyDecision(p.id, "REJECT")
+                              }
+                            >
+                              {t("internshipTable.companyActions.reject")}
                             </button>
                           </div>
                         )}
+
+                        {/* ================= ADMIN ================= */}
+                        {role === "ADMIN" &&
+                          ["ACCEPTED", "APPROVED", "PASSED", "FAILED"].includes(
+                            p.status.toUpperCase()
+                          ) && (
+                            <div style={{ marginTop: 15 }}>
+                              <select
+                                value={adminState}
+                                onChange={(e) => setAdminState(e.target.value)}
+                              >
+                                <option value="APPROVED">
+                                  {t("internshipTable.admin.approved")}
+                                </option>
+                                <option value="DENIED">
+                                  {t("internshipTable.admin.denied")}
+                                </option>
+                                <option value="PASSED">
+                                  {t("internshipTable.admin.passed")}
+                                </option>
+                                <option value="FAILED">
+                                  {t("internshipTable.admin.failed")}
+                                </option>
+                              </select>
+                              <button
+                                className="btn-ok"
+                                onClick={() => handleAdminStateChange(p.id)}
+                              >
+                                {t("internshipTable.admin.ok")}
+                              </button>
+                            </div>
+                          )}
+
                       </div>
                     </td>
                   </tr>

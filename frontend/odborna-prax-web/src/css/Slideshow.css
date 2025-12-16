@@ -1,42 +1,154 @@
 .slideshow {
-  text-align: center;
-  padding: 2rem;
-  background-color: #f5f5f5;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0 1.5rem;
+  box-sizing: border-box;
 }
 
+/* zvyšok .slide-box, .slide-buttons, .slide-footer atď. nechaj tak ako teraz */
+
+
+/* Karta so slidom – pevná šírka pre všetky slidy */
 .slide-box {
-  background-color: #ddd;
-  padding: 2rem;
-  border-radius: 8px;
-  max-width: 600px;
-  margin: 0 auto;
+  width: 900px;          /* <<< všetky slidy majú rovnakú šírku */
+  max-width: 100%;       /* na menších obrazovkách sa len zmenší */
+  box-sizing: border-box;
+
+  background-color: #ffffff;
+  border-radius: 18px;
+  padding: 2.8rem 3rem;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.07);
+  border-top: 5px solid #32b467;
+
+  /* rovnaká výška pre všetky slidy */
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.6rem;
 }
 
+/* Nadpis */
+.slide-box h2 {
+  margin: 0;
+  font-size: 2.1rem;
+  color: #184f33;
+  font-weight: 700;
+}
+
+/* Text */
+.slide-box p {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #4f5b53;
+}
+
+/* CTA tlačidlá */
 .slide-buttons {
-  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .slide-btn {
-  margin: 0 0.5rem;
-  padding: 0.5rem 1rem;
-  background-color: #0077cc;
-  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.5rem;
+  border-radius: 999px;
   text-decoration: none;
-  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  background-color: #32b467;
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(50, 180, 103, 0.35);
+  transition: background-color 0.18s ease, transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
+.slide-btn:hover {
+  background-color: #278650;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(50, 180, 103, 0.4);
+}
+
+/* Druhé tlačidlo ako outline */
+.slide-btn-secondary {
+  background-color: #ffffff;
+  color: #278650;
+  border: 1px solid #32b467;
+  box-shadow: none;
+}
+
+.slide-btn-secondary:hover {
+  background-color: #e7f7ee;
+}
+
+/* Spodný riadok – navigácia + counter */
+.slide-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+/* Navigačné tlačidlá */
 .slide-nav {
-  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
 }
 
 .slide-nav button {
-  margin: 0 0.5rem;
-  padding: 0.5rem 1rem;
+  background-color: #ffffff;
+  color: #184f33;
+  border-radius: 999px;
+  border: 1px solid #cde6d7;
+  padding: 0.45rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease,
+    transform 0.18s ease;
 }
 
+.slide-nav button:hover {
+  background-color: #e7f7ee;
+  border-color: #32b467;
+  transform: translateY(-1px);
+}
+
+/* Counter */
 .slide-info {
-  margin-top: 1rem;
-  font-weight: bold;
-  text-align: center;
+  font-weight: 500;
+  color: #184f33;
+  font-size: 0.9rem;
+  white-space: nowrap;
 }
 
+/* Mobilné úpravy */
+@media (max-width: 768px) {
+  .slide-box {
+    width: 100%;
+    padding: 2rem 1.6rem;
+    border-radius: 14px;
+    min-height: 260px;
+  }
+
+  .slide-box h2 {
+    font-size: 1.6rem;
+  }
+
+  .slide-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .slide-info {
+    align-self: flex-end;
+  }
+}

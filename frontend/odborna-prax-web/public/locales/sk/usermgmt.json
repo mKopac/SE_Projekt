@@ -1,0 +1,47 @@
+{
+  "_SECTION_USERMGMT": "User management",
+
+  "title": "Správa používateľov",
+
+  "table": {
+    "id": "ID",
+    "user": "Používateľ",
+    "email": "Email",
+    "status": "Status",
+    "action": "Akcia"
+  },
+
+  "status": {
+    "active": "Aktívny",
+    "suspended": "Pozastavený"
+  },
+
+  "actions": {
+    "openCreateAdmin": "+ Vytvoriť admina",
+    "suspend": "Pozastaviť",
+    "reactivate": "Reaktivovať"
+  },
+
+  "create": {
+    "title": "Vytvoriť admin účet",
+    "fields": {
+      "firstName": "Meno",
+      "lastName": "Priezvisko",
+      "email": "Email",
+      "phoneNumber": "Telefónne číslo"
+    },
+    "actions": {
+      "create": "Vytvoriť",
+      "cancel": "Zrušiť"
+    }
+  },
+
+  "alerts": {
+    "createdOk": "Admin účet bol vytvorený. Overovací email bol odoslaný.",
+    "createFailed": "Chyba pri vytváraní admina."
+  },
+
+  "errors": {
+    "loadUsersConsole": "Chyba pri načítaní používateľov:"
+  }
+}

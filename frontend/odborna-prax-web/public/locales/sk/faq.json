@@ -1,0 +1,139 @@
+{
+  "title": "FAQ k odbornej praxi (AI)",
+  "intro": "Najčastejšie otázky k procesu praxe, zmluvám, obhajobe a posterovej prezentácii.",
+  "items": [
+    {
+      "question": "Ako si mám nájsť firmu na odbornú prax?",
+      "answer": {
+        "paragraphs": [
+          "Firma by mala mať náplň práce vhodnú pre rozvoj tvojich IT zručností. Prax by si si mal nájsť sám, občas ponúka prax aj univerzita."
+        ],
+        "bullets": [
+          "Prax musí byť overiteľná – garanti náhodne kontrolujú firmy a kontaktujú ich.",
+          "Dbaj na to, aby kontaktné údaje v zmluve (meno, email, telefón) boli správne."
+        ]
+      }
+    },
+    {
+      "question": "Môžem absolvovať prax v zahraničnej firme?",
+      "answer": {
+        "paragraphs": [
+          "Áno, ale prax musí byť overiteľná:"
+        ],
+        "bullets": [
+          "Firma musí mať funkčnú webovú stránku.",
+          "Je pravdepodobné, že ju pracovisko bude telefonicky kontaktovať – kontaktná osoba musí vedieť po slovensky alebo po anglicky.",
+          "Overovať sa môžu aj sociálne siete a podobné zdroje."
+        ]
+      }
+    },
+    {
+      "question": "Prečo musím podpísať dohodu o odbornej praxi?",
+      "answer": {
+        "paragraphs": [
+          "Dohoda o odbornej praxi preukazuje, že prax skutočne vykonávaš a chráni pracovisko pred vykonávaním čiernej práce.",
+          "Bez platnej dohody (alebo alternatívnej zmluvy) nie je možné prax uznať."
+        ]
+      }
+    },
+    {
+      "question": "Ako mám navštevovať prax a kedy si zapísať predmet Odborná prax?",
+      "answer": {
+        "bullets": [
+          "Prax navštevuješ v súlade s pokynmi pracoviska (pracovný čas, dochádzka, spôsob komunikácie atď.).",
+          "Predmet „Odborná prax“ si zapíš až v semestri, keď je predpoklad, že prax bude ukončená alebo máš dostatok hodín (min. 150).",
+          "Prax nesmie začať skôr, ako nastúpiš na daný stupeň štúdia."
+        ]
+      }
+    },
+    {
+      "question": "Ako prebieha obhajoba praxe?",
+      "answer": {
+        "paragraphs": [
+          "Obhajoba praxe prebieha formou posterovej prezentácie:"
+        ],
+        "bullets": [
+          "Na konci semestra vytvoríš poster, na ktorom predstavíš svoju prax a výsledky.",
+          "Prihlásiš sa na termín obhajoby cez aplikovanainformatika.sk.",
+          "Na termíne máš pripravený a rozložený poster, vysvetlíš, čo si robil a čo sa podarilo.",
+          "Po diskusii sa môžeš zbaliť – obhajoba je ukončená."
+        ]
+      }
+    },
+    {
+      "question": "Aké sú alternatívy k dohode o odbornej praxi (napr. pri brigáde alebo TPP)?",
+      "answer": {
+        "paragraphs": [
+          "Namiesto dohody o odbornej praxi môžeš použiť aj iné pracovné vzťahy, ak práca spadá do IT oblasti:"
+        ],
+        "bullets": [
+          "dohoda o brigádnickej činnosti minimálne na požadovaný počet hodín,",
+          "dohoda o vykonaní práce alebo dohoda o pracovnej činnosti na daný počet hodín,",
+          "pracovná zmluva.",
+          "Vtedy prikladáš dohodu alebo zmluvu medzi tebou a firmou (mzdu môžeš zneviditeľniť) a nie je potrebné podpisovať dohodu s univerzitou."
+        ]
+      }
+    },
+    {
+      "question": "Musím absolvovať obhajobu praxe aj pri alternatívnej forme (brigáda, TPP a pod.)?",
+      "answer": {
+        "paragraphs": [
+          "Áno. Alternatívne riešenia praxe nezbavujú študenta povinnosti obhajoby. Stále musíš pripraviť poster a prax obhájiť."
+        ]
+      }
+    },
+    {
+      "question": "Aké dôkazy o absolvovaní praxe musím mať?",
+      "answer": {
+        "paragraphs": [
+          "Dôkazy sú dôležité pri obhajobe aj pri prípadnom overovaní praxe:"
+        ],
+        "bullets": [
+          "Výkaz o vykonanej odbornej praxi + hodnotenie študenta od firmy.",
+          "Fotografie aktivít (hardvér, práca s ľuďmi, školenia) a screenshoty vytvorených aplikácií alebo softvéru.",
+          "Poster – vizuálna prezentácia praxe (výstupy, projekty, riešenia)."
+        ]
+      }
+    },
+    {
+      "question": "Aké materiály si mám priniesť na posterovú prezentáciu (obhajobu)?",
+      "answer": {
+        "bullets": [
+          "Výkaz o vykonanej odbornej praxi + hodnotenie študenta (potvrdené firmou).",
+          "Ak ide o platenú aktivitu: kópiu zmluvy (mzda môže byť zneviditeľnená).",
+          "Ak ide o aktivity v rámci vlastnej firmy, postupuje sa individuálne po dohode s hodnotiacim (napr. doloženie faktúr dodávateľov). Nie je možné robiť pre vlastnú firmu veci určené len na interné použitie."
+        ]
+      }
+    },
+    {
+      "question": "Ako má vyzerať poster k odbornej praxi?",
+      "answer": {
+        "bullets": [
+          "Plagát formátu A2 vytvorený napr. v Canve podobne ako postery záverečných prác, prípadne vhodná kombinácia A4 (musí byť dobre čitateľný aj z diaľky).",
+          "Musí obsahovať: meno študenta, názov firmy a činnosť, ktorú si robil najčastejšie.",
+          "Kombinácia fotografií aktivít, printscreenov aplikácií, ukážok hardvérového riešenia, mobilných aplikácií a podobne – všetko vizuálne podporené textom na posteri."
+        ]
+      }
+    },
+    {
+      "question": "Ako prebieha samotná obhajoba na termíne?",
+      "answer": {
+        "bullets": [
+          "Prihlásiš sa na termín cez aplikovanainformatika.sk.",
+          "Pripravíš si, čo chceš povedať – sústreď sa na to, čo sa podarilo, nie na to, čo sa nepodarilo.",
+          "V čase termínu máš poster už rozložený a si pripravený prezentovať.",
+          "Po prezentácii a diskusii sa môžeš zbaliť – obhajoba je ukončená."
+        ]
+      }
+    },
+    {
+      "question": "Čo sa deje po obhajobe praxe (post-processing)?",
+      "answer": {
+        "bullets": [
+          "Vybrané praxe budú ešte dodatočne overované.",
+          "Po skončení overovacieho procesu prebehne zápis hodnotenia do AIS."
+        ]
+      }
+    }
+  ]
+}

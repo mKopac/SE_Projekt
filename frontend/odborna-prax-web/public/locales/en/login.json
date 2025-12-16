@@ -1,0 +1,144 @@
+{
+"loginForm": {
+    "info": {
+      "registeredSuccess": "Registration was successful. A confirmation email has been sent.",
+      "verificationSuccess": "Your account has been activated. You can now log in.",
+      "verificationError": "The verification link is invalid or has expired.",
+      "close": "X"
+    },
+    "logoAria": "Logo button",
+    "logoPlaceholder": "Logo?",
+    "fields": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "email@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Password"
+    },
+    "forgotPassword": {
+      "link": "Forgot your password? Change it here.",
+      "enterEmailFirst": "Please enter your email first.",
+      "confirmSend": "Do you want to send a password reset link to: {{email}}?",
+      "sentOk": "A password reset link has been sent to your email.",
+      "sendFailed": "Failed to send the link.",
+      "serverUnavailable": "The server is currently unavailable."
+    },
+    "validation": {
+      "emailRequired": "Enter your email.",
+      "passwordRequired": "Enter your password."
+    },
+    "errors": {
+      "loginFailed": "Login failed.",
+      "serverUnavailable": "The server is currently unavailable."
+    },
+    "registerNote": {
+      "text": "Don’t have an account yet?",
+      "link": "Sign up."
+    },
+    "submit": "Log in"
+  },
+
+  "_RegisterForm": "RegisterForm",
+
+  "registerForm": {
+    "title": "Registration",
+
+    "accountType": {
+      "label": "Choose account type",
+      "student": "Student",
+      "company": "Company"
+    },
+
+    "studyProgram": {
+      "label": "Select study program",
+      "placeholder": "-- Select program --"
+    },
+
+    "personal": {
+      "firstName": "First name",
+      "lastName": "Last name"
+    },
+
+    "company": {
+      "firmType": "Company type",
+      "existing": "Existing company",
+      "new": "New company",
+      "selectCompany": "Select company",
+      "selectPlaceholder": "-- Select company --",
+      "name": "Company name",
+      "ico": "Company ID",
+      "street": "Street"
+    },
+
+    "contact": {
+      "email": "Email",
+      "altEmail": "Alternative email",
+      "phone": "Phone",
+      "address": "Address",
+      "city": "City",
+      "zip": "ZIP code"
+    },
+
+    "consent": {
+      "label": "I agree with the processing of personal data",
+      "requiredError": "You must agree with the processing of personal data."
+    },
+
+    "errors": {
+      "nameRequired": "Enter first and last name.",
+      "emailRequired": "Enter email.",
+      "registerFailed": "Registration failed. Please check your data or try again later."
+    },
+
+    "submit": {
+      "default": "Submit",
+      "loading": "Submitting..."
+    },
+
+    "back": "← Back to login"
+  },
+
+  "_SECTION_RESETPASSWORDFORM": "ResetPasswordForm",
+
+  "resetPasswordForm": {
+    "title": "Reset password",
+    "backToLogin": "Back to login",
+
+    "loading": {
+      "verifyingLink": "Verifying the reset link..."
+    },
+
+    "invalid": {
+      "title": "Password reset is not available"
+    },
+
+    "fields": {
+      "newPassword": {
+        "label": "New password",
+        "placeholder": "Enter a new password"
+      },
+      "confirmPassword": {
+        "label": "Confirm password",
+        "placeholder": "Repeat the password"
+      }
+    },
+
+    "actions": {
+      "saving": "Saving...",
+      "submit": "Reset password"
+    },
+
+    "confirm": {
+      "success": "Your password has been changed successfully."
+    },
+
+    "errors": {
+      "invalidLink": "The password reset link is invalid.",
+      "invalidOrExpired": "The password reset link is invalid or expired.",
+      "verifyError": "Error while verifying the link.",
+      "fillAllFields": "Please fill in all fields.",
+      "passwordMismatch": "Passwords do not match.",
+      "resetFailed": "Password reset failed.",
+      "serverUnavailable": "The server is currently unavailable."
+    }
+  }
+}

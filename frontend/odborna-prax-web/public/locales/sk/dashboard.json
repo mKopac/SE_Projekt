@@ -142,5 +142,50 @@
       "templateDownloadFailed": "Zlyhalo sťahovanie šablóny zmluvy",
       "templateDownloadError": "Chyba pri sťahovaní šablóny:"
     }
+  },
+  
+  "contract": {
+    "title": "Zmluva o praxi",
+    "missing": "Zmluva zatiaľ nebola nahraná.",
+    "uploaded": "Zmluva bola nahraná.",
+    "uploadError": "Chyba pri nahrávaní zmluvy.",
+    "status": {
+      "missing": "Zmluva zatiaľ nebola nahraná.",
+      "waitingCompany": "Čaká na schválenie firmy.",
+      "approved": "Zmluva schválená",
+      "denied": "Zmluva zamietnutá"
+    }
+  },
+
+  "timestatement": {
+    "title": "Výkaz o činnosti",
+    "approve": "Schváliť výkaz",
+    "deny": "Zamietnuť výkaz",
+    "missing": "Výkaz zatiaľ nebol nahraný.",
+    "uploadAfterContract": "Výkaz môžeš nahrať až po schválení zmluvy.",
+    "status": {
+      "missing": "Výkaz zatiaľ nebol nahraný.",
+      "waitingCompany": "Čaká na schválenie firmy",
+      "approved": "Výkaz schválený",
+      "denied": "Výkaz zamietnutý",
+      "unknown": "Neznámy stav výkazu"
+    }
+  },
+
+  "documents": {
+    "downloadError": "Chyba pri sťahovaní dokumentu.",
+    "serverError": "Chyba pri komunikácii so serverom.",
+    "stateChangeError": "Chyba pri zmene stavu dokumentu.",
+    "stateChanged": "Stav dokumentu bol úspešne zmenený."
+  },
+
+  "status": {
+    "CREATED": "Vytvorená",
+    "ACCEPTED": "Schválená firmou",
+    "REJECTED": "Zamietnutá firmou",
+    "APPROVED": "Schválená",
+    "DENIED": "Zamietnutá",
+    "PASSED": "Splnená",
+    "FAILED": "Nesplnená"
   }
 }

@@ -162,7 +162,7 @@ const InternshipTable: React.FC<Props> = ({
       });
 
       if (!res.ok) {
-        alert("Chyba pri sťahovaní dokumentu.");
+        alert(t("internshipTable.documents.downloadError"));
         return;
       }
 
@@ -179,7 +179,7 @@ const InternshipTable: React.FC<Props> = ({
       window.URL.revokeObjectURL(url);
     } catch (e) {
       console.error(e);
-      alert("Chyba pri komunikácii so serverom.");
+      alert(t("internshipTable.documents.serverError"));
     }
   };
 
@@ -311,10 +311,10 @@ const InternshipTable: React.FC<Props> = ({
     );
 
     if (res.ok) {
-      alert("Zmluva bola nahraná.");
+      alert(t("internshipTable.contract.uploaded"));
       loadDocuments(internshipId);
     } else {
-      alert("Chyba pri nahrávaní zmluvy.");
+      alert(t("internshipTable.contract.uploadError"));
     }
   };
 
@@ -337,7 +337,7 @@ const InternshipTable: React.FC<Props> = ({
       const data = await res.json().catch(() => null);
 
       if (!res.ok) {
-        alert(data?.error ?? "Chyba pri zmene stavu dokumentu.");
+        alert(data?.error ?? t("internshipTable.documents.stateChangeError"));
         return;
       }
 
@@ -354,10 +354,10 @@ const InternshipTable: React.FC<Props> = ({
         };
       });
 
-      alert("Stav dokumentu bol úspešne zmenený.");
+      alert(t("internshipTable.documents.stateChanged"));
     } catch (e) {
       console.error(e);
-      alert("Chyba pri komunikácii so serverom.");
+      alert(t("internshipTable.documents.serverError"));
     }
   };
 
@@ -373,22 +373,23 @@ const InternshipTable: React.FC<Props> = ({
 
 
     const getContractStatus = () => {
-      if (!contract) return "Zmluva zatiaľ nebola nahraná.";
-      if (internship.status === "CREATED") return "Čaká na schválenie firmy.";
-      if (internship.status === "ACCEPTED") return "Zmluva schválená";
-      if (internship.status === "REJECTED") return "Zmluva zamietnutá";
+      if (!contract) return t("internshipTable.contract.status.missing");
 
-      return "Zmluva schválená";
+      if (internship.status === "CREATED") return t("internshipTable.contract.status.waitingCompany");
+      if (internship.status === "ACCEPTED") return t("internshipTable.contract.status.approved");
+      if (internship.status === "REJECTED") return t("internshipTable.contract.status.denied");
+      
+      return t("internshipTable.contract.status.approved");
     };
 
     const getTimestatementStatus = () => {
-      if (!timestatement) return "Výkaz zatiaľ nebol nahraný.";
-
-      if (timestatement.currentState === "UPLOADED") return "Čaká na schválenie firmy";
-      if (timestatement.currentState === "APPROVED") return "Výkaz schválený";
-      if (timestatement.currentState === "DENIED") return "Výkaz zamietnutý";
-
-      return "Neznámy stav výkazu";
+      if (!timestatement) return t("internshipTable.timestatement.status.missing");
+      
+      if (timestatement.currentState === "UPLOADED") return t("internshipTable.timestatement.status.waitingCompany");
+      if (timestatement.currentState === "APPROVED") return t("internshipTable.timestatement.status.approved");
+      if (timestatement.currentState === "DENIED") return t("internshipTable.timestatement.status.denied");
+      
+      return t("internshipTable.timestatement.status.unknown");
     };
 
     return (
@@ -396,7 +397,7 @@ const InternshipTable: React.FC<Props> = ({
 
 
         <div style={{ marginBottom: 15 }}>
-          <strong>Zmluva o praxi:</strong><br />
+          <strong>{t("internshipTable.contract.title")}:</strong><br />
 
           {contract ? (
             <div className="document-item" style={{ marginTop: 8 }}>
@@ -426,7 +427,7 @@ const InternshipTable: React.FC<Props> = ({
             <>
               {isStudent ? (
                 <>
-                  <span style={{ color: "#666" }}>Zmluva zatiaľ nebola nahraná.</span><br />
+                  <span style={{ color: "#666" }}>{t("internshipTable.contract.missing")}</span><br />
                   <input
                     type="file"
                     accept=".pdf,.doc,.docx"
@@ -435,7 +436,7 @@ const InternshipTable: React.FC<Props> = ({
                   />
                 </>
               ) : (
-                <span style={{ color: "#666" }}>Zmluva zatiaľ nebola nahraná.</span>
+                <span style={{ color: "#666" }}>{t("internshipTable.contract.missing")}</span>
               )}
             </>
           )}
@@ -443,7 +444,7 @@ const InternshipTable: React.FC<Props> = ({
 
 
         <div>
-          <strong>Výkaz o činnosti:</strong><br />
+          <strong>{t("internshipTable.timestatement.title")}:</strong><br />
 
           {timestatement ? (
             <div className="document-item" style={{ marginTop: 8 }}>
@@ -472,7 +473,7 @@ const InternshipTable: React.FC<Props> = ({
                         )
                       }
                     >
-                      Schváliť výkaz
+                      {t("internshipTable.timestatement.approve")}
                     </button>
 
                     <button
@@ -485,7 +486,7 @@ const InternshipTable: React.FC<Props> = ({
                         )
                       }
                     >
-                      Zamietnuť výkaz
+                      {t("internshipTable.timestatement.deny")}
                     </button>
                   </div>
                 )}

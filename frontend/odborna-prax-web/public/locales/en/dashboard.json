@@ -142,5 +142,50 @@
       "templateDownloadFailed": "Downloading the contract template failed",
       "templateDownloadError": "Error while downloading the template:"
     }
+  },
+
+  "contract": {
+    "title": "Internship contract",
+    "missing": "The contract has not been uploaded yet.",
+    "uploaded": "The contract was uploaded.",
+    "uploadError": "Error uploading the contract.",
+    "status": {
+      "missing": "The contract has not been uploaded yet.",
+      "waitingCompany": "Waiting for company approval.",
+      "approved": "Contract approved",
+      "denied": "Contract denied"
+    }
+  },
+
+  "timestatement": {
+    "title": "Timesheet",
+    "approve": "Approve timesheet",
+    "deny": "Deny timesheet",
+    "missing": "The timesheet has not been uploaded yet.",
+    "uploadAfterContract": "You can upload the timesheet only after the contract is approved.",
+    "status": {
+      "missing": "The timesheet has not been uploaded yet.",
+      "waitingCompany": "Waiting for company approval",
+      "approved": "Timesheet approved",
+      "denied": "Timesheet denied",
+      "unknown": "Unknown timesheet status"
+    }
+  },
+
+  "documents": {
+    "downloadError": "Error downloading the document.",
+    "serverError": "Server communication error.",
+    "stateChangeError": "Error changing the document state.",
+    "stateChanged": "Document state was successfully changed."
+  },
+
+  "status": {
+    "CREATED": "Created",
+    "ACCEPTED": "Accepted by company",
+    "REJECTED": "Rejected by company",
+    "APPROVED": "Approved",
+    "DENIED": "Denied",
+    "PASSED": "Passed",
+    "FAILED": "Failed"
   }
 }

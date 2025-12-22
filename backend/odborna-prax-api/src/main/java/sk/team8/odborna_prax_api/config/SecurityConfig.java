@@ -39,7 +39,6 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
 
-                        // ===== YOUR ORIGINAL PUBLIC ENDPOINTS =====
                         .requestMatchers(HttpMethod.POST,
                                 "/auth/register/admin","/auth/register/company",
                                 "/auth/register/student",
@@ -55,7 +54,6 @@ public class SecurityConfig {
                                 "/auth/companies"
                         ).permitAll()
 
-                        // ===== PROTECTED ENDPOINTS =====
                         .requestMatchers("/auth/me").authenticated()
 
                         .requestMatchers("/dashboard/**").authenticated()
@@ -63,7 +61,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                         .requestMatchers("/actuator/health", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
 
-                        // EVERYTHING ELSE
                         .anyRequest().authenticated()
                 )
 
@@ -77,12 +74,11 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // CORS configuration to allow React frontend
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // React frontend
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

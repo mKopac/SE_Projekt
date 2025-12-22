@@ -50,15 +50,13 @@ public class Internship {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    // Relationships
     @OneToMany(mappedBy = "internship")
-    @JsonManagedReference("internship-internshipState") // zachováva referenciu
+    @JsonManagedReference("internship-internshipState")
     private List<InternshipStateChange> internshipStateChanges;
 
     @OneToMany(mappedBy = "internship")
     private List<Documents> documents;
 
-    // Constructors
     public Internship() {
     }
 
@@ -72,7 +70,6 @@ public class Internship {
         this.description = description;
     }
 
-    // Getters & Setters
     public int getId() {
         return id;
     }

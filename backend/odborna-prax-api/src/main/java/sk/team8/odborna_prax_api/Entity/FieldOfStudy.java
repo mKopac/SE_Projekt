@@ -17,12 +17,10 @@ public class FieldOfStudy {
     @Column(name = "field_of_study_name", nullable = false, length = 45)
     private String name;
 
-    // Relationships
     @OneToMany(mappedBy = "fieldOfStudy")
     @JsonBackReference("fieldofstudy-user")
     private List<User> users;
 
-    // Constructors
     public FieldOfStudy() {}
 
     public FieldOfStudy(String name) {
@@ -34,7 +32,6 @@ public class FieldOfStudy {
         this.name = name;
     }
 
-    // Getters & Setters
     public int getId() {
         return id;
     }

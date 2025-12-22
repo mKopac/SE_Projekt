@@ -57,9 +57,7 @@ public class DashboardController {
         this.timestatementStateRepository = timestatementStateRepository;
     }
 
-    // ============================================================
-    // Helpers
-    // ============================================================
+
 
     private boolean isValidToken(String authHeader) {
         return authHeader != null && authHeader.startsWith("Bearer ")
@@ -89,9 +87,7 @@ public class DashboardController {
         return ResponseEntity.badRequest().body(Map.of("error", msg));
     }
 
-    // ============================================================
-    // DTO pre FE
-    // ============================================================
+
 
     public static class InternshipDTO {
         public int id;
@@ -103,7 +99,7 @@ public class DashboardController {
         public String dateStart;
         public String dateEnd;
         public String status;
-        public String description;   // ← pridáme
+        public String description;
 
         public InternshipDTO(Internship i, String status) {
             this.id = i.getId();
@@ -115,7 +111,7 @@ public class DashboardController {
             this.dateStart = i.getDateStart() != null ? i.getDateStart().toString() : null;
             this.dateEnd = i.getDateEnd() != null ? i.getDateEnd().toString() : null;
             this.status = status;
-            this.description = i.getDescription(); // ← pridáme
+            this.description = i.getDescription();
         }
     }
 
@@ -402,7 +398,7 @@ public class DashboardController {
     public ResponseEntity<?> adminChangeState(
             @RequestHeader("Authorization") String authHeader,
             @PathVariable int id,
-            @RequestParam("state") String state   // APPROVED, DENIED, PASSED, FAILED
+            @RequestParam("state") String state
     ) {
         if (!isValidToken(authHeader)) return unauthorized();
 
@@ -424,12 +420,12 @@ public class DashboardController {
 
         String lastName = lastOpt.get().getInternshipState().getName().toUpperCase(Locale.ROOT);
 
-        // REJECTED sa nikdy meniť nesmie
+
         if ("REJECTED".equals(lastName)) {
             return badRequest("Rejected internship state cannot be changed");
         }
 
-        // admin môže meniť stav po potvrdení firmou
+
         Set<String> allowedCurrent = Set.of("ACCEPTED", "APPROVED", "DENIED", "PASSED", "FAILED");
         if (!allowedCurrent.contains(lastName)) {
             return badRequest("Admin can change state only after company ACCEPTED");
@@ -452,9 +448,7 @@ public class DashboardController {
         ));
     }
 
-    // ============================================================
-    // Helper na zápis zmeny stavu
-    // ============================================================
+
 
     private InternshipStateChange addStateChange(
             Internship internship,

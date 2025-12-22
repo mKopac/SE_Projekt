@@ -30,11 +30,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     """, nativeQuery = true)
     int deleteInactiveOlderThan24h();
 
-    // Needed for DashboardController
+
     @Query("SELECT u FROM User u WHERE UPPER(u.role.name) = UPPER(:roleName)")
     List<User> findByRoleName(String roleName);
 
-    // Optional strict version
+
     @Query("SELECT u FROM User u WHERE u.role.name = :roleName")
     List<User> findByRoleExact(String roleName);
 

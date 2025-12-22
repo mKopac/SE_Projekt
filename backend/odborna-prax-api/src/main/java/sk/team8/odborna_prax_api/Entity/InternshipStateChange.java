@@ -21,18 +21,18 @@ public class InternshipStateChange {
 
     @ManyToOne
     @JoinColumn(name = "internship_state_id", nullable = false)
-    @JsonIgnoreProperties("stateChanges") // zabráni cyklu
+    @JsonIgnoreProperties("stateChanges")
     private InternshipState internshipState;
 
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;  // The user who made the change (could be admin, company, etc.)
+    private User user;
 
     @Column(name = "state_changed_at", nullable = false)
     private Timestamp stateChangedAt;
 
-    // Constructors
+
     public InternshipStateChange() {}
 
     public InternshipStateChange(Internship internship, InternshipState internshipState, User user, Timestamp stateChangedAt) {
@@ -42,7 +42,7 @@ public class InternshipStateChange {
         this.stateChangedAt = stateChangedAt;
     }
 
-    // Getters & Setters
+
     public int getId() {
         return id;
     }

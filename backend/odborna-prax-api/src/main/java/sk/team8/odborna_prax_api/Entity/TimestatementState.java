@@ -15,11 +15,9 @@ public class TimestatementState {
     @Column(name = "timestatement_state_name", nullable = false, length = 25)
     private String name;
 
-    // Relationships
     @OneToMany(mappedBy = "timestatementState")
     private List<TimestatementStateChange> stateChanges;
 
-    // Constructors
     public TimestatementState() {}
 
     public TimestatementState(String name) {
@@ -31,7 +29,6 @@ public class TimestatementState {
         this.name = name;
     }
 
-    // Getters & Setters
     public int getId() {
         return id;
     }

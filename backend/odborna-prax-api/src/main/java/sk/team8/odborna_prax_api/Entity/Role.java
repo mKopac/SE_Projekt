@@ -16,12 +16,10 @@ public class Role {
     @Column(name = "role_name", nullable = false, length = 25)
     private String name;
 
-    // Relationships
     @JsonIgnore
     @OneToMany(mappedBy = "role")
     private List<User> users;
 
-    // Constructors
     public Role() {}
 
     public Role(String name) {
@@ -33,7 +31,7 @@ public class Role {
         this.name = name;
     }
 
-    // Getters & Setters
+
     public int getId() {
         return id;
     }

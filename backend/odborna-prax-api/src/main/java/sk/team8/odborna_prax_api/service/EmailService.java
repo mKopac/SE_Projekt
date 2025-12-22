@@ -12,7 +12,7 @@ public class EmailService {
 
     public void sendEmail(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("tvoj.email@gmail.com"); // môžeš aj priamo zadať odosielateľa
+        message.setFrom("tvoj.email@gmail.com");
         message.setTo(to);
         message.setSubject(subject);
         message.setText(text);

@@ -22,7 +22,7 @@ public class Address {
     @Column(name = "zip", length = 5, nullable = false)
     private String zip;
 
-    // Relationships
+
     @OneToMany(mappedBy = "address")
     @JsonBackReference("user-address")
     private List<User> users;
@@ -39,7 +39,6 @@ public class Address {
         this.zip = zip;
     }
 
-    // Getters & Setters
     public int getId() { return id; }
 
     public void setId(int id) { this.id = id; }

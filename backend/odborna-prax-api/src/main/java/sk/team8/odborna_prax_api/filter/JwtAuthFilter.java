@@ -37,6 +37,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+
+        if (path.startsWith("/external/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String auth = request.getHeader("Authorization");
 
         if (auth != null && auth.startsWith("Bearer ")) {

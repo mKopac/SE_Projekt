@@ -99,32 +99,38 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="dashboard">
-      <h2>{t("dashboard.title")}</h2>
+  <div className="dashboard-header">
+    <h2 className="dashboard-title">{t("dashboard.title")}</h2>
 
-      {role === "STUDENT" && (
+    {role === "STUDENT" && (
+      <div className="add-button-row">
         <button className="add-button" onClick={() => setShowModal(true)}>
           {t("dashboard.actions.addInternship")}
         </button>
-      )}
+      </div>
+    )}
 
-      {/* === MODAL === */}
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <button
-              className="close-button"
-              onClick={() => setShowModal(false)}
-            >
-              {t("dashboard.actions.close")}
-            </button>
+  </div>
 
-            <InternshipForm onAdd={handleAddInternship} />
-          </div>
-        </div>
-      )}
+  {/* === MODAL === */}
+  {showModal && (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <button
+          className="close-button"
+          onClick={() => setShowModal(false)}
+        >
+          {t("dashboard.actions.close")}
+        </button>
 
-      <InternshipTable internships={internships} role={role} />
+        <InternshipForm onAdd={handleAddInternship} />
+      </div>
     </div>
+  )}
+
+  <InternshipTable internships={internships} role={role} />
+</div>
+
   );
 };
 

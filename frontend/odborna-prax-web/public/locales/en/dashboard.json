@@ -67,10 +67,10 @@
       "timestatement": "Activity report",
       "uploaded": "Report uploaded.",
       "uploadError": "Upload failed.",
-      "approved": "✔️ Approved",
-      "denied": "❌ Denied",
-      "waiting": "⏳ Waiting for approval",
-      "noState": "🟦 No state"
+      "approved": "Approved",
+      "denied": "Denied",
+      "waiting": "Waiting for approval",
+      "noState": "No state"
     },
 
     "companyActions": {

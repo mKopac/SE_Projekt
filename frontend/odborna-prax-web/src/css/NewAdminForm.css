@@ -1,0 +1,107 @@
+.new-admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+}
+
+.new-admin-modal-content {
+  width: min(520px, 100%);
+}
+
+.new-admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  min-width: 340px;
+  animation: fadeIn 0.3s ease-in-out;
+  box-sizing: border-box;
+}
+
+.new-admin-form h3 {
+  margin-top: 0;
+  color: #1a1a1a;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.new-admin-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.new-admin-form-group label {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.new-admin-form input {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.new-admin-form input:focus {
+  border-color: #184f33;
+  box-shadow: 0 0 3px rgba(0, 123, 255, 0.4);
+  outline: none;
+}
+
+.new-admin-form-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.new-admin-btn-save {
+  background-color: #184f33;
+  color: #fff;
+  padding: 12px 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.new-admin-btn-save:hover {
+  background-color: #184f33;
+}
+
+.new-admin-btn-cancel {
+  background: transparent;
+  color: #184f33;
+  padding: 12px 14px;
+  font-weight: 600;
+  border: 1px solid #184f33;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.new-admin-btn-cancel:hover {
+  background: rgba(24, 79, 51, 0.08);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

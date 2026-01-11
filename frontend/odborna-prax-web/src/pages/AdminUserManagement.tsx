@@ -4,6 +4,7 @@ import "../css/Dashboard.css";
 import "../css/AdminManagement.css"
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import NewAdminForm from "../forms/NewAdminForm";
 import { useTranslation } from "react-i18next";
 
 interface User {
@@ -131,97 +132,19 @@ export default function AdminUserManagement() {
         </div>
 
         {showCreateForm && (
-          <div className="create-admin-container">
-            <h3>{t("create.title")}</h3>
-
-            <form
-              className="create-admin-form"
-              onSubmit={async (e) => {
-                e.preventDefault();
-
-                const res = await fetch(
-                  "http://localhost:8080/auth/register/admin",
-                  {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                      firstName,
-                      lastName,
-                      email,
-                      phoneNumber,
-                    }),
-                  }
-                );
-
-                if (res.ok) {
-                  alert(t("alerts.createdOk"));
-                  setShowCreateForm(false);
-                  fetchUsers();
-                } else {
-                  let errorMessage = t("alerts.createFailed");
-
-                  try {
-                    const err = await res.json();
-                    errorMessage = err.message || err.error || errorMessage;
-                  } catch (_) {}
-
-                  alert(errorMessage);
-                }
-              }}
-            >
-              <label>
-                {t("create.fields.firstName")}
-                <input
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  required
-                />
-              </label>
-
-              <label>
-                {t("create.fields.lastName")}
-                <input
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  required
-                />
-              </label>
-
-              <label>
-                {t("create.fields.email")}
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </label>
-
-              <label>
-                {t("create.fields.phoneNumber")}
-                <input
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                />
-              </label>
-
-              <div className="form-buttons">
-                <button type="submit" className="btn create">
-                  {t("create.actions.create")}
-                </button>
-                <button
-                  type="button"
-                  className="btn cancel"
-                  onClick={() => setShowCreateForm(false)}
-                >
-                  {t("create.actions.cancel")}
-                </button>
-              </div>
-            </form>
-          </div>
+          <NewAdminForm
+            token={token}
+            firstName={firstName}
+            setFirstName={setFirstName}
+            lastName={lastName}
+            setLastName={setLastName}
+            email={email}
+            setEmail={setEmail}
+            phoneNumber={phoneNumber}
+            setPhoneNumber={setPhoneNumber}
+            onClose={() => setShowCreateForm(false)}
+            onCreated={fetchUsers}
+          />
         )}
       </main>
 

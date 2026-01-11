@@ -2,6 +2,26 @@
   padding: 30px;
 }
 
+.dashboard-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.dashboard-title {
+  text-align: center;
+  margin: 10px 0 0 0;
+}
+
+.add-button-row {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 12px;
+}
+
 .add-button {
   background-color: #184f33;
   color: white;
@@ -17,10 +37,11 @@
 
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,18 +66,12 @@
 }
 
 .dashboard-container {
-  max-width: 1400px;   
+  max-width: 1400px;
   margin: 0 auto;
   width: 100%;
   padding: 20px 40px;
 }
 
-.dashboard h2 {
-  margin-top: 10px;
-  margin-bottom: 20px;
-}
-
 .dashboard table {
-  width: 100%;        
+  width: 100%;
 }
-

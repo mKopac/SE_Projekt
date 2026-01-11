@@ -153,7 +153,7 @@ public class CompanyRegistrationService {
         );
 
         String verificationLink =
-                "http://localhost:8080/auth/verify-email?token=" + token.getToken();
+                "https://localhost:8443/auth/verify-email?token=" + token.getToken();
 
         String subject = "Aktivácia účtu firmy – Odborná prax";
         String body = "Dobrý deň " + u.getFirstName() + " " + u.getLastName() + ",\n\n" +

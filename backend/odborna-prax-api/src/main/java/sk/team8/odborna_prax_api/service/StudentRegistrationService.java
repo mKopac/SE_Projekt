@@ -67,7 +67,7 @@ public class StudentRegistrationService {
         userRepository.save(u);
 
         AuthToken token = authTokenService.createToken(u, TokenType.EMAIL_VERIFICATION, 24);
-        String verificationLink = "http://localhost:8080/auth/verify-email?token=" + token.getToken();
+        String verificationLink = "https://localhost:8443/auth/verify-email?token=" + token.getToken();
 
         String subject = "Aktivácia účtu – Odborná prax";
         String body = "Dobrý deň " + u.getFirstName() + ",\n\n" +

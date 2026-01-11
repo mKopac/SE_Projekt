@@ -65,7 +65,7 @@ public class AdminRegistrationService {
 
         var token = authTokenService.createToken(u, TokenType.EMAIL_VERIFICATION, 1);
 
-        String verifyLink = "http://localhost:8080/auth/verify-email?token=" + token.getToken();
+        String verifyLink = "https://localhost:8443/auth/verify-email?token=" + token.getToken();
 
         String body =
                 "Dobrý deň,\n\n" +

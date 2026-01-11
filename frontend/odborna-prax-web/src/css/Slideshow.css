@@ -6,22 +6,18 @@
   box-sizing: border-box;
 }
 
-/* zvyšok .slide-box, .slide-buttons, .slide-footer atď. nechaj tak ako teraz */
-
-
 /* Karta so slidom – pevná šírka pre všetky slidy */
 .slide-box {
-  width: 900px;          /* <<< všetky slidy majú rovnakú šírku */
-  max-width: 100%;       /* na menších obrazovkách sa len zmenší */
+  width: 900px; 
+  max-width: 100%;   
   box-sizing: border-box;
 
   background-color: #ffffff;
   border-radius: 18px;
   padding: 2.8rem 3rem;
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.07);
-  border-top: 5px solid #32b467;
+  border-top: 5px solid #184f33;
 
-  /* rovnaká výška pre všetky slidy */
   min-height: 320px;
   display: flex;
   flex-direction: column;
@@ -62,7 +58,7 @@
   font-weight: 600;
   font-size: 0.95rem;
   border: none;
-  background-color: #32b467;
+  background-color: #184f33;
   color: #ffffff;
   box-shadow: 0 3px 10px rgba(50, 180, 103, 0.35);
   transition: background-color 0.18s ease, transform 0.18s ease,
@@ -118,7 +114,7 @@
 
 .slide-nav button:hover {
   background-color: #e7f7ee;
-  border-color: #32b467;
+  border-color: #184f33;
   transform: translateY(-1px);
 }
 

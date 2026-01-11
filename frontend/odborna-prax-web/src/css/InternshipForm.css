@@ -41,7 +41,7 @@
 .practice-form input:focus,
 .practice-form select:focus,
 .practice-form textarea:focus {
-  border-color: #007bff;
+  border-color: #184f33;
   box-shadow: 0 0 3px rgba(0, 123, 255, 0.4);
   outline: none;
 }
@@ -57,7 +57,7 @@ textarea {
 }
 
 .btn-save {
-  background-color: #007bff;
+  background-color: #184f33;
   color: #fff;
   padding: 12px;
   font-weight: 600;
@@ -68,7 +68,7 @@ textarea {
 }
 
 .btn-save:hover {
-  background-color: #005fcc;
+  background-color: #184f33;
 }
 
 @keyframes fadeIn {

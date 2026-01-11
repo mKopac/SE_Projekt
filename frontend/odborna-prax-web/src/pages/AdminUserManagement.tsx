@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "../css/Dashboard.css";
+import "../css/AdminManagement.css"
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useTranslation } from "react-i18next";
@@ -59,7 +60,7 @@ export default function AdminUserManagement() {
   }, []);
 
   return (
-    <div>
+    <div className="page-layout">
       <Header />
 
       <main className="main-content">
@@ -75,8 +76,8 @@ export default function AdminUserManagement() {
             </button>
           </div>
 
-          <div className="table-wrapper">
-            <table className="styled-table">
+          <div className="table-card">
+            <table className="dashboard-table">
               <thead>
                 <tr>
                   <th>{t("table.id")}</th>

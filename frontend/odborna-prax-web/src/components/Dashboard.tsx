@@ -40,14 +40,14 @@ const Dashboard: React.FC = () => {
     const headers = { Authorization: `Bearer ${token}` };
 
     // === Load role ===
-    fetch("http://localhost:8080/auth/me", { headers })
+    fetch("https://localhost:8443/auth/me", { headers })
       .then(res => (res.ok ? res.json() : null))
       .then(user => {
         if (user) setRole(user.role?.name || "");
       });
 
     // === Load internships + state ===
-    fetch("http://localhost:8080/dashboard/internships", { headers })
+    fetch("https://localhost:8443/dashboard/internships", { headers })
       .then(async res => {
         if (!res.ok) {
           const text = await res.text();

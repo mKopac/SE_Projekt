@@ -33,7 +33,7 @@ interface Props {
   onAdd: (internship: any) => void;
 }
 
-const baseUrl = "http://localhost:8080";
+const baseUrl = "https://localhost:8443";
 
 const InternshipForm: React.FC<Props> = ({ onAdd }) => {
   const { t } = useTranslation("dashboard");

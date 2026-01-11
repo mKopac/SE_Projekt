@@ -27,7 +27,7 @@ export const ResetPasswordForm = () => {
       return;
     }
 
-    fetch(`http://localhost:8080/auth/verify-reset-token?token=${token}`)
+    fetch(`https://localhost:8443/auth/verify-reset-token?token=${token}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.valid) setValid(true);
@@ -53,7 +53,7 @@ export const ResetPasswordForm = () => {
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:8080/auth/reset-password", {
+      const response = await fetch("https://localhost:8443/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, newPassword: password }),

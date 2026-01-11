@@ -35,7 +35,7 @@ interface Props {
   role: string;
 }
 
-const baseUrl = "http://localhost:8080";
+const baseUrl = "https://localhost:8443";
 
 const InternshipTable: React.FC<Props> = ({
   internships: initialInternships,

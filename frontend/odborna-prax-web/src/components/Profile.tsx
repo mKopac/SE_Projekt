@@ -47,7 +47,7 @@ const Profile: React.FC = () => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:8080/account/me", {
+        const res = await fetch("https://localhost:8443/account/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error(t("errors.profileLoad"));
@@ -65,7 +65,7 @@ const Profile: React.FC = () => {
     const fetchStudyPrograms = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:8080/account/study-programs", {
+        const res = await fetch("https://localhost:8443/account/study-programs", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error(t("errors.studyProgramsLoad"));
@@ -83,7 +83,7 @@ const Profile: React.FC = () => {
     const fetchDepartments = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:8080/account/departments", {
+        const res = await fetch("https://localhost:8443/account/departments", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error(t("errors.departmentsLoad"));
@@ -110,7 +110,7 @@ const Profile: React.FC = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8080/account/update", {
+      const res = await fetch("https://localhost:8443/account/update", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -138,7 +138,7 @@ const Profile: React.FC = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8080/auth/change-password", {
+      const res = await fetch("https://localhost:8443/auth/change-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

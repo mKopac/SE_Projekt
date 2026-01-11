@@ -88,7 +88,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
   useEffect(() => {
     const fetchStudyPrograms = async () => {
       try {
-        const res = await fetch("http://localhost:8080/auth/study-programs");
+        const res = await fetch("https://localhost:8443/auth/study-programs");
         if (!res.ok) throw new Error("Chyba pri načítavaní študijných odborov");
         const data = await res.json();
         setStudyPrograms(data);
@@ -103,7 +103,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const res = await fetch("http://localhost:8080/auth/companies"); // endpoint pre všetky firmy
+        const res = await fetch("https://localhost:8443/auth/companies"); // endpoint pre všetky firmy
         if (!res.ok) throw new Error("Chyba pri načítavaní firiem");
         const data = await res.json();
         setCompanies(data);

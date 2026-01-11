@@ -52,7 +52,7 @@ export const LoginForm: React.FC<Props> = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/auth/login", {
+      const response = await fetch("https://localhost:8443/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -110,7 +110,7 @@ export const LoginForm: React.FC<Props> = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8080/auth/request-password-reset",
+        "https://localhost:8443/auth/request-password-reset",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -234,7 +234,7 @@ export const LoginForm: React.FC<Props> = () => {
 
                       try {
                         const res = await fetch(
-                          "http://localhost:8080/auth/force-change-password",
+                          "https://localhost:8443/auth/force-change-password",
                           {
                             method: "POST",
                             headers: {

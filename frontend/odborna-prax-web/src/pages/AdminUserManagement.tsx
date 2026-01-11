@@ -27,7 +27,7 @@ export default function AdminUserManagement() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/admin/users", {
+      const res = await axios.get("https://localhost:8443/api/admin/users", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(res.data);
@@ -38,7 +38,7 @@ export default function AdminUserManagement() {
 
   const handleSuspend = async (id: number) => {
     await axios.post(
-      `http://localhost:8080/api/admin/users/${id}/suspend`,
+      `https://localhost:8443/api/admin/users/${id}/suspend`,
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -47,7 +47,7 @@ export default function AdminUserManagement() {
 
   const handleReactivate = async (id: number) => {
     await axios.post(
-      `http://localhost:8080/api/admin/users/${id}/reactivate`,
+      `https://localhost:8443/api/admin/users/${id}/reactivate`,
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -139,7 +139,7 @@ export default function AdminUserManagement() {
                 e.preventDefault();
 
                 const res = await fetch(
-                  "http://localhost:8080/auth/register/admin",
+                  "https://localhost:8443/auth/register/admin",
                   {
                     method: "POST",
                     headers: {

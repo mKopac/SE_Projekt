@@ -12,7 +12,7 @@ type FaqItem = {
 };
 
 const PracticeFaq: React.FC = () => {
-  const { t } = useTranslation("faq"); // namespace "faq"
+  const { t } = useTranslation("faq");
 
   const rawItems = t("items", { returnObjects: true }) as unknown;
   const items: FaqItem[] = Array.isArray(rawItems) ? rawItems : [];

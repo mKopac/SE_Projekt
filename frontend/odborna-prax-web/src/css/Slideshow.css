@@ -6,7 +6,7 @@
   box-sizing: border-box;
 }
 
-/* Karta so slidom – pevná šírka pre všetky slidy */
+/* Karta so slidom */
 .slide-box {
   width: 900px; 
   max-width: 100%;   
@@ -25,7 +25,6 @@
   gap: 1.6rem;
 }
 
-/* Nadpis */
 .slide-box h2 {
   margin: 0;
   font-size: 2.1rem;
@@ -33,7 +32,6 @@
   font-weight: 700;
 }
 
-/* Text */
 .slide-box p {
   margin: 0;
   font-size: 1rem;
@@ -41,7 +39,6 @@
   color: #4f5b53;
 }
 
-/* CTA tlačidlá */
 .slide-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -71,7 +68,6 @@
   box-shadow: 0 5px 14px rgba(50, 180, 103, 0.4);
 }
 
-/* Druhé tlačidlo ako outline */
 .slide-btn-secondary {
   background-color: #ffffff;
   color: #278650;
@@ -83,7 +79,6 @@
   background-color: #e7f7ee;
 }
 
-/* Spodný riadok – navigácia + counter */
 .slide-footer {
   display: flex;
   align-items: center;
@@ -92,7 +87,6 @@
   margin-top: 0.5rem;
 }
 
-/* Navigačné tlačidlá */
 .slide-nav {
   display: flex;
   flex-wrap: wrap;
@@ -118,7 +112,6 @@
   transform: translateY(-1px);
 }
 
-/* Counter */
 .slide-info {
   font-weight: 500;
   color: #184f33;
@@ -126,7 +119,6 @@
   white-space: nowrap;
 }
 
-/* Mobilné úpravy */
 @media (max-width: 768px) {
   .slide-box {
     width: 100%;

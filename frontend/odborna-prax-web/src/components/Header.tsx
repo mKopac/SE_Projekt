@@ -11,7 +11,6 @@ const Header: React.FC = () => {
 
   const [isLangOpen, setIsLangOpen] = useState(false);
 
-  // derive login/admin info directly from localStorage
   const token = localStorage.getItem("token");
   const userData = localStorage.getItem("user");
 

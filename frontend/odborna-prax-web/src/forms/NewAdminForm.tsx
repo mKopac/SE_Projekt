@@ -13,7 +13,7 @@ type Props = {
   phoneNumber: string;
   setPhoneNumber: React.Dispatch<React.SetStateAction<string>>;
   onClose: () => void;
-  onCreated: () => void; // zavolá sa po úspešnom vytvorení (napr. fetchUsers)
+  onCreated: () => void;
 };
 
 const NewAdminForm: React.FC<Props> = ({

@@ -11,7 +11,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { ResetPasswordForm } from "./forms/ResetPasswordForm";
 import type { RegisterFormData } from "./forms/RegisterForm";
 import AdminUserManagement from "./pages/AdminUserManagement";
-import AdminRoute from "./components/AdminRoute";
 
 function App() {
   const handleLogin = (email: string, password: string) => {

@@ -52,7 +52,7 @@
   color: inherit;
 }
 
-/* chyba – jednoduchá */
+/* chyba */
 .form-error {
   border: 1px solid #f1c0c6;
   background: #fff1f3;
@@ -79,7 +79,7 @@
 
 .text-input {
   width: 100%;
-  height: 30px;
+  height: 50px;
   margin-top: 4px;
   padding: 4px 8px;
   border: 1px solid #cfcfcf;
@@ -98,7 +98,7 @@
 /* forgot link */
 .small-links {
   margin-top: 2px;
-  font-size: 12px;
+  font-size: 15px;
 }
 
 .small-links a {
@@ -119,7 +119,7 @@
 }
 
 .register-note {
-  font-size: 11px;
+  font-size: 15px;
   color: #666;
   line-height: 1.25;
 }

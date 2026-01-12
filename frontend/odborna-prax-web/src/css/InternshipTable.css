@@ -158,3 +158,51 @@
     grid-column: auto;
   }
 }
+
+@media (max-width: 768px) {
+  .filter-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .export-btn {
+    width: 100%;
+  }
+
+  .practice-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 8px;
+  }
+
+  .practice-table table {
+    width: 100%;
+    min-width: 600px;
+  }
+
+  .practice-table th,
+  .practice-table td {
+    padding: 10px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .practice-table th,
+  .practice-table td {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .export-btn,
+  .btn-ok {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}

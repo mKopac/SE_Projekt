@@ -75,3 +75,43 @@
 .dashboard table {
   width: 100%;
 }
+
+@media (max-width: 900px) {
+  .dashboard {
+    padding: 20px;
+  }
+
+  .dashboard-container {
+    padding: 10px 20px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .add-button-row {
+    justify-content: center;
+  }
+
+  .add-button {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard {
+    padding: 15px;
+  }
+
+  .dashboard-title {
+    font-size: 18px;
+  }
+
+  .modal-content {
+    width: 90%;
+    padding: 15px;
+  }
+}

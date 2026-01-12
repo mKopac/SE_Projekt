@@ -68,31 +68,31 @@
 .new-admin-btn-save {
   background-color: #184f33;
   color: #fff;
-  padding: 12px 14px;
-  font-weight: 600;
   border: none;
+  padding: 10px 14px;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  font-weight: 600;
+  transition: background-color 0.15s ease;
 }
 
 .new-admin-btn-save:hover {
-  background-color: #184f33;
+  background-color: #32b467;
 }
 
 .new-admin-btn-cancel {
-  background: transparent;
-  color: #184f33;
-  padding: 12px 14px;
-  font-weight: 600;
-  border: 1px solid #184f33;
+  background-color: #184f33;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  font-weight: 600;
+  transition: background-color 0.15s ease;
 }
 
 .new-admin-btn-cancel:hover {
-  background: rgba(24, 79, 51, 0.08);
+  background-color: #32b467;
 }
 
 @keyframes fadeIn {

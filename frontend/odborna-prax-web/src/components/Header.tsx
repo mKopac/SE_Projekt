@@ -40,6 +40,7 @@ const Header: React.FC = () => {
   const handleFaqClick = () => navigate("/faq");
 
   const currentPath = location.pathname;
+  const isOnAdminUsersPage = currentPath.startsWith("/admin/users");
 
   const renderNavButton = () => {
     if (!isLoggedIn) return null;
@@ -138,11 +139,16 @@ const Header: React.FC = () => {
 
         {isLoggedIn ? (
           <>
-            {isAdmin && (
-              <button className="admin-button" onClick={handleAdminClick}>
-                {t("header.adminUsers")}
-              </button>
-            )}
+            {isAdmin &&
+              (isOnAdminUsersPage ? (
+                <button className="dashboard-button" onClick={handleDashboardClick}>
+                  {t("header.dashboard")}
+                </button>
+              ) : (
+                <button className="admin-button" onClick={handleAdminClick}>
+                  {t("header.adminUsers")}
+                </button>
+              ))}
 
             {renderNavButton()}
 

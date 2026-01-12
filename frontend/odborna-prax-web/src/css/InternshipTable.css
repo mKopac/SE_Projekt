@@ -56,17 +56,18 @@
   width: 200px;
 }
 .export-btn {
-  padding: 8px 14px;
-  background: #184f33;
-  color: white;
+  background-color: #184f33;
+  color: #fff;
   border: none;
-  border-radius: 6px;
+  padding: 10px 14px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
+  transition: background-color 0.15s ease;
 }
 
 .export-btn:hover {
-  background: #184f33;
+  background-color: #32b467;
 }
 
 .expanded-grid {
@@ -138,7 +139,7 @@
 }
 
 .btn-ok:hover {
-  background-color: #32b467; /* rovnaký hover vibe ako inde */
+  background-color: #32b467;
 }
 
 

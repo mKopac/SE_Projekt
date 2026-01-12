@@ -32,7 +32,6 @@
   margin-bottom: 1rem;
 }
 
-/* Grid layout for side-by-side fields */
 .profile-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
@@ -92,7 +91,6 @@
   font-size: 1rem;
 }
 
-/* --- Zmena hesla --- */
 .password-section {
   margin-top: 3rem;
   border-top: 1px solid #ddd;
@@ -133,17 +131,16 @@
 }
 
 .password-save-btn {
-  align-self: center;
-  background-color: #007bff;
-  color: white;
-  padding: 0.6rem 1.2rem;
+  background-color: #184f33;
+  color: #fff;
   border: none;
-  border-radius: 6px;
-  font-size: 1rem;
+  padding: 10px 14px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
+  font-weight: 600;
+  transition: background-color 0.15s ease;
 }
 
 .password-save-btn:hover {
-  background-color: #0056b3;
+  background-color: #32b467;
 }

@@ -86,7 +86,8 @@
     "errors": {
       "nameRequired": "Enter first and last name.",
       "emailRequired": "Enter email.",
-      "registerFailed": "Registration failed. Please check your data or try again later."
+      "registerFailed": "Registration failed. Please check your data or try again later.",
+      "invalidStudentEmail": "Email must be in format @student.ukf.sk"
     },
 
     "submit": {

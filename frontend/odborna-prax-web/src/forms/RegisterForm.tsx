@@ -7,8 +7,6 @@ import { useNavigate } from "react-router-dom";
 import "./../css/RegisterForm.css";
 import { useTranslation } from "react-i18next";
 
-
-
 export type RegisterFormData = {
   accountType: "Študent" | "Firma";
   firmType: "" | "existujuca" | "nova";
@@ -103,7 +101,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const res = await fetch("https://localhost:8443/auth/companies"); // endpoint pre všetky firmy
+        const res = await fetch("https://localhost:8443/auth/companies");
         if (!res.ok) throw new Error("Chyba pri načítavaní firiem");
         const data = await res.json();
         setCompanies(data);
@@ -125,6 +123,12 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
 
     if (!formData.studentEmail) {
       setError(t("registerForm.errors.emailRequired"));
+      return;
+    }
+
+    // Validácia pre študentský e-mail
+    if (formData.accountType === "Študent" && !formData.studentEmail.endsWith("@student.ukf.sk")) {
+      setError(t("registerForm.errors.invalidStudentEmail"));
       return;
     }
 

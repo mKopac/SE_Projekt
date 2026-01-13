@@ -53,6 +53,7 @@
   width: 400px;
   position: relative;
   z-index: 10000;
+  scale: 85%;
 }
 
 .close-button {

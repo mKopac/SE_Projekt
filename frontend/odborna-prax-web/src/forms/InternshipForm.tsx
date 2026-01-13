@@ -131,6 +131,7 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
     >
   ) => {
     const { name, value } = e.target;
+
     setForm((prev) => ({
       ...prev,
       [name]: name === "semester" ? Number(value) : value,
@@ -315,6 +316,8 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
             value={form.dateStart}
             onChange={handleChange}
             required
+            // NEW: if end is selected first, start cannot be after end
+            max={form.dateEnd || undefined}
           />
         </div>
 
@@ -326,6 +329,8 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
             value={form.dateEnd}
             onChange={handleChange}
             required
+            // NEW: if start is selected first, end cannot be before start
+            min={form.dateStart || undefined}
           />
         </div>
       </div>

@@ -27,6 +27,7 @@
   border: 1px solid #d6e8dd;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.10);
   padding: 18px;
+  margin-top: 12%;
 }
 
 /* info message */
@@ -71,10 +72,9 @@
 }
 
 .input-label {
-  display: block;
-  font-size: 30px;
+  margin-bottom: 1.5rem;
   font-weight: 600;
-  color: #333;
+  font-size: 1.3rem;
 }
 
 .text-input {

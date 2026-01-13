@@ -13,7 +13,7 @@
 
 	<groupId>sk.team8</groupId>
 	<artifactId>odborna-prax-api</artifactId>
-	<version>0.0.1</version>
+	<version>1.0.0</version>
 	<name>odborna-prax-api</name>
 	<description>Evidencia odbornej praxe</description>
 

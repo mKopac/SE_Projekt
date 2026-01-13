@@ -378,17 +378,17 @@ const InternshipTable: React.FC<Props> = ({
       if (internship.status === "CREATED") return t("internshipTable.contract.status.waitingCompany");
       if (internship.status === "ACCEPTED") return t("internshipTable.contract.status.approved");
       if (internship.status === "REJECTED") return t("internshipTable.contract.status.denied");
-      
+
       return t("internshipTable.contract.status.approved");
     };
 
     const getTimestatementStatus = () => {
       if (!timestatement) return t("internshipTable.timestatement.status.missing");
-      
+
       if (timestatement.currentState === "UPLOADED") return t("internshipTable.timestatement.status.waitingCompany");
       if (timestatement.currentState === "APPROVED") return t("internshipTable.timestatement.status.approved");
       if (timestatement.currentState === "DENIED") return t("internshipTable.timestatement.status.denied");
-      
+
       return t("internshipTable.timestatement.status.unknown");
     };
 
@@ -734,25 +734,24 @@ const InternshipTable: React.FC<Props> = ({
 
                               return (
                                 <>
+                                  {/* CONTRACT */}
                                   <div className="expanded-card">
                                     <strong>{t("internshipTable.documents.contract")}:</strong>
                                     <div className="expanded-card-body">
                                       {contract ? (
                                         <div className="document-item">
-                                          <a
-                                            href={`${baseUrl}/documents/${contract.documentId}/download`}
-                                            target="_blank"
-                                            rel="noreferrer"
+                                          <button
+                                            type="button"
                                             className="doc-link"
+                                            onClick={() => handleDownloadDocument(contract.documentId, contract.fileName)}
                                           >
                                             {contract.fileName}
-                                          </a>
+                                          </button>
                                         </div>
                                       ) : (
                                         <>
-                                          <span className="muted">
-                                            {t("internshipTable.documents.contractMissing")}
-                                          </span>
+                                          <span className="muted">{t("internshipTable.documents.contractMissing")}</span>
+                                          <br />
                                           <input
                                             type="file"
                                             accept=".pdf,.doc,.docx"
@@ -763,23 +762,22 @@ const InternshipTable: React.FC<Props> = ({
                                     </div>
                                   </div>
 
+                                  {/* TIMESTATEMENT */}
                                   <div className="expanded-card">
                                     <strong>{t("internshipTable.documents.timestatement")}:</strong>
                                     <div className="expanded-card-body">
                                       {timestatement ? (
                                         <div className="document-item">
-                                          <a
-                                            href={`${baseUrl}/documents/${timestatement.documentId}/download`}
-                                            target="_blank"
-                                            rel="noreferrer"
+                                          <button
+                                            type="button"
                                             className="doc-link"
+                                            onClick={() =>
+                                              handleDownloadDocument(timestatement.documentId, timestatement.fileName)
+                                            }
                                           >
                                             {timestatement.fileName}
-                                          </a>
-
-                                          <span
-                                            className={`state-badge ${timestatement.currentState?.toLowerCase()}`}
-                                          >
+                                          </button>
+                                          <span className={`state-badge ${timestatement.currentState?.toLowerCase()}`}>
                                             {timestatement.currentState === "APPROVED" &&
                                               t("internshipTable.documents.approved")}
                                             {timestatement.currentState === "DENIED" &&
@@ -809,6 +807,7 @@ const InternshipTable: React.FC<Props> = ({
                         {["COMPANY", "ADMIN"].includes(role) && (
                           <div className="expanded-section">{renderDocuments(p)}</div>
                         )}
+
 
                         {/* ================= COMPANY ACTIONS ================= */}
                         {role === "COMPANY" && p.status === "CREATED" && (

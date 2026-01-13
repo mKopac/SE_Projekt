@@ -1,19 +1,23 @@
 .practice-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 20px;
+  gap: 14px;
+  padding: clamp(12px, 2vw, 20px);
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  min-width: 340px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  max-width: 520px;
+  min-width: unset;
   animation: fadeIn 0.3s ease-in-out;
 }
 
 .practice-form h3 {
   margin-top: 0;
   color: #1a1a1a;
-  font-size: 1.3rem;
+  font-size: clamp(1.1rem, 2.5vw, 1.3rem);
   font-weight: 600;
 }
 
@@ -25,7 +29,8 @@
 .form-group label {
   font-weight: 500;
   color: #333;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
 }
 
 .practice-form input,
@@ -33,16 +38,16 @@
 .practice-form textarea {
   border: 1px solid #ccc;
   border-radius: 6px;
-  padding: 10px;
-  font-size: 14px;
+  padding: clamp(8px, 1.8vw, 10px);
+  font-size: clamp(13px, 1.5vw, 14px);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .practice-form input:focus,
 .practice-form select:focus,
 .practice-form textarea:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 3px rgba(0, 123, 255, 0.4);
+  border-color: #184f33;
+  box-shadow: 0 0 3px rgba(24, 79, 51, 0.4);
   outline: none;
 }
 
@@ -51,16 +56,23 @@
   gap: 10px;
 }
 
+@media (max-width: 640px) {
+  .date-row {
+    flex-direction: column;
+  }
+}
+
 textarea {
   resize: vertical;
   min-height: 60px;
 }
 
 .btn-save {
-  background-color: #007bff;
+  background-color: #184f33;
   color: #fff;
-  padding: 12px;
+  padding: clamp(10px, 2vw, 12px);
   font-weight: 600;
+  font-size: 0.95rem;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -68,7 +80,7 @@ textarea {
 }
 
 .btn-save:hover {
-  background-color: #005fcc;
+  background-color: #136c45;
 }
 
 @keyframes fadeIn {

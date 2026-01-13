@@ -3,10 +3,9 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  background: #f1f7f3; /* čistý, jemný greenish background */
+  background: #ffffff;
 }
 
-/* aby sa slideshow pekne centrovala medzi headerom a footerom */
 .landing-main {
   flex: 1;
   display: flex;

@@ -3,7 +3,7 @@
   max-width: 650px;
   width: 100%;
   overflow: hidden;
-  background-color: #e5e5e5;
+  background-color: #ffffff;
   border: 1px solid #bcbcbc;
   padding: 0;
 }
@@ -72,7 +72,7 @@
 }
 
 .register-form .submit-btn {
-  background: #0077cc;
+  background: #184f33;
   color: white;
   border: none;
   padding: 0.55rem 1.4rem;
@@ -82,11 +82,11 @@
 }
 
 .register-form .submit-btn:hover {
-  background: #005fa3;
+  background: #184f33;
 }
 
 .back-link {
-  color: #0044cc;
+  color: #184f33;
   text-decoration: none;
   font-size: 0.9rem;
 }

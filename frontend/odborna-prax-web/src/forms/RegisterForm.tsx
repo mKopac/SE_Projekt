@@ -103,7 +103,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const res = await fetch("https://localhost:8443/auth/companies"); // endpoint pre všetky firmy
+        const res = await fetch("https://localhost:8443/auth/companies");
         if (!res.ok) throw new Error("Chyba pri načítavaní firiem");
         const data = await res.json();
         setCompanies(data);

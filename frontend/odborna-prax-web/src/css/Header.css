@@ -78,21 +78,21 @@
 /* Profile & Dashboard buttons */
 .profile-button,
 .dashboard-button {
-  background-color: #32b467;
+  background-color: #184f33;
   color: #ffffff;
   box-shadow: 0 2px 6px rgba(50, 180, 103, 0.35);
 }
 
 .profile-button:hover,
 .dashboard-button:hover {
-  background-color: #278650;
+  background-color: #184f33;
 }
 
 /* Home button */
 .home-button {
   background-color: #ffffff;
-  color: #278650;
-  border: 1px solid #32b467;
+  color: #184f33;
+  border: 1px solid #184f33;
 }
 
 .home-button:hover {
@@ -115,7 +115,7 @@
 .login-link {
   text-decoration: none;
   color: #ffffff;
-  background-color: #32b467;
+  background-color: #184f33;
   padding: 0.45rem 0.9rem;
   border-radius: 999px;
   font-weight: 500;
@@ -125,7 +125,7 @@
 }
 
 .login-link:hover {
-  background-color: #278650;
+  background-color: #184f33;
 }
 
 /* Admin button */

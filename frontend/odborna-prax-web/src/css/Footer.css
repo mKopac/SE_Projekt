@@ -1,5 +1,6 @@
 .footer {
   width: 100%;
+  box-sizing: border-box;
   background-color: white;
   border-top: 1px solid #d6e8dd;
   padding: 1.5rem 2rem;

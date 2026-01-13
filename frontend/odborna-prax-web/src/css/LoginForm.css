@@ -1,136 +1,215 @@
-/* Reset */
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-}
-
-/* Root layout */
 .page-root {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f4f4f4;
+  font-family: "Segoe UI", sans-serif;
   color: #333;
 }
 
-/* Main content – vycentrovaný login box */
-.main-content {
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
-  background-color: #f4f4f4;
+.auth-page {
+  flex: 1;
+  background: #fdfdfd;
+  padding: 40px 16px;
 }
 
-/* Login box */
 .login-box-outer {
-  background-color: #ffffff;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-width: 1100px;
+  margin: auto;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.login-box {
   width: 100%;
-  max-width: 400px;
+  max-width: 400x;
+  background: #fff;
+  border-radius: 4px;
+  border: 1px solid #d6e8dd;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.10);
+  padding: 18px;
+  margin-top: 12%;
 }
 
-.logo-btn {
-  background: none;
+/* info message */
+.form-info {
+  border: 1px solid #cfe5ff;
+  background: #f2f8ff;
+  color: #184f33;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 13px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-info-close {
   border: none;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
+  background: transparent;
   cursor: pointer;
-  color: #0077cc;
+  font-weight: 700;
+  color: inherit;
 }
 
-/* Form */
+/* chyba */
+.form-error {
+  border: 1px solid #f1c0c6;
+  background: #fff1f3;
+  color: #8a1f2a;
+  border-radius: 3px;
+  padding: 8px 10px;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+/* form */
 .login-form {
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
 
 .input-label {
-  margin-bottom: 1rem;
-  font-weight: 500;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  font-size: 1.3rem;
 }
 
 .text-input {
   width: 100%;
-  padding: 0.5rem;
-  margin-top: 0.25rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  height: 50px;
+  margin-top: 4px;
+  padding: 4px 8px;
+  border: 1px solid #cfcfcf;
+  border-radius: 3px;
+  outline: none;
+  font-size: 12px;
+  background: #fff;
+  box-sizing: border-box;
 }
 
+.text-input:focus {
+  border-color: #8bbcff;
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.12);
+}
+
+/* forgot link */
 .small-links {
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
+  margin-top: 2px;
+  font-size: 15px;
 }
 
 .small-links a {
-  color: #0077cc;
+  color: #184f33;
   text-decoration: none;
 }
 
-.form-error {
-  color: red;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
+.small-links a:hover {
+  text-decoration: underline;
 }
 
-/* Actions */
 .actions-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-top: 1rem;
+  align-items: flex-end;
+  gap: 12px;
+  margin-top: 8px;
 }
 
 .register-note {
-  font-size: 0.85rem;
+  font-size: 15px;
   color: #666;
+  line-height: 1.25;
+}
+
+.register-note a {
+  color: #184f33;
+  text-decoration: none;
+}
+
+.register-note a:hover {
+  text-decoration: underline;
 }
 
 .submit-btn {
-  background-color: #0077cc;
+  height: 35px;
+  padding: 0 14px;
+  background: #184f33;
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  border-radius: 3px;
   cursor: pointer;
-  transition: background 0.2s;
+  font-weight: 700;
+  font-size: 12px;
 }
 
 .submit-btn:hover {
-  background-color: #005fa3;
-}
-
-/* Footer */
-.footer {
-  width: 100%;
-  background-color: #ffffff;
-  padding: 1rem 2rem;
-  text-align: center;
-  font-size: 0.9rem;
-  color: #666;
-  border-top: 1px solid #ddd;
-  box-sizing: border-box;
+  background: #184f33;
 }
 
 .force-password-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.55);
   z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 16px;
 }
 
 .force-password-modal {
-  background: white;
-  padding: 2rem;
-  max-width: 400px;
-  margin: 10% auto;
-  border-radius: 6px;
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 4px;
+  border: 1px solid #d6e8dd;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+  padding: 18px;
 }
 
+.force-password-modal h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+
+.force-password-modal p {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+.force-password-modal button {
+  margin-top: 10px;
+  width: auto;
+  height: 28px;
+  padding: 0 14px;
+  border-radius: 3px;
+  border: none;
+  cursor: pointer;
+  background: #0066cc;
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.force-password-modal button:hover {
+  background: #005fa3;
+}
+
+/* mobil */
+@media (max-width: 480px) {
+  .login-box {
+    max-width: 100%;
+  }
+
+  .actions-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .submit-btn {
+    width: 100%;
+  }
+}

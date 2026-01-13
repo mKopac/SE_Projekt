@@ -397,7 +397,7 @@ const InternshipTable: React.FC<Props> = ({
 
 
         <div style={{ marginBottom: 15 }}>
-          <strong>{t("internshipTable.contract.title")}:</strong><br />
+          <strong>{t("contract.title")}:</strong><br />
 
           {contract ? (
             <div className="document-item" style={{ marginTop: 8 }}>
@@ -427,7 +427,7 @@ const InternshipTable: React.FC<Props> = ({
             <>
               {isStudent ? (
                 <>
-                  <span style={{ color: "#666" }}>{t("internshipTable.contract.missing")}</span><br />
+                  <span style={{ color: "#666" }}>{t("contract.missing")}</span><br />
                   <input
                     type="file"
                     accept=".pdf,.doc,.docx"
@@ -436,7 +436,7 @@ const InternshipTable: React.FC<Props> = ({
                   />
                 </>
               ) : (
-                <span style={{ color: "#666" }}>{t("internshipTable.contract.missing")}</span>
+                <span style={{ color: "#666" }}>{t("contract.missing")}</span>
               )}
             </>
           )}
@@ -444,7 +444,7 @@ const InternshipTable: React.FC<Props> = ({
 
 
         <div>
-          <strong>{t("internshipTable.timestatement.title")}:</strong><br />
+          <strong>{t("timestatement.title")}:</strong><br />
 
           {timestatement ? (
             <div className="document-item" style={{ marginTop: 8 }}>
@@ -504,11 +504,11 @@ const InternshipTable: React.FC<Props> = ({
                       style={{ marginTop: 6 }}
                     />
                   ) : (
-                    <span style={{ color: "#666" }}>Výkaz môžeš nahrať až po schválení zmluvy.</span>
+                    <span style={{ color: "#666" }}>{t("timestatement.uploadAfterContract")}</span>
                   )}
                 </>
               ) : (
-                <span style={{ color: "#666" }}>Výkaz zatiaľ nebol nahraný.</span>
+                <span style={{ color: "#666" }}>{t("timestatement.missing")}</span>
               )}
             </>
           )}
@@ -680,131 +680,124 @@ const InternshipTable: React.FC<Props> = ({
                   <tr className="expanded-row">
                     <td colSpan={8}>
                       <div className="expanded-content">
-                        <p>
-                          <strong>{t("internshipTable.detail.student")}:</strong>{" "}
-                          {getStudentName(p.studentId)}
-                        </p>
-                        <p>
-                          <strong>{t("internshipTable.detail.company")}:</strong>{" "}
-                          {getCompanyName(p.companyId)}
-                        </p>
-                        <p>
-                          <strong>{t("internshipTable.detail.mentor")}:</strong>{" "}
-                          {getMentorName(p.mentorId)}
-                        </p>
-                        <p>
-                          <strong>{t("internshipTable.detail.year")}:</strong>{" "}
-                          {p.academicYear}
-                        </p>
-                        <p>
-                          <strong>{t("internshipTable.detail.semester")}:</strong>{" "}
-                          {p.semester}
-                        </p>
-                        <p>
-                          <strong>{t("internshipTable.detail.start")}:</strong>{" "}
-                          {p.dateStart}
-                        </p>
-                        <p>
-                          <strong>{t("internshipTable.detail.end")}:</strong>{" "}
-                          {p.dateEnd}
-                        </p>
+                        <div className="expanded-grid">
+                          <div className="detail-item">
+                            <strong>{t("internshipTable.detail.student")}:</strong>{" "}
+                            {getStudentName(p.studentId)}
+                          </div>
 
-                        <p>
-                          <strong>{t("internshipTable.detail.description")}:</strong>{" "}
-                          {p.description || t("internshipTable.detail.noDescription")}
-                        </p>
+                          <div className="detail-item">
+                            <strong>{t("internshipTable.detail.company")}:</strong>{" "}
+                            {getCompanyName(p.companyId)}
+                          </div>
 
-                        <p>
-                          <strong>{t("internshipTable.detail.status")}:</strong> {p.status}
-                        </p>
+                          <div className="detail-item">
+                            <strong>{t("internshipTable.detail.mentor")}:</strong>{" "}
+                            {getMentorName(p.mentorId)}
+                          </div>
+
+                          <div className="detail-item">
+                            <strong>{t("internshipTable.detail.status")}:</strong> {p.status}
+                          </div>
+
+                          <div className="detail-item">
+                            <strong>{t("internshipTable.detail.year")}:</strong> {p.academicYear}
+                          </div>
+
+                          <div className="detail-item">
+                            <strong>{t("internshipTable.detail.semester")}:</strong> {p.semester}
+                          </div>
+
+                          <div className="detail-item">
+                            <strong>{t("internshipTable.detail.start")}:</strong>{" "}
+                            {new Date(p.dateStart).toLocaleDateString("sk-SK")}
+                          </div>
+
+                          <div className="detail-item">
+                            <strong>{t("internshipTable.detail.end")}:</strong>{" "}
+                            {new Date(p.dateEnd).toLocaleDateString("sk-SK")}
+                          </div>
+
+                          <div className="detail-item detail-full">
+                            <strong>{t("internshipTable.detail.description")}:</strong>{" "}
+                            {p.description || t("internshipTable.detail.noDescription")}
+                          </div>
+                        </div>
 
                         {/* ================= STUDENT ================= */}
                         {role === "STUDENT" && (
-                          <div style={{ marginTop: 20 }}>
+                          <div className="expanded-section">
                             {(() => {
                               const docs = documents[p.id] || [];
-                              const contract = docs.find(
-                                (d) => d.documentType === "CONTRACT"
-                              );
-                              const timestatement = docs.find(
-                                (d) => d.documentType === "TIMESTATEMENT"
-                              );
+                              const contract = docs.find((d) => d.documentType === "CONTRACT");
+                              const timestatement = docs.find((d) => d.documentType === "TIMESTATEMENT");
 
                               return (
                                 <>
-                                  {/* ====== CONTRACT – Zmluva o praxi ====== */}
-                                  <div style={{ marginBottom: 16 }}>
+                                  <div className="expanded-card">
                                     <strong>{t("internshipTable.documents.contract")}:</strong>
-                                    <br />
-                                    {contract ? (
-                                      <div className="document-item" style={{ marginTop: 8 }}>
-                                        <a
-                                          href={`${baseUrl}/documents/${contract.documentId}/download`}
-                                          target="_blank"
-                                          rel="noreferrer"
-                                          className="doc-link"
-                                        >
-                                          {contract.fileName}
-                                        </a>
-                                      </div>
-                                    ) : (
-                                      <>
-                                        <span style={{ color: "#666" }}>
-                                          {t("internshipTable.documents.contractMissing")}
-                                        </span>
-                                        <br />
-                                        <input
-                                          type="file"
-                                          accept=".pdf,.doc,.docx"
-                                          onChange={(e) =>
-                                            handleUploadContract(p.id, e)
-                                          }
-                                          style={{ marginTop: 6 }}
-                                        />
-                                      </>
-                                    )}
+                                    <div className="expanded-card-body">
+                                      {contract ? (
+                                        <div className="document-item">
+                                          <a
+                                            href={`${baseUrl}/documents/${contract.documentId}/download`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="doc-link"
+                                          >
+                                            {contract.fileName}
+                                          </a>
+                                        </div>
+                                      ) : (
+                                        <>
+                                          <span className="muted">
+                                            {t("internshipTable.documents.contractMissing")}
+                                          </span>
+                                          <input
+                                            type="file"
+                                            accept=".pdf,.doc,.docx"
+                                            onChange={(e) => handleUploadContract(p.id, e)}
+                                          />
+                                        </>
+                                      )}
+                                    </div>
                                   </div>
 
-                                  {/* ====== TIMESTATEMENT – Výkaz ====== */}
-                                  <div>
-                                    <strong>
-                                      {t("internshipTable.documents.timestatement")}:
-                                    </strong>
-                                    <br />
-                                    {timestatement ? (
-                                      <div className="document-item" style={{ marginTop: 8 }}>
-                                        <a
-                                          href={`${baseUrl}/documents/${timestatement.documentId}/download`}
-                                          target="_blank"
-                                          rel="noreferrer"
-                                          className="doc-link"
-                                        >
-                                          {timestatement.fileName}
-                                        </a>
+                                  <div className="expanded-card">
+                                    <strong>{t("internshipTable.documents.timestatement")}:</strong>
+                                    <div className="expanded-card-body">
+                                      {timestatement ? (
+                                        <div className="document-item">
+                                          <a
+                                            href={`${baseUrl}/documents/${timestatement.documentId}/download`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="doc-link"
+                                          >
+                                            {timestatement.fileName}
+                                          </a>
 
-                                        <span
-                                          className={`state-badge ${timestatement.currentState?.toLowerCase()}`}
-                                        >
-                                          {timestatement.currentState === "APPROVED" &&
-                                            t("internshipTable.documents.approved")}
-                                          {timestatement.currentState === "DENIED" &&
-                                            t("internshipTable.documents.denied")}
-                                          {timestatement.currentState === "UPLOADED" &&
-                                            t("internshipTable.documents.waiting")}
-                                          {["UNKNOWN", null].includes(
-                                            timestatement.currentState
-                                          ) &&
-                                            t("internshipTable.documents.noState")}
-                                        </span>
-                                      </div>
-                                    ) : (
-                                      <input
-                                        type="file"
-                                        accept="application/pdf"
-                                        onChange={(e) => handleUpload(p.id, e)}
-                                        style={{ marginTop: 6 }}
-                                      />
-                                    )}
+                                          <span
+                                            className={`state-badge ${timestatement.currentState?.toLowerCase()}`}
+                                          >
+                                            {timestatement.currentState === "APPROVED" &&
+                                              t("internshipTable.documents.approved")}
+                                            {timestatement.currentState === "DENIED" &&
+                                              t("internshipTable.documents.denied")}
+                                            {timestatement.currentState === "UPLOADED" &&
+                                              t("internshipTable.documents.waiting")}
+                                            {["UNKNOWN", null].includes(timestatement.currentState) &&
+                                              t("internshipTable.documents.noState")}
+                                          </span>
+                                        </div>
+                                      ) : (
+                                        <input
+                                          type="file"
+                                          accept="application/pdf"
+                                          onChange={(e) => handleUpload(p.id, e)}
+                                        />
+                                      )}
+                                    </div>
                                   </div>
                                 </>
                               );
@@ -814,28 +807,16 @@ const InternshipTable: React.FC<Props> = ({
 
                         {/* ================= COMPANY + ADMIN (spoločné) ================= */}
                         {["COMPANY", "ADMIN"].includes(role) && (
-                          <div style={{ marginTop: 20 }}>
-                            {renderDocuments(p)}
-                          </div>
+                          <div className="expanded-section">{renderDocuments(p)}</div>
                         )}
 
                         {/* ================= COMPANY ACTIONS ================= */}
                         {role === "COMPANY" && p.status === "CREATED" && (
-                          <div style={{ marginTop: 15 }}>
-                            <button
-                              className="btn-accept"
-                              onClick={() =>
-                                handleCompanyDecision(p.id, "ACCEPT")
-                              }
-                            >
+                          <div className="expanded-actions">
+                            <button className="btn-accept" onClick={() => handleCompanyDecision(p.id, "ACCEPT")}>
                               {t("internshipTable.companyActions.accept")}
                             </button>
-                            <button
-                              className="btn-reject"
-                              onClick={() =>
-                                handleCompanyDecision(p.id, "REJECT")
-                              }
-                            >
+                            <button className="btn-reject" onClick={() => handleCompanyDecision(p.id, "REJECT")}>
                               {t("internshipTable.companyActions.reject")}
                             </button>
                           </div>
@@ -843,37 +824,21 @@ const InternshipTable: React.FC<Props> = ({
 
                         {/* ================= ADMIN ================= */}
                         {role === "ADMIN" &&
-                          ["ACCEPTED", "APPROVED", "PASSED", "FAILED"].includes(
-                            p.status.toUpperCase()
-                          ) && (
-                            <div style={{ marginTop: 15 }}>
-                              <select
-                                value={adminState}
-                                onChange={(e) => setAdminState(e.target.value)}
-                              >
-                                <option value="APPROVED">
-                                  {t("internshipTable.admin.approved")}
-                                </option>
-                                <option value="DENIED">
-                                  {t("internshipTable.admin.denied")}
-                                </option>
-                                <option value="PASSED">
-                                  {t("internshipTable.admin.passed")}
-                                </option>
-                                <option value="FAILED">
-                                  {t("internshipTable.admin.failed")}
-                                </option>
+                          ["ACCEPTED", "APPROVED", "PASSED", "FAILED"].includes(p.status.toUpperCase()) && (
+                            <div className="expanded-actions">
+                              <select value={adminState} onChange={(e) => setAdminState(e.target.value)}>
+                                <option value="APPROVED">{t("internshipTable.admin.approved")}</option>
+                                <option value="DENIED">{t("internshipTable.admin.denied")}</option>
+                                <option value="PASSED">{t("internshipTable.admin.passed")}</option>
+                                <option value="FAILED">{t("internshipTable.admin.failed")}</option>
                               </select>
-                              <button
-                                className="btn-ok"
-                                onClick={() => handleAdminStateChange(p.id)}
-                              >
+                              <button className="btn-ok" onClick={() => handleAdminStateChange(p.id)}>
                                 {t("internshipTable.admin.ok")}
                               </button>
                             </div>
                           )}
-
                       </div>
+
                     </td>
                   </tr>
                 )}

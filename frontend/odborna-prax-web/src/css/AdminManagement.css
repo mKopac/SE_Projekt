@@ -1,0 +1,160 @@
+.page-title {
+  text-align: center;
+  font-weight: 600;
+  margin: 10px 0 20px 0;
+}
+
+.actions-top {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px 0;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn.create-admin {
+  background: #184f33;
+  color: #fff;
+}
+
+.btn.create-admin:hover {
+  background: #007a29;
+}
+
+.btn.suspend {
+  background: #dc3545;
+  color: #fff;
+}
+
+.btn.suspend:hover {
+  filter: brightness(0.95);
+}
+
+.btn.reactivate {
+  background: #198754;
+  color: #fff;
+}
+
+.btn.reactivate:hover {
+  filter: brightness(0.95);
+}
+
+.table-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  overflow: hidden; 
+}
+
+.dashboard-table {
+  width: 100%;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.dashboard-table thead th {
+  background: #184f33;
+  color: #fff;
+  font-weight: 600;
+  padding: 12px 14px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.dashboard-table tbody td {
+  padding: 12px 14px;
+  font-size: 14px;
+  border-top: 1px solid #e9ecef;
+  vertical-align: middle;
+}
+
+.dashboard-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+/* --- STATUS badge --- */
+.status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status.active {
+  background: rgba(25, 135, 84, 0.12);
+  color: #198754;
+}
+
+.status.suspended {
+  background: rgba(220, 53, 69, 0.12);
+  color: #dc3545;
+}
+
+.dashboard-table td:last-child {
+  white-space: nowrap;
+}
+
+.page-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .table-card {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dashboard-table {
+    min-width: 760px;
+  }
+
+  .dashboard-table thead th,
+  .dashboard-table tbody td {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .actions-top {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .actions-top .btn {
+    width: 100%;
+  }
+
+  .dashboard-table thead th {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-table thead th,
+  .dashboard-table tbody td {
+    padding: 8px 10px;
+    font-size: 12.5px;
+  }
+
+  .btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}

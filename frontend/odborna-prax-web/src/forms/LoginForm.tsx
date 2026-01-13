@@ -131,16 +131,12 @@ export const LoginForm: React.FC<Props> = () => {
   };
 
   return (
-    <div className="page-root">
+    <div className="page-layout">
       <Header />
 
-      <main className="main-content">
+      <main className="main-content auth-page">
         <div className="login-box-outer">
           <div className="login-box">
-            <button className="logo-btn" aria-label={t("loginForm.logoAria")}>
-              {t("loginForm.logoPlaceholder")}
-            </button>
-
             {infoMessage && (
               <div className="form-info">
                 {infoMessage}

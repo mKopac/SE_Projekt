@@ -354,10 +354,10 @@ const InternshipTable: React.FC<Props> = ({
         };
       });
 
-      alert(t("internshipTable.documents.stateChanged"));
+      alert(t("documents.stateChanged"));
     } catch (e) {
       console.error(e);
-      alert(t("internshipTable.documents.serverError"));
+      alert(t("documents.serverError"));
     }
   };
 
@@ -373,23 +373,23 @@ const InternshipTable: React.FC<Props> = ({
 
 
     const getContractStatus = () => {
-      if (!contract) return t("internshipTable.contract.status.missing");
+      if (!contract) return t("contract.status.missing");
 
-      if (internship.status === "CREATED") return t("internshipTable.contract.status.waitingCompany");
-      if (internship.status === "ACCEPTED") return t("internshipTable.contract.status.approved");
-      if (internship.status === "REJECTED") return t("internshipTable.contract.status.denied");
+      if (internship.status === "CREATED") return t("contract.status.waitingCompany");
+      if (internship.status === "ACCEPTED") return t("contract.status.approved");
+      if (internship.status === "REJECTED") return t("contract.status.denied");
 
-      return t("internshipTable.contract.status.approved");
+      return t("contract.status.approved");
     };
 
     const getTimestatementStatus = () => {
-      if (!timestatement) return t("internshipTable.timestatement.status.missing");
+      if (!timestatement) return t("timestatement.status.missing");
 
-      if (timestatement.currentState === "UPLOADED") return t("internshipTable.timestatement.status.waitingCompany");
-      if (timestatement.currentState === "APPROVED") return t("internshipTable.timestatement.status.approved");
-      if (timestatement.currentState === "DENIED") return t("internshipTable.timestatement.status.denied");
+      if (timestatement.currentState === "UPLOADED") return t("timestatement.status.waitingCompany");
+      if (timestatement.currentState === "APPROVED") return t("timestatement.status.approved");
+      if (timestatement.currentState === "DENIED") return t("timestatement.status.denied");
 
-      return t("internshipTable.timestatement.status.unknown");
+      return t("timestatement.status.unknown");
     };
 
     return (
@@ -461,7 +461,7 @@ const InternshipTable: React.FC<Props> = ({
                         )
                       }
                     >
-                      {t("internshipTable.timestatement.approve")}
+                      {t("timestatement.approve")}
                     </button>
 
                     <button
@@ -474,7 +474,7 @@ const InternshipTable: React.FC<Props> = ({
                         )
                       }
                     >
-                      {t("internshipTable.timestatement.deny")}
+                      {t("timestatement.deny")}
                     </button>
                   </div>
                 )}

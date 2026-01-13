@@ -67,10 +67,10 @@
       "timestatement": "Výkaz o činnosti",
       "uploaded": "Výkaz bol nahraný.",
       "uploadError": "Chyba pri nahrávaní.",
-      "approved": "✔️ Potvrdené",
-      "denied": "❌ Zamietnuté",
-      "waiting": "⏳ Čaká na schválenie",
-      "noState": "🟦 Bez stavu"
+      "approved": "Potvrdené",
+      "denied": "Zamietnuté",
+      "waiting": "Čaká na schválenie",
+      "noState": "Bez stavu"
     },
 
     "companyActions": {

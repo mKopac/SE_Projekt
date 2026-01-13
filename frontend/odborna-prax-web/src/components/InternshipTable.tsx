@@ -738,14 +738,13 @@ const InternshipTable: React.FC<Props> = ({
                                     <br />
                                     {contract ? (
                                       <div className="document-item" style={{ marginTop: 8 }}>
-                                        <a
-                                          href={`${baseUrl}/documents/${contract.documentId}/download`}
-                                          target="_blank"
-                                          rel="noreferrer"
+                                        <button
+                                          type="button"
                                           className="doc-link"
+                                          onClick={() => handleDownloadDocument(contract.documentId, contract.fileName)}
                                         >
                                           {contract.fileName}
-                                        </a>
+                                        </button>
                                       </div>
                                     ) : (
                                       <>
@@ -773,14 +772,13 @@ const InternshipTable: React.FC<Props> = ({
                                     <br />
                                     {timestatement ? (
                                       <div className="document-item" style={{ marginTop: 8 }}>
-                                        <a
-                                          href={`${baseUrl}/documents/${timestatement.documentId}/download`}
-                                          target="_blank"
-                                          rel="noreferrer"
-                                          className="doc-link"
-                                        >
-                                          {timestatement.fileName}
-                                        </a>
+                                        <button
+                                              type="button"
+                                              className="doc-link"
+                                              onClick={() => handleDownloadDocument(timestatement.documentId, timestatement.fileName)}
+                                            >
+                                              {timestatement.fileName}
+                                            </button>
 
                                         <span
                                           className={`state-badge ${timestatement.currentState?.toLowerCase()}`}

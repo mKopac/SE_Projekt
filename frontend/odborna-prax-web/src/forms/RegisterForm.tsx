@@ -7,8 +7,6 @@ import { useNavigate } from "react-router-dom";
 import "./../css/RegisterForm.css";
 import { useTranslation } from "react-i18next";
 
-
-
 export type RegisterFormData = {
   accountType: "Študent" | "Firma";
   firmType: "" | "existujuca" | "nova";
@@ -125,6 +123,12 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit }) => {
 
     if (!formData.studentEmail) {
       setError(t("registerForm.errors.emailRequired"));
+      return;
+    }
+
+    // Validácia pre študentský e-mail
+    if (formData.accountType === "Študent" && !formData.studentEmail.endsWith("@student.ukf.sk")) {
+      setError(t("registerForm.errors.invalidStudentEmail"));
       return;
     }
 

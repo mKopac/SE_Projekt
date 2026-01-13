@@ -86,7 +86,8 @@
     "errors": {
       "nameRequired": "Zadajte meno a priezvisko.",
       "emailRequired": "Zadajte e-mail.",
-      "registerFailed": "Registrácia zlyhala. Skontrolujte údaje alebo skúste neskôr."
+      "registerFailed": "Registrácia zlyhala. Skontrolujte údaje alebo skúste neskôr.",
+      "invalidStudentEmail": "Email musí byť vo formáte @student.ukf.sk"
     },
 
     "submit": {

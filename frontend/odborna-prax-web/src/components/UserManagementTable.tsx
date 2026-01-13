@@ -3,7 +3,7 @@ import axios from "axios";
 import "../css/Dashboard.css";
 import "../css/AdminManagement.css";
 import { useTranslation } from "react-i18next";
-import NewAdminForm from "./NewAdminForm";
+import NewAdminForm from "../forms/NewAdminForm";
 
 interface User {
   id: number;
@@ -27,7 +27,7 @@ export default function UserManagementTable() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/admin/users", {
+      const res = await axios.get("https://localhost:8443/api/admin/users", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(res.data);
@@ -38,7 +38,7 @@ export default function UserManagementTable() {
 
   const handleSuspend = async (id: number) => {
     await axios.post(
-      `http://localhost:8080/api/admin/users/${id}/suspend`,
+      `https://localhost:8443/api/admin/users/${id}/suspend`,
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -47,7 +47,7 @@ export default function UserManagementTable() {
 
   const handleReactivate = async (id: number) => {
     await axios.post(
-      `http://localhost:8080/api/admin/users/${id}/reactivate`,
+      `https://localhost:8443/api/admin/users/${id}/reactivate`,
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     );

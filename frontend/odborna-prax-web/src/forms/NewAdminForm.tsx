@@ -47,7 +47,7 @@ const NewAdminForm: React.FC<Props> = ({
           onSubmit={async (e) => {
             e.preventDefault();
 
-            const res = await fetch("http://localhost:8080/auth/register/admin", {
+            const res = await fetch("https://localhost:8443/auth/register/admin", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

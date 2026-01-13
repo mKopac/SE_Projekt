@@ -57,7 +57,7 @@ public class DocumentController {
         try {
             Resource resource = new ClassPathResource("documents/Ziadost_o_prax.docx");
 
-            // tu je názov už čistý ASCII
+
             String safeFileName = "Ziadost_o_prax.docx";
 
             return ResponseEntity.ok()
@@ -94,10 +94,10 @@ public class DocumentController {
 
         int dot = originalName.lastIndexOf('.');
         if (dot != -1) {
-            extension = originalName.substring(dot); // vrátane bodky
+            extension = originalName.substring(dot);
         }
 
-        // vždy ASCII názov do hlavičky
+
         String safeFileName = "document" + extension;
 
         String contentType = "application/octet-stream";
@@ -135,7 +135,7 @@ public class DocumentController {
                 extension = originalName.substring(dot);
             }
 
-            // ASCII názov pre vygenerovanú zmluvu
+
             String safeFileName = "contract_" + internshipId + extension;
 
             String contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
@@ -173,7 +173,7 @@ public class DocumentController {
         Documents doc = documentsRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Document not found"));
 
-        // skontroluje ze ci dokument patri tej firme
+        
         if (doc.getInternship() == null
                 || doc.getInternship().getCompany() == null
                 || !Objects.equals(doc.getInternship().getCompany().getId(), user.getCompany().getId())) {

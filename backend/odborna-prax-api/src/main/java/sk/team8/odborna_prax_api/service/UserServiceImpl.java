@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Používateľ s týmto emailom neexistuje."));
 
-        // Aktualizácia základných údajov
+
         if (updates.containsKey("firstName")) {
             user.setFirstName((String) updates.get("firstName"));
         }

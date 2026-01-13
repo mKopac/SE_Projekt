@@ -27,7 +27,6 @@ public class TimestatementStateChange {
     @Column(name = "state_changed_at", nullable = false)
     private Timestamp stateChangedAt;
 
-    // Constructors
     public TimestatementStateChange() {}
 
     public TimestatementStateChange(Documents document, TimestatementState timestatementState, User employee, Timestamp stateChangedAt) {
@@ -37,7 +36,6 @@ public class TimestatementStateChange {
         this.stateChangedAt = stateChangedAt;
     }
 
-    // Getters & Setters
     public int getId() {
         return id;
     }

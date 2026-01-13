@@ -318,13 +318,12 @@ public class AuthController {
         @GetMapping("/me")
     public ResponseEntity<?> me(org.springframework.security.core.Authentication authentication) {
 
-        // ak JWT filter nepustil request, authentication bude null alebo neautentikovaný
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Unauthorized or missing token"));
         }
 
-        String email = authentication.getName();  // v JwtAuthFilter dávame do principal e-mail
+        String email = authentication.getName();
 
         Optional<User> userOpt = userRepository.findByEmail(email);
 

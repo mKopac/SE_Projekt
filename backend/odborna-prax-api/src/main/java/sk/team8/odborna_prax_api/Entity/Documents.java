@@ -27,11 +27,9 @@ public class Documents {
     @Column(name = "uploaded_at", nullable = false)
     private Timestamp uploadedAt;
 
-    // Relationships
     @OneToMany(mappedBy = "document")
     private List<TimestatementStateChange> timestatementStateChanges;
 
-    // Constructors
     public Documents() {}
 
     public Documents(DocumentType documentType, Internship internship, String documentName, Timestamp uploadedAt) {
@@ -41,7 +39,6 @@ public class Documents {
         this.uploadedAt = uploadedAt;
     }
 
-    // Getters & Setters
     public int getId() {
         return id;
     }

@@ -52,30 +52,29 @@ public class User {
     @Column(name = "password_needs_change", columnDefinition = "TINYINT(1)")
     private boolean passwordNeedsChange;
 
-    // ===== RELÁCIE (všetky nechávame NULLable, kým nemáš tabuľky) =====
 
     @ManyToOne
-    @JoinColumn(name = "address_id", nullable = true) // bolo false, nastavujeme na NULLable
+    @JoinColumn(name = "address_id", nullable = true)
     @JsonManagedReference("user-address")
     private Address address;
 
     @ManyToOne
-    @JoinColumn(name = "department_id", nullable = true) // NULLable
+    @JoinColumn(name = "department_id", nullable = true)
     @JsonManagedReference("department-user")
     private Department department;
 
     @ManyToOne
-    @JoinColumn(name = "field_of_study_id", nullable = true) // NULLable
+    @JoinColumn(name = "field_of_study_id", nullable = true)
     @JsonManagedReference("fieldofstudy-user")
     private FieldOfStudy fieldOfStudy;
 
     @ManyToOne
-    @JoinColumn(name = "company_id", nullable = true) // NULLable
+    @JoinColumn(name = "company_id", nullable = true)
     @JsonManagedReference("company-user")
     private Company company;
 
     @ManyToOne
-    @JoinColumn(name = "role_id", nullable = false) // rolu potrebujeme
+    @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
     @JsonIgnore
@@ -92,7 +91,7 @@ public class User {
 
     public User() {}
 
-    // Student constructor
+
     public User(int id, String firstName, String lastName, String email, String emailAlternate, String phoneNumber, String password, Address address, boolean active, Timestamp createdAt, Timestamp updatedAt, boolean passwordNeedsChange, FieldOfStudy fieldOfStudy, Role role, List<Internship> internships, List<InternshipStateChange> internshipStateChanges, List<TimestatementStateChange> timestatementStateChanges) {
         this.id = id;
         this.firstName = firstName;
@@ -113,7 +112,7 @@ public class User {
         this.timestatementStateChanges = timestatementStateChanges;
     }
 
-    // Company constructor
+
     public User(int id, String firstName, String lastName, String email, String phoneNumber, String password, boolean active, Timestamp createdAt, Timestamp updatedAt, boolean passwordNeedsChange, Company company, Role role, List<InternshipStateChange> internshipStateChanges, List<TimestatementStateChange> timestatementStateChanges) {
         this.id = id;
         this.firstName = firstName;
@@ -131,7 +130,7 @@ public class User {
         this.timestatementStateChanges = timestatementStateChanges;
     }
 
-    // Admin Constructor
+
     public User(int id, String firstName, String lastName, String email, String emailAlternate, String phoneNumber, String password, boolean active, Timestamp createdAt, Timestamp updatedAt, boolean passwordNeedsChange, Department department, Role role, List<InternshipStateChange> internshipStateChanges) {
         this.id = id;
         this.firstName = firstName;

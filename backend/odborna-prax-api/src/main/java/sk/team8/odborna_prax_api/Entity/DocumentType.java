@@ -15,11 +15,9 @@ public class DocumentType {
     @Column(name = "document_type_name", nullable = false, length = 25)
     private String name;
 
-    // Relationships
     @OneToMany(mappedBy = "documentType")
     private List<Documents> documents;
 
-    // Constructors
     public DocumentType() {}
 
     public DocumentType(String name) {
@@ -31,7 +29,6 @@ public class DocumentType {
         this.name = name;
     }
 
-    // Getters & Setters
     public int getId() {
         return id;
     }

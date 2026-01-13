@@ -35,6 +35,8 @@ services:
       # JWT_SECRET: "nejaky-super-tajny-kluc"
     ports:
       - "8443:8443"
+    volumes:
+      - ./backend/odborna-prax-api/uploads:/app/uploads
 
   frontend:
     build:

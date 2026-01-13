@@ -187,7 +187,7 @@ const InternshipForm: React.FC<Props> = ({ onAdd }) => {
         const token = localStorage.getItem("token");
 
         const resTemplate = await fetch(
-          `${baseUrl}/documents/contracts/template`,
+          `${baseUrl}/documents/contracts/generated?internshipId=${data.internshipId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

@@ -10,6 +10,7 @@ import sk.team8.odborna_prax_api.dao.InternshipStateChangeRepository;
 import sk.team8.odborna_prax_api.dao.InternshipStateRepository;
 import sk.team8.odborna_prax_api.dao.UserRepository;
 import sk.team8.odborna_prax_api.service.AuthTokenService;
+import sk.team8.odborna_prax_api.service.EmailService;
 import sk.team8.odborna_prax_api.service.InternshipStateChangeService;
 import sk.team8.odborna_prax_api.service.InternshipStateService;
 
@@ -26,6 +27,7 @@ public class ExternalController {
     private final InternshipStateChangeService internshipStateChangeService;
     private final AuthTokenService authTokenService;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
     @GetMapping("/internships")
     public ResponseEntity<?> getApprovedInternships(
@@ -116,6 +118,53 @@ public class ExternalController {
         change.setStateChangedAt(new java.sql.Timestamp(System.currentTimeMillis()));
 
         internshipStateChangeRepository.save(change);
+
+// ===== EMAIL NOTIFIKÁCIA =====
+        User student = internship.getStudent();
+        User mentor = internship.getMentor();
+
+        String resultText;
+        if ("PASSED".equals(targetState.getName())) {
+            resultText = "obhájená";
+        } else {
+            resultText = "neobhájená";
+        }
+
+        if (student.getEmail() != null && !student.getEmail().isBlank()) {
+            String subjectStudent = "Výsledok odbornej praxe – " + resultText;
+            String bodyStudent =
+                    "Dobrý deň,\n\n" +
+                            "Vaša odborná prax vo firme " + internship.getCompany().getName() +
+                            " bola vyhodnotená ako " + resultText + ".\n\n" +
+                            "S pozdravom\n" +
+                            "Systém odbornej praxe";
+
+            emailService.sendEmail(
+                    student.getEmail(),
+                    subjectStudent,
+                    bodyStudent
+            );
+        }
+
+        if (mentor != null && mentor.getEmail() != null && !mentor.getEmail().isBlank()) {
+            String subjectMentor =
+                    "Výsledok praxe študenta " +
+                            student.getFirstName() + " " + student.getLastName();
+
+            String bodyMentor =
+                    "Dobrý deň,\n\n" +
+                            "odborná prax študenta " +
+                            student.getFirstName() + " " + student.getLastName() +
+                            " bola ukončená so stavom: " + resultText + ".\n\n" +
+                            "S pozdravom\n" +
+                            "Systém odbornej praxe";
+
+            emailService.sendEmail(
+                    mentor.getEmail(),
+                    subjectMentor,
+                    bodyMentor
+            );
+        }
 
         return ResponseEntity.ok(Map.of(
                 "internshipId", internship.getId(),

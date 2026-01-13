@@ -94,7 +94,26 @@ public class DocumentsServiceImpl implements DocumentsService {
                 user,
                 new Timestamp(System.currentTimeMillis())
         );
+        // === NOTIFIKÁCIA: študent nahral výkaz → notif mentor ===
+        User mentor = internship.getMentor();
+        User student = internship.getStudent();
 
+        if (mentor != null) {
+            String subjectMentor = "Študent nahral výkaz o činnosti";
+            String bodyMentor =
+                    "Dobrý deň,\n\n" +
+                            "študent " + student.getFirstName() + " " + student.getLastName() +
+                            " nahral výkaz o činnosti k praxi vo firme " + internship.getCompany().getName() + ".\n" +
+                            "Prosím prihláste sa do systému a výkaz skontrolujte.\n\n" +
+                            "S pozdravom\n" +
+                            "Systém odbornej praxe";
+
+            emailService.sendEmail(
+                    mentor.getEmail(),
+                    subjectMentor,
+                    bodyMentor
+            );
+        }
         timestatementStateChangeRepository.save(stateChange);
         notifyMentorAboutUpload(internship, user, "výkaz (timestatement)");
     }

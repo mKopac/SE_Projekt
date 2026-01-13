@@ -11,6 +11,8 @@ import sk.team8.odborna_prax_api.Entity.*;
 import sk.team8.odborna_prax_api.dao.*;
 import sk.team8.odborna_prax_api.dto.CreateInternshipRequest;
 import sk.team8.odborna_prax_api.service.AuthService;
+import sk.team8.odborna_prax_api.service.EmailService;
+
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,6 +28,7 @@ public class DashboardController {
 
     private final AuthService authService;
     private final InternshipRepository internshipRepository;
+    private final EmailService emailService;
     private final InternshipStateChangeRepository stateChangeRepository;
     private final InternshipStateRepository stateRepository;
     private final UserRepository userRepository;
@@ -37,7 +40,7 @@ public class DashboardController {
 
     public DashboardController(
             AuthService authService,
-            InternshipRepository internshipRepository,
+            InternshipRepository internshipRepository, EmailService emailService,
             InternshipStateChangeRepository stateChangeRepository,
             InternshipStateRepository stateRepository,
             UserRepository userRepository,
@@ -48,6 +51,7 @@ public class DashboardController {
     ) {
         this.authService = authService;
         this.internshipRepository = internshipRepository;
+        this.emailService = emailService;
         this.stateChangeRepository = stateChangeRepository;
         this.stateRepository = stateRepository;
         this.userRepository = userRepository;
@@ -271,6 +275,25 @@ public class DashboardController {
             );
 
             stateChangeRepository.save(change);
+
+            User mentorUser = internship.getMentor();
+            if (mentorUser != null) {
+                String subject = "Nová prax študenta " +
+                        student.getFirstName() + " " + student.getLastName();
+                String body =
+                        "Dobrý deň,\n\n" +
+                                "študent " + student.getFirstName() + " " + student.getLastName() +
+                                " si vytvoril prax vo firme " + company.getName() + ".\n" +
+                                "Prosím prihláste sa do systému a prax potvrďte alebo zamietnite.\n\n" +
+                                "S pozdravom\n" +
+                                "Systém odbornej praxe";
+
+                emailService.sendEmail(
+                        mentorUser.getEmail(),
+                        subject,
+                        body
+                );
+            }
             return ResponseEntity.ok(Map.of(
                     "message", "Internship created",
                     "internshipId", internship.getId()
@@ -384,6 +407,42 @@ public class DashboardController {
                 new Timestamp(System.currentTimeMillis())
         );
 
+        User student = internship.getStudent();
+
+        if ("ACCEPT".equalsIgnoreCase(decision)) {
+            // === mentor POTVRDIL prax ===
+            String subjectStudent = "Vaša prax bola potvrdená mentorom";
+            String bodyStudent =
+                    "Dobrý deň,\n\n" +
+                            "vaša prax vo firme " + internship.getCompany().getName() +
+                            " bola potvrdená mentorom.\n\n" +
+                            "S pozdravom\n" +
+                            "Systém odbornej praxe";
+
+            emailService.sendEmail(
+                    student.getEmail(),
+                    subjectStudent,
+                    bodyStudent
+            );
+
+
+
+        } else if ("REJECT".equalsIgnoreCase(decision)) {
+            // === mentor ZAMIETOL prax ===
+            String subjectStudent = "Vaša prax bola zamietnutá mentorom";
+            String bodyStudent =
+                    "Dobrý deň,\n\n" +
+                            "vaša prax vo firme " + internship.getCompany().getName() +
+                            " bola zamietnutá mentorom.\n\n" +
+                            "S pozdravom\n" +
+                            "Systém odbornej praxe";
+
+            emailService.sendEmail(
+                    student.getEmail(),
+                    subjectStudent,
+                    bodyStudent
+            );
+        }
         stateChangeRepository.save(change);
 
         return ResponseEntity.ok(Map.of("internshipId", id, "newState", targetName));
@@ -441,7 +500,42 @@ public class DashboardController {
                 .orElseThrow(() -> new RuntimeException("State " + targetName + " not found"));
 
         InternshipStateChange change = addStateChange(internship, targetState, user);
+        // === EMAIL NOTIFIKÁCIA: admin zmenil stav praxe ===
+        User student = internship.getStudent();
+        User mentor  = internship.getMentor();
 
+        String humanReadable;
+        switch (targetName) {
+            case "APPROVED" -> humanReadable = "schválená";
+            case "DENIED"   -> humanReadable = "zamietnutá";
+            case "PASSED"   -> humanReadable = "úspešne absolvovaná";
+            case "FAILED"   -> humanReadable = "neúspešne absolvovaná";
+            default         -> humanReadable = targetName;
+        }
+
+        String subject = "Zmena stavu vašej praxe";
+        String body =
+                "Dobrý deň,\n\n" +
+                        "prax vo firme " + internship.getCompany().getName() +
+                        " bola administrátorom označená ako: " + humanReadable + ".\n\n" +
+                        "S pozdravom\n" +
+                        "Systém odbornej praxe";
+
+        // študent
+        emailService.sendEmail(
+                student.getEmail(),
+                subject,
+                body
+        );
+
+        // mentor (ak existuje)
+        if (mentor != null) {
+            emailService.sendEmail(
+                    mentor.getEmail(),
+                    subject,
+                    body
+            );
+        }
         return ResponseEntity.ok(Map.of(
                 "internshipId", internship.getId(),
                 "newState", change.getInternshipState().getName()
@@ -461,6 +555,7 @@ public class DashboardController {
         change.setUser(user);
         change.setStateChangedAt(new Timestamp(System.currentTimeMillis()));
         return stateChangeRepository.save(change);
+
     }
 
 
@@ -499,6 +594,7 @@ public class DashboardController {
 
             response.add(item);
         }
+
 
         return ResponseEntity.ok(response);
     }

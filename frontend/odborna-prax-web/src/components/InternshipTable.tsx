@@ -410,18 +410,6 @@ const InternshipTable: React.FC<Props> = ({
               </button>
 
               <span className="state-badge">{getContractStatus()}</span>
-
-              {isCompany && internship.status === "CREATED" && (
-                <div style={{ marginTop: 8 }}>
-                  <button className="btn-accept" onClick={() => handleCompanyDecision(internshipId, "ACCEPT")}>
-                    Schváliť prax
-                  </button>
-
-                  <button className="btn-reject" onClick={() => handleCompanyDecision(internshipId, "REJECT")}>
-                    Zamietnuť prax
-                  </button>
-                </div>
-              )}
             </div>
           ) : (
             <>

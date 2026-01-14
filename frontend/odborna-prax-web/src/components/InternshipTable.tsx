@@ -30,6 +30,32 @@ interface Internship {
   description: string;
 }
 
+type InternshipStatus =
+  | "CREATED"
+  | "ACCEPTED"
+  | "REJECTED"
+  | "APPROVED"
+  | "DENIED"
+  | "PASSED"
+  | "FAILED"
+  | "UNKNOWN";
+
+  const normalizeInternshipStatus = (status: string | null | undefined): InternshipStatus => {
+  const s = (status ?? "").toString().trim().toUpperCase();
+
+  const allowed: InternshipStatus[] = [
+    "CREATED",
+    "ACCEPTED",
+    "REJECTED",
+    "APPROVED",
+    "DENIED",
+    "PASSED",
+    "FAILED",
+  ];
+
+  return (allowed as string[]).includes(s) ? (s as InternshipStatus) : "UNKNOWN";
+};
+
 interface Props {
   internships: Internship[];
   role: string;
@@ -42,6 +68,11 @@ const InternshipTable: React.FC<Props> = ({
   role,
 }) => {
   const { t } = useTranslation("dashboard");
+
+  const translateStatus = (status: string | null | undefined) => {
+    const key = normalizeInternshipStatus(status);
+    return t(`status.${key}`);
+  };
 
   const [companies, setCompanies] = useState<Company[]>([]);
   const [mentors, setMentors] = useState<Mentor[]>([]);
@@ -705,7 +736,8 @@ const InternshipTable: React.FC<Props> = ({
                           </div>
 
                           <div className="detail-item">
-                            <strong>{t("internshipTable.detail.status")}:</strong> {p.status}
+                            <strong>{t("internshipTable.detail.status")}:</strong>{" "}
+                            {translateStatus(p.status)}
                           </div>
 
                           <div className="detail-item">

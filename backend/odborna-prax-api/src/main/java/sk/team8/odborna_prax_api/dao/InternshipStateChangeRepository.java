@@ -6,5 +6,6 @@ import java.util.Optional;
 
 public interface InternshipStateChangeRepository extends JpaRepository<InternshipStateChange, Integer> {
     Optional<InternshipStateChange> findTopByInternshipIdOrderByStateChangedAtDesc(Integer internshipId);
+    Optional<InternshipStateChange> findTopByInternship_IdOrderByStateChangedAtDesc(int internshipId);
 
 }

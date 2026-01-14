@@ -181,8 +181,8 @@
 
   "status": {
     "CREATED": "Created",
-    "ACCEPTED": "Accepted by company",
-    "REJECTED": "Rejected by company",
+    "ACCEPTED": "Accepted",
+    "REJECTED": "Rejected",
     "APPROVED": "Approved",
     "DENIED": "Denied",
     "PASSED": "Passed",

@@ -181,8 +181,8 @@
 
   "status": {
     "CREATED": "Vytvorená",
-    "ACCEPTED": "Schválená firmou",
-    "REJECTED": "Zamietnutá firmou",
+    "ACCEPTED": "Akceptovaná",
+    "REJECTED": "Odmietnutá",
     "APPROVED": "Schválená",
     "DENIED": "Zamietnutá",
     "PASSED": "Splnená",

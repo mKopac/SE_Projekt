@@ -478,39 +478,67 @@ public class DashboardController {
         }
 
         String lastName = lastOpt.get().getInternshipState().getName().toUpperCase(Locale.ROOT);
-
-
-        if ("REJECTED".equals(lastName)) {
-            return badRequest("Rejected internship state cannot be changed");
-        }
-
-
-        Set<String> allowedCurrent = Set.of("ACCEPTED", "APPROVED", "DENIED", "PASSED", "FAILED");
-        if (!allowedCurrent.contains(lastName)) {
-            return badRequest("Admin can change state only after company ACCEPTED");
-        }
-
         String targetName = state.toUpperCase(Locale.ROOT);
-        Set<String> allowedTarget = Set.of("APPROVED", "DENIED", "PASSED", "FAILED");
-        if (!allowedTarget.contains(targetName)) {
-            return badRequest("Unsupported state. Allowed: " + allowedTarget);
+
+
+        if (Set.of("DENIED", "PASSED", "FAILED").contains(lastName)) {
+            return badRequest("This internship state cannot be changed anymore");
+        }
+
+
+        if ("CREATED".equals(lastName)) {
+            if (!Set.of("APPROVED", "DENIED").contains(targetName)) {
+                return badRequest("From CREATED you can set only APPROVED or DENIED");
+            }
+        }
+
+        if ("ACCEPTED".equals(lastName)) {
+            if (!Set.of("APPROVED", "DENIED").contains(targetName)) {
+                return badRequest("From ACCEPTED you can set only APPROVED or DENIED");
+            }
+        }
+
+        if ("APPROVED".equals(lastName)) {
+            if (!Set.of("PASSED", "FAILED").contains(targetName)) {
+                return badRequest("From APPROVED you can set only PASSED or FAILED");
+            }
+
+
+            boolean hasContract = documentsRepository
+                    .existsByInternshipIdAndDocumentType_Name(id, "CONTRACT");
+
+            if (!hasContract) {
+                return badRequest("Contract is required before setting PASSED/FAILED");
+            }
+        }
+
+
+        Set<String> knownStates = Set.of("CREATED", "ACCEPTED", "APPROVED", "DENIED", "PASSED", "FAILED");
+        if (!knownStates.contains(lastName)) {
+            return badRequest("Unsupported current state: " + lastName);
+        }
+
+        // safety check - unknown target state
+        Set<String> allowedTargets = Set.of("APPROVED", "DENIED", "PASSED", "FAILED");
+        if (!allowedTargets.contains(targetName)) {
+            return badRequest("Unsupported target state: " + targetName);
         }
 
         InternshipState targetState = stateRepository.findByName(targetName)
                 .orElseThrow(() -> new RuntimeException("State " + targetName + " not found"));
 
         InternshipStateChange change = addStateChange(internship, targetState, user);
-        // === EMAIL NOTIFIKÁCIA: admin zmenil stav praxe ===
+
         User student = internship.getStudent();
-        User mentor  = internship.getMentor();
+        User mentor = internship.getMentor();
 
         String humanReadable;
         switch (targetName) {
             case "APPROVED" -> humanReadable = "schválená";
-            case "DENIED"   -> humanReadable = "zamietnutá";
-            case "PASSED"   -> humanReadable = "úspešne absolvovaná";
-            case "FAILED"   -> humanReadable = "neúspešne absolvovaná";
-            default         -> humanReadable = targetName;
+            case "DENIED" -> humanReadable = "zamietnutá";
+            case "PASSED" -> humanReadable = "úspešne absolvovaná";
+            case "FAILED" -> humanReadable = "neúspešne absolvovaná";
+            default -> humanReadable = targetName;
         }
 
         String subject = "Zmena stavu vašej praxe";
@@ -522,25 +550,20 @@ public class DashboardController {
                         "Systém odbornej praxe";
 
         // študent
-        emailService.sendEmail(
-                student.getEmail(),
-                subject,
-                body
-        );
+        emailService.sendEmail(student.getEmail(), subject, body);
 
         // mentor (ak existuje)
         if (mentor != null) {
-            emailService.sendEmail(
-                    mentor.getEmail(),
-                    subject,
-                    body
-            );
+            emailService.sendEmail(mentor.getEmail(), subject, body);
         }
+
         return ResponseEntity.ok(Map.of(
                 "internshipId", internship.getId(),
                 "newState", change.getInternshipState().getName()
         ));
     }
+
+
 
 
 

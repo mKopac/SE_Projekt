@@ -849,6 +849,11 @@ const InternshipTable: React.FC<Props> = ({
                                   <div className="expanded-actions">
                                     {/* 1) CREATED / ACCEPTED -> APPROVED / DENIED (zmluva netreba) */}
                                     {canApproveDeny && (
+                                      <div style={{ marginTop: 10 }}>
+                                        {/* Text nad tlačidlami */}
+                                        <div style={{ marginBottom: 6, fontWeight: 600 }}>
+                                          Zmeniť stav praxe na:
+                                        </div>
                                       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                                         <button
                                           className="btn-accept"
@@ -865,41 +870,49 @@ const InternshipTable: React.FC<Props> = ({
                                         >
                                           {t("internshipTable.admin.denied")}
                                         </button>
+                                        </div>
                                       </div>
                                     )}
 
                                     {/* 2) APPROVED -> PASSED / FAILED (zmluva musí existovať) */}
                                     {canMarkDone && (
-                                      <div style={{ marginTop: 10 }}>
-                                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                                          <button
-                                            className="btn-accept"
-                                            type="button"
-                                            disabled={!hasContract}
-                                            title={!hasContract ? "Najprv musí byť nahraná zmluva o praxi." : ""}
-                                            onClick={() => handleAdminStateChange(p.id, "PASSED")}
-                                          >
-                                            {t("internshipTable.admin.passed")}
-                                          </button>
-
-                                          <button
-                                            className="btn-reject"
-                                            type="button"
-                                            disabled={!hasContract}
-                                            title={!hasContract ? "Najprv musí byť nahraná zmluva o praxi." : ""}
-                                            onClick={() => handleAdminStateChange(p.id, "FAILED")}
-                                          >
-                                            {t("internshipTable.admin.failed")}
-                                          </button>
-                                        </div>
-
-                                        {!hasContract && (
-                                          <div style={{ marginTop: 6, color: "#666" }}>
-                                            Chýba zmluva o praxi – absolvovanie sa nedá označiť.
-                                          </div>
-                                        )}
+                                    <div style={{ marginTop: 10 }}>
+                                      {/* Text nad tlačidlami */}
+                                      <div style={{ marginBottom: 6, fontWeight: 600 }}>
+                                        Zmena stavu praxe:
                                       </div>
-                                    )}
+
+                                      {/* Tlačidlá PASSED / FAILED */}
+                                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                                        <button
+                                          className="btn-accept"
+                                          type="button"
+                                          disabled={!hasContract}
+                                          title={!hasContract ? "Najprv musí byť nahraná zmluva o praxi." : ""}
+                                          onClick={() => handleAdminStateChange(p.id, "PASSED")}
+                                        >
+                                          {t("internshipTable.admin.passed")}
+                                        </button>
+
+                                        <button
+                                          className="btn-reject"
+                                          type="button"
+                                          disabled={!hasContract}
+                                          title={!hasContract ? "Najprv musí byť nahraná zmluva o praxi." : ""}
+                                          onClick={() => handleAdminStateChange(p.id, "FAILED")}
+                                        >
+                                          {t("internshipTable.admin.failed")}
+                                        </button>
+                                      </div>
+
+                                      {/* Info o zmluve – vždy zobrazené */}
+                                      <div style={{ marginTop: 6, color: "#666" }}>
+                                        {hasContract
+                                          ? "Zmluva o praxi je nahraná – absolvovanie môžeš označiť."
+                                          : "Chýba zmluva o praxi – absolvovanie sa nedá označiť."}
+                                      </div>
+                                    </div>
+                                  )}
                                   </div>
                                 );
                               })()}

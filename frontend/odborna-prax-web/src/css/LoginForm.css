@@ -188,14 +188,14 @@
   border-radius: 3px;
   border: none;
   cursor: pointer;
-  background: #0066cc;
+  background: #184f33;
   color: #fff;
   font-weight: 700;
   font-size: 12px;
 }
 
 .force-password-modal button:hover {
-  background: #005fa3;
+  background: #184f33;
 }
 
 /* mobil */

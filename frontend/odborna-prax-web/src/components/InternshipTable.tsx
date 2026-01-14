@@ -712,7 +712,7 @@ const InternshipTable: React.FC<Props> = ({
                   <td>{new Date(p.dateEnd).toLocaleDateString("sk-SK")}</td>
                   <td>{p.academicYear}</td>
                   <td>{p.semester}</td>
-                  <td>{p.status}</td>
+                  <td>{translateStatus(p.status)}</td>
                 </tr>
 
                 {expandedId === p.id && (
@@ -796,7 +796,7 @@ const InternshipTable: React.FC<Props> = ({
                                         >
                                           {contract.fileName}
                                         </button>
-                                        <span className="state-badge">{getContractStatusLabel(p.status)}</span>
+                                        <span className="state-badge">{getContractStatusLabel(translateStatus(p.status))}</span>
                                       </div>
                                     ) : (
                                         <>

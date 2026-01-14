@@ -143,7 +143,6 @@ const InternshipTable: React.FC<Props> = ({
     setExpandedId(prev => {
       const newValue = prev === id ? null : id;
 
-      // ak rozklikávame (otvárame), načítaj dokumenty
       if (newValue !== null) {
         loadDocuments(newValue);
       }
@@ -410,7 +409,29 @@ const InternshipTable: React.FC<Props> = ({
               </button>
 
               <span className="state-badge">{getContractStatus()}</span>
+              {isCompany && internship.status === "CREATED" && (
+                <div style={{ marginTop: 10 }}>
+                  <button
+                    className="btn-accept"
+                    type="button"
+                    onClick={() => handleCompanyDecision(internshipId, "ACCEPT")}
+                  >
+                    {t("internshipTable.companyActions.accept")}
+                  </button>
+
+                  <button
+                    className="btn-reject"
+                    type="button"
+                    onClick={() => handleCompanyDecision(internshipId, "REJECT")}
+                    style={{ marginLeft: 8 }}
+                  >
+                    {t("internshipTable.companyActions.reject")}
+                  </button>
+                </div>
+              )}
+
             </div>
+            
           ) : (
             <>
               {isStudent ? (
@@ -446,7 +467,6 @@ const InternshipTable: React.FC<Props> = ({
 
               <span className="state-badge">{getTimestatementStatus()}</span>
 
-              {/* Firma schvaľuje výkaz, iba ak prax je ACCEPTED */}
               {isCompany &&
                 internship.status === "ACCEPTED" &&
                 timestatement.currentState === "UPLOADED" && (
@@ -719,6 +739,15 @@ const InternshipTable: React.FC<Props> = ({
                               const docs = documents[p.id] || [];
                               const contract = docs.find((d) => d.documentType === "CONTRACT");
                               const timestatement = docs.find((d) => d.documentType === "TIMESTATEMENT");
+                              const canUploadTimestatement = Boolean(contract) && p.status === "ACCEPTED";
+                              const getContractStatusLabel = (status: string) => {
+                              const s = (status || "").toUpperCase();
+                              if (s === "CREATED") return t("contract.status.waitingCompany");
+                              if (s === "ACCEPTED") return t("contract.status.approved");
+                              if (s === "REJECTED") return t("contract.status.denied");
+                              return status; 
+                            };
+
 
                               return (
                                 <>
@@ -727,16 +756,17 @@ const InternshipTable: React.FC<Props> = ({
                                     <strong>{t("internshipTable.documents.contract")}:</strong>
                                     <div className="expanded-card-body">
                                       {contract ? (
-                                        <div className="document-item">
-                                          <button
-                                            type="button"
-                                            className="doc-link"
-                                            onClick={() => handleDownloadDocument(contract.documentId, contract.fileName)}
-                                          >
-                                            {contract.fileName}
-                                          </button>
-                                        </div>
-                                      ) : (
+                                      <div className="document-item">
+                                        <button
+                                          type="button"
+                                          className="doc-link"
+                                          onClick={() => handleDownloadDocument(contract.documentId, contract.fileName)}
+                                        >
+                                          {contract.fileName}
+                                        </button>
+                                        <span className="state-badge">{getContractStatusLabel(p.status)}</span>
+                                      </div>
+                                    ) : (
                                         <>
                                           <span className="muted">{t("internshipTable.documents.contractMissing")}</span>
                                           <br />
@@ -776,13 +806,23 @@ const InternshipTable: React.FC<Props> = ({
                                               t("internshipTable.documents.noState")}
                                           </span>
                                         </div>
-                                      ) : (
-                                        <input
-                                          type="file"
-                                          accept="application/pdf"
-                                          onChange={(e) => handleUpload(p.id, e)}
-                                        />
-                                      )}
+                                        ) : canUploadTimestatement ? (
+                                          <input
+                                            type="file"
+                                            accept="application/pdf"
+                                            onChange={(e) => handleUpload(p.id, e)}
+                                          />
+                                        ) : (
+                                          <span className="muted">
+                                            {!contract
+                                              ? "Najprv nahraj zmluvu o praxi."
+                                              : p.status === "CREATED"
+                                              ? "Výkaz môžeš nahrať až po potvrdení zmluvy firmou."
+                                              : p.status === "REJECTED"
+                                              ? "Zmluva bola zamietnutá – nahraj opravenú zmluvu a počkaj na potvrdenie."
+                                              : "Výkaz zatiaľ nie je možné nahrať."}
+                                          </span>
+                                        )}
                                     </div>
                                   </div>
                                 </>
@@ -794,19 +834,6 @@ const InternshipTable: React.FC<Props> = ({
                         {/* ================= COMPANY + ADMIN (spoločné) ================= */}
                         {["COMPANY", "ADMIN"].includes(role) && (
                           <div className="expanded-section">{renderDocuments(p)}</div>
-                        )}
-
-
-                        {/* ================= COMPANY ACTIONS ================= */}
-                        {role === "COMPANY" && p.status === "CREATED" && (
-                          <div className="expanded-actions">
-                            <button className="btn-accept" onClick={() => handleCompanyDecision(p.id, "ACCEPT")}>
-                              {t("internshipTable.companyActions.accept")}
-                            </button>
-                            <button className="btn-reject" onClick={() => handleCompanyDecision(p.id, "REJECT")}>
-                              {t("internshipTable.companyActions.reject")}
-                            </button>
-                          </div>
                         )}
 
                         {/* ================= ADMIN ================= */}

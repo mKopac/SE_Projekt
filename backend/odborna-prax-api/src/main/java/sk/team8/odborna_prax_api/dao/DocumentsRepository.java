@@ -9,6 +9,7 @@ import java.util.List;
 @Repository
 public interface DocumentsRepository extends JpaRepository<Documents, Integer> {
     List<Documents> findByInternshipId(Integer internshipId);
-    
 
+
+    boolean existsByInternshipIdAndDocumentType_Name(int id, String contract);
 }

@@ -30,6 +30,32 @@ interface Internship {
   description: string;
 }
 
+type InternshipStatus =
+  | "CREATED"
+  | "ACCEPTED"
+  | "REJECTED"
+  | "APPROVED"
+  | "DENIED"
+  | "PASSED"
+  | "FAILED"
+  | "UNKNOWN";
+
+  const normalizeInternshipStatus = (status: string | null | undefined): InternshipStatus => {
+  const s = (status ?? "").toString().trim().toUpperCase();
+
+  const allowed: InternshipStatus[] = [
+    "CREATED",
+    "ACCEPTED",
+    "REJECTED",
+    "APPROVED",
+    "DENIED",
+    "PASSED",
+    "FAILED",
+  ];
+
+  return (allowed as string[]).includes(s) ? (s as InternshipStatus) : "UNKNOWN";
+};
+
 interface Props {
   internships: Internship[];
   role: string;
@@ -42,6 +68,11 @@ const InternshipTable: React.FC<Props> = ({
   role,
 }) => {
   const { t } = useTranslation("dashboard");
+
+  const translateStatus = (status: string | null | undefined) => {
+    const key = normalizeInternshipStatus(status);
+    return t(`status.${key}`);
+  };
 
   const [companies, setCompanies] = useState<Company[]>([]);
   const [mentors, setMentors] = useState<Mentor[]>([]);
@@ -64,7 +95,6 @@ const InternshipTable: React.FC<Props> = ({
   const [filterSemester, setFilterSemester] = useState<number | "ALL">("ALL");
 
   // admin dropdown state
-  const [adminState, setAdminState] = useState<string>("APPROVED");
 
   const token = localStorage.getItem("token") ?? "";
   const headers = { Authorization: `Bearer ${token}` };
@@ -211,31 +241,32 @@ const InternshipTable: React.FC<Props> = ({
     }
   };
 
-  const handleAdminStateChange = async (id: number) => {
-    try {
-      const res = await fetch(
-        `${baseUrl}/dashboard/internship/${id}/admin-state?state=${adminState}`,
-        { method: "POST", headers }
-      );
+  const handleAdminStateChange = async (id: number, targetState: string) => {
+  try {
+    const res = await fetch(
+      `${baseUrl}/dashboard/internship/${id}/admin-state?state=${targetState}`,
+      { method: "POST", headers }
+    );
 
-      const data = await res.json().catch(() => null);
+    const data = await res.json().catch(() => null);
 
-      if (!res.ok) {
-        alert(data?.error ?? t("internshipTable.companyActions.stateError"));
-        return;
-      }
-
-      const newState: string = data?.newState ?? adminState;
-
-      setLocalData((prev) =>
-        prev.map((i) => (i.id === id ? { ...i, status: newState } : i))
-      );
-
-      alert(t("internshipTable.companyActions.stateChanged"));
-    } catch {
-      alert(t("internshipTable.companyActions.serverError"));
+    if (!res.ok) {
+      alert(data?.error ?? t("internshipTable.companyActions.stateError"));
+      return;
     }
-  };
+
+    const newState: string = data?.newState ?? targetState;
+
+    setLocalData((prev) =>
+      prev.map((i) => (i.id === id ? { ...i, status: newState } : i))
+    );
+
+    alert(t("internshipTable.companyActions.stateChanged"));
+  } catch {
+    alert(t("internshipTable.companyActions.serverError"));
+  }
+};
+
 
   const filteredData = useMemo(() => {
     return localData.filter((i) => {
@@ -681,7 +712,7 @@ const InternshipTable: React.FC<Props> = ({
                   <td>{new Date(p.dateEnd).toLocaleDateString("sk-SK")}</td>
                   <td>{p.academicYear}</td>
                   <td>{p.semester}</td>
-                  <td>{p.status}</td>
+                  <td>{translateStatus(p.status)}</td>
                 </tr>
 
                 {expandedId === p.id && (
@@ -705,7 +736,8 @@ const InternshipTable: React.FC<Props> = ({
                           </div>
 
                           <div className="detail-item">
-                            <strong>{t("internshipTable.detail.status")}:</strong> {p.status}
+                            <strong>{t("internshipTable.detail.status")}:</strong>{" "}
+                            {translateStatus(p.status)}
                           </div>
 
                           <div className="detail-item">
@@ -764,7 +796,7 @@ const InternshipTable: React.FC<Props> = ({
                                         >
                                           {contract.fileName}
                                         </button>
-                                        <span className="state-badge">{getContractStatusLabel(p.status)}</span>
+                                        <span className="state-badge">{getContractStatusLabel(translateStatus(p.status))}</span>
                                       </div>
                                     ) : (
                                         <>
@@ -837,20 +869,86 @@ const InternshipTable: React.FC<Props> = ({
                         )}
 
                         {/* ================= ADMIN ================= */}
-                        {role === "ADMIN" &&
-                          ["ACCEPTED", "APPROVED", "PASSED", "FAILED"].includes(p.status.toUpperCase()) && (
-                            <div className="expanded-actions">
-                              <select value={adminState} onChange={(e) => setAdminState(e.target.value)}>
-                                <option value="APPROVED">{t("internshipTable.admin.approved")}</option>
-                                <option value="DENIED">{t("internshipTable.admin.denied")}</option>
-                                <option value="PASSED">{t("internshipTable.admin.passed")}</option>
-                                <option value="FAILED">{t("internshipTable.admin.failed")}</option>
-                              </select>
-                              <button className="btn-ok" onClick={() => handleAdminStateChange(p.id)}>
-                                {t("internshipTable.admin.ok")}
-                              </button>
-                            </div>
-                          )}
+                              {role === "ADMIN" && (() => {
+                                const st = (p.status || "").toUpperCase();
+                                const docs = documents[p.id] || [];
+                                const hasContract = docs.some((d: any) => d.documentType === "CONTRACT");
+
+                                const canApproveDeny = ["CREATED", "ACCEPTED"].includes(st); // ak chceš iba CREATED, vyhoď ACCEPTED
+                                const canMarkDone = st === "APPROVED";
+
+                                return (
+                                  <div className="expanded-actions">
+                                    {/* 1) CREATED / ACCEPTED -> APPROVED / DENIED (zmluva netreba) */}
+                                    {canApproveDeny && (
+                                      <div style={{ marginTop: 10 }}>
+                                        {/* Text nad tlačidlami */}
+                                        <div style={{ marginBottom: 6, fontWeight: 600 }}>
+                                          Zmeniť stav praxe na:
+                                        </div>
+                                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                                        <button
+                                          className="btn-accept"
+                                          type="button"
+                                          onClick={() => handleAdminStateChange(p.id, "APPROVED")}
+                                        >
+                                          {t("internshipTable.admin.approved")}
+                                        </button>
+
+                                        <button
+                                          className="btn-reject"
+                                          type="button"
+                                          onClick={() => handleAdminStateChange(p.id, "DENIED")}
+                                        >
+                                          {t("internshipTable.admin.denied")}
+                                        </button>
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* 2) APPROVED -> PASSED / FAILED (zmluva musí existovať) */}
+                                    {canMarkDone && (
+                                    <div style={{ marginTop: 10 }}>
+                                      {/* Text nad tlačidlami */}
+                                      <div style={{ marginBottom: 6, fontWeight: 600 }}>
+                                        Zmena stavu praxe:
+                                      </div>
+
+                                      {/* Tlačidlá PASSED / FAILED */}
+                                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                                        <button
+                                          className="btn-accept"
+                                          type="button"
+                                          disabled={!hasContract}
+                                          title={!hasContract ? "Najprv musí byť nahraná zmluva o praxi." : ""}
+                                          onClick={() => handleAdminStateChange(p.id, "PASSED")}
+                                        >
+                                          {t("internshipTable.admin.passed")}
+                                        </button>
+
+                                        <button
+                                          className="btn-reject"
+                                          type="button"
+                                          disabled={!hasContract}
+                                          title={!hasContract ? "Najprv musí byť nahraná zmluva o praxi." : ""}
+                                          onClick={() => handleAdminStateChange(p.id, "FAILED")}
+                                        >
+                                          {t("internshipTable.admin.failed")}
+                                        </button>
+                                      </div>
+
+                                      {/* Info o zmluve – vždy zobrazené */}
+                                      <div style={{ marginTop: 6, color: "#666" }}>
+                                        {hasContract
+                                          ? "Zmluva o praxi je nahraná – absolvovanie môžeš označiť."
+                                          : "Chýba zmluva o praxi – absolvovanie sa nedá označiť."}
+                                      </div>
+                                    </div>
+                                  )}
+                                  </div>
+                                );
+                              })()}
+
                       </div>
 
                     </td>

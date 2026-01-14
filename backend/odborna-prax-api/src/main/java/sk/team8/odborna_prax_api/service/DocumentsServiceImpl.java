@@ -2,8 +2,10 @@ package sk.team8.odborna_prax_api.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import sk.team8.odborna_prax_api.Entity.*;
 import sk.team8.odborna_prax_api.dao.*;
 import sk.team8.odborna_prax_api.dto.DocumentDownloadResponse;
@@ -45,6 +47,8 @@ public class DocumentsServiceImpl implements DocumentsService {
     private final InternshipRepository internshipRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final InternshipStateChangeRepository internshipStateChangeRepository;
+
 
     @Override
     public void uploadTimestatement(Integer internshipId, MultipartFile file, String email) {
@@ -57,6 +61,18 @@ public class DocumentsServiceImpl implements DocumentsService {
 
         if (internship.getStudent().getId() != user.getId()) {
             throw new RuntimeException("Unauthorized: student does not own this internship.");
+        }
+
+        String currentState = internshipStateChangeRepository
+                .findTopByInternship_IdOrderByStateChangedAtDesc(internshipId)
+                .map(ch -> ch.getInternshipState().getName())  // uprav podľa názvov v entite
+                .orElse("CREATED");
+
+        if (!"ACCEPTED".equalsIgnoreCase(currentState)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Výkaz môžeš nahrať až po potvrdení praxe firmou (ACCEPTED)."
+            );
         }
 
         DocumentType type = documentTypeRepository.findById(2)
